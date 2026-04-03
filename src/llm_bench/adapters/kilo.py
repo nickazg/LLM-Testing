@@ -17,6 +17,7 @@ class KiloAdapter(CLIAdapter):
         cmd = [
             "kilo",
             "run",
+            "--auto",
             "--format", "json",
         ]
         if model_id:
