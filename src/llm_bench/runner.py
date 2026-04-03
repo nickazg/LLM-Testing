@@ -27,7 +27,7 @@ LANG_MAP = {
 }
 
 # Files/dirs to skip when snapshotting workspace
-SKIP_NAMES = {".claude", ".git", "__pycache__", "validate.py", "CLAUDE.md", "AGENTS.md", ".gitkeep", "expected"}
+SKIP_NAMES = {".claude", ".git", "__pycache__", "validate.py", "CLAUDE.md", "AGENTS.md", ".gitkeep", "expected", "kilo.json"}
 
 
 def _snapshot_files(workspace: Path, max_file_size: int = 50000) -> list[OutputFile]:

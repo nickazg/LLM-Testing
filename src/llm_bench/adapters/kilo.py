@@ -21,6 +21,18 @@ class KiloAdapter(CLIAdapter):
             prompt,
         ]
 
+    def _write_kilo_config(self, cwd: Path, model_id: str, env: dict | None):
+        """Write kilo.json into the workspace with provider and model config."""
+        config = {
+            "model": model_id,
+            "provider": {
+                "openrouter": {
+                    "env": ["OPENROUTER_API_KEY"],
+                },
+            },
+        }
+        (Path(cwd) / "kilo.json").write_text(json.dumps(config, indent=2))
+
     def parse_output(self, raw: str) -> CLIOutput:
         lines = raw.strip().splitlines()
         full_output = []
@@ -43,7 +55,11 @@ class KiloAdapter(CLIAdapter):
 
         if env is None:
             env = os.environ.copy()
-        env["KILOCODE_MODEL"] = self._resolve_model_id(env)
+
+        model_id = self._resolve_model_id(env)
+
+        # Write kilo.json config into workspace
+        self._write_kilo_config(cwd, model_id, env)
 
         start = time.monotonic()
         proc = await asyncio.create_subprocess_exec(
