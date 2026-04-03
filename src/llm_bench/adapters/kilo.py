@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 
 from llm_bench.adapters.base import CLIAdapter, CLIOutput
+from llm_bench.models import TokenUsage, ConversationMessage
 
 
 class KiloAdapter(CLIAdapter):
@@ -36,19 +37,80 @@ class KiloAdapter(CLIAdapter):
         (Path(cwd) / "kilo.json").write_text(json.dumps(config, indent=2))
 
     def parse_output(self, raw: str) -> CLIOutput:
-        lines = raw.strip().splitlines()
-        full_output = []
-        for line in lines:
+        """Parse Kilo's --format json output (newline-delimited JSON events)."""
+        conversation: list[ConversationMessage] = []
+        token_usage = TokenUsage()
+        cost_usd = 0.0
+        final_text = []
+
+        for line in raw.strip().splitlines():
+            line = line.strip()
+            if not line:
+                continue
             try:
                 msg = json.loads(line)
-                if msg.get("type") == "assistant":
-                    full_output.append(msg.get("content", ""))
             except json.JSONDecodeError:
-                full_output.append(line)
+                continue
 
+            msg_type = msg.get("type", "")
+            part = msg.get("part", {})
+
+            if msg_type == "text":
+                text = part.get("text", "")
+                if text:
+                    final_text.append(text)
+                    conversation.append(ConversationMessage(
+                        role="response", content=text,
+                    ))
+
+            elif msg_type == "tool_call":
+                tool_name = part.get("tool", "unknown")
+                tool_input = part.get("args", part.get("input", {}))
+                if isinstance(tool_input, dict):
+                    tool_input = json.dumps(tool_input, indent=2)
+                conversation.append(ConversationMessage(
+                    role="tool_use", content=str(tool_input),
+                    tool_name=tool_name,
+                ))
+
+            elif msg_type == "tool_result":
+                content = part.get("content", part.get("text", ""))
+                if isinstance(content, list):
+                    content = "\n".join(
+                        b.get("text", "") for b in content if isinstance(b, dict)
+                    )
+                conversation.append(ConversationMessage(
+                    role="tool_result", content=str(content)[:2000],
+                    tool_name=part.get("tool", ""),
+                ))
+
+            elif msg_type == "thinking":
+                text = part.get("text", part.get("thinking", ""))
+                if text:
+                    conversation.append(ConversationMessage(
+                        role="thinking", content=text,
+                    ))
+
+            elif msg_type == "step_finish":
+                tokens = part.get("tokens", {})
+                token_usage = TokenUsage(
+                    input=tokens.get("input", 0),
+                    output=tokens.get("output", 0),
+                    thinking=tokens.get("reasoning", 0),
+                    cache_read=tokens.get("cache", {}).get("read", 0),
+                )
+                cost_usd += part.get("cost", 0.0)
+
+        stdout = "\n".join(final_text)
         return CLIOutput(
-            stdout="\n".join(full_output), stderr="",
-            exit_code=0, wall_time_s=0, raw_response=raw,
+            stdout=stdout,
+            stderr="",
+            exit_code=0,
+            wall_time_s=0,
+            token_usage=token_usage,
+            cost_usd=cost_usd,
+            raw_response=raw,
+            conversation=conversation,
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
