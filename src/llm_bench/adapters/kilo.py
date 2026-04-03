@@ -64,15 +64,22 @@ class KiloAdapter(CLIAdapter):
                         role="response", content=text,
                     ))
 
-            elif msg_type == "tool_call":
+            elif msg_type in ("tool_call", "tool_use"):
                 tool_name = part.get("tool", "unknown")
-                tool_input = part.get("args", part.get("input", {}))
+                state = part.get("state", {})
+                tool_input = state.get("input", part.get("args", part.get("input", {})))
+                tool_output = state.get("output", "")
                 if isinstance(tool_input, dict):
                     tool_input = json.dumps(tool_input, indent=2)
                 conversation.append(ConversationMessage(
                     role="tool_use", content=str(tool_input),
                     tool_name=tool_name,
                 ))
+                if tool_output:
+                    conversation.append(ConversationMessage(
+                        role="tool_result", content=str(tool_output)[:2000],
+                        tool_name=tool_name,
+                    ))
 
             elif msg_type == "tool_result":
                 content = part.get("content", part.get("text", ""))
