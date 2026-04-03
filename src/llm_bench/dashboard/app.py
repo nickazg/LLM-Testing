@@ -111,6 +111,25 @@ canvas { max-height: 260px; }
 .tok-out { background: var(--green); }
 .tok-cache { background: var(--muted); }
 
+/* Conversation thread */
+.conv-thread { margin-top: 12px; }
+.conv-msg { border-left: 3px solid var(--border); padding: 8px 12px; margin: 6px 0; border-radius: 0 4px 4px 0; }
+.conv-msg.thinking { border-color: var(--purple); background: rgba(188,140,255,0.06); }
+.conv-msg.response { border-color: var(--green); background: rgba(63,185,80,0.06); }
+.conv-msg.tool_use { border-color: var(--accent); background: rgba(88,166,255,0.06); }
+.conv-msg.tool_result { border-color: var(--yellow); background: rgba(210,153,34,0.06); }
+.conv-msg.error { border-color: var(--red); background: rgba(248,81,73,0.06); }
+.conv-msg-role { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.conv-msg.thinking .conv-msg-role { color: var(--purple); }
+.conv-msg.response .conv-msg-role { color: var(--green); }
+.conv-msg.tool_use .conv-msg-role { color: var(--accent); }
+.conv-msg.tool_result .conv-msg-role { color: var(--yellow); }
+.conv-msg.error .conv-msg-role { color: var(--red); }
+.conv-msg-content { font-family: 'SF Mono', Menlo, monospace; font-size: 11px; white-space: pre-wrap; word-break: break-word; max-height: 200px; overflow-y: auto; }
+.conv-msg-content.collapsed { max-height: 60px; overflow: hidden; cursor: pointer; }
+.conv-expand { font-size: 10px; color: var(--accent); cursor: pointer; margin-top: 4px; }
+.section-toggle { font-size: 11px; color: var(--accent); cursor: pointer; margin-bottom: 8px; user-select: none; }
+
 /* Compare */
 .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .compare-col { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; }
@@ -305,9 +324,12 @@ function showRunDetail(idx) {
     const e=r.scores.efficiency||{};
     const t=e.tokens||{};
     const total=tokTotal(t);
+    const conv=r.conversation||[];
 
     let h = '<div class="detail-panel">';
     h += '<h3>'+r.task_id+' | '+r.model+' | '+r.cli+'</h3>';
+
+    // Metrics grid
     h += '<div class="detail-grid">';
     h += df('Task ID', r.task_id) + df('Model', r.model) + df('CLI', r.cli);
     h += df('Tier', r.tier||'-') + df('Skill', r.skill||'none') + df('Timestamp', r.timestamp);
@@ -319,7 +341,7 @@ function showRunDetail(idx) {
     h += df('Total Tokens', total);
     h += '</div>';
 
-    // Token bar
+    // Token breakdown bar
     if(total) {
         h += '<div class="detail-field"><div class="lbl">Token Breakdown</div>';
         h += '<div class="token-bar">';
@@ -334,23 +356,106 @@ function showRunDetail(idx) {
         h += '</div>';
     }
 
-    // Prompt
-    if(r.prompt) {
-        h += '<div style="margin-top:12px"><div class="lbl" style="font-size:11px;color:var(--muted);">Prompt</div>';
-        h += '<div class="code-block">'+esc(r.prompt)+'</div></div>';
-    }
+    // === INPUT PROMPT ===
+    h += '<div style="margin-top:16px">';
+    h += '<div class="section-toggle" onclick="toggleSection(\'sec-prompt\')">INPUT PROMPT</div>';
+    h += '<div id="sec-prompt" class="code-block">'+esc(r.prompt||'(no prompt)')+'</div>';
+    h += '</div>';
 
-    // Raw output
-    if(r.raw_output) {
-        let parsed = r.raw_output;
-        try { parsed = JSON.stringify(JSON.parse(r.raw_output), null, 2); } catch(e) {}
-        h += '<div style="margin-top:12px"><div class="lbl" style="font-size:11px;color:var(--muted);">Raw CLI Output</div>';
-        h += '<div class="code-block" style="max-height:400px">'+esc(parsed)+'</div></div>';
+    // === CONVERSATION THREAD ===
+    if(conv.length) {
+        h += '<div style="margin-top:16px">';
+        h += '<div class="section-toggle" onclick="toggleSection(\'sec-conv\')">CONVERSATION ('+conv.length+' messages)</div>';
+        h += '<div id="sec-conv" class="conv-thread">';
+
+        const thinkMsgs = conv.filter(m=>m.role==='thinking');
+        const toolMsgs = conv.filter(m=>m.role==='tool_use'||m.role==='tool_result');
+        const respMsgs = conv.filter(m=>m.role==='response');
+
+        // Thinking section
+        if(thinkMsgs.length) {
+            h += '<div class="section-toggle" onclick="toggleSection(\'sec-thinking\')" style="margin-top:8px">THINKING ('+thinkMsgs.length+' blocks)</div>';
+            h += '<div id="sec-thinking">';
+            thinkMsgs.forEach((m,i) => {
+                h += '<div class="conv-msg thinking">';
+                h += '<div class="conv-msg-role">Thinking #'+(i+1)+'</div>';
+                h += '<div class="conv-msg-content" id="think-'+i+'" onclick="toggleExpand(\'think-'+i+'\')">'+esc(m.content)+'</div>';
+                if(m.content.length>300) h += '<div class="conv-expand" onclick="toggleExpand(\'think-'+i+'\')">expand/collapse</div>';
+                h += '</div>';
+            });
+            h += '</div>';
+        }
+
+        // Tool use section
+        if(toolMsgs.length) {
+            h += '<div class="section-toggle" onclick="toggleSection(\'sec-tools\')" style="margin-top:8px">TOOL CALLS ('+toolMsgs.length+')</div>';
+            h += '<div id="sec-tools">';
+            toolMsgs.forEach((m,i) => {
+                h += '<div class="conv-msg '+m.role+'">';
+                const label = m.role==='tool_use' ? 'Tool: '+(m.tool_name||'unknown') : 'Result'+(m.tool_name?' ('+m.tool_name+')':'');
+                h += '<div class="conv-msg-role">'+label+'</div>';
+                h += '<div class="conv-msg-content" id="tool-'+i+'" onclick="toggleExpand(\'tool-'+i+'\')">'+esc(m.content)+'</div>';
+                if(m.content.length>300) h += '<div class="conv-expand" onclick="toggleExpand(\'tool-'+i+'\')">expand/collapse</div>';
+                h += '</div>';
+            });
+            h += '</div>';
+        }
+
+        // Response section
+        if(respMsgs.length) {
+            h += '<div class="section-toggle" onclick="toggleSection(\'sec-response\')" style="margin-top:8px">OUTPUT RESPONSE</div>';
+            h += '<div id="sec-response">';
+            respMsgs.forEach((m,i) => {
+                h += '<div class="conv-msg response">';
+                h += '<div class="conv-msg-role">Response'+(respMsgs.length>1?' #'+(i+1):'')+'</div>';
+                h += '<div class="conv-msg-content">'+esc(m.content)+'</div>';
+                h += '</div>';
+            });
+            h += '</div>';
+        }
+
+        // Full chronological view (collapsed by default)
+        h += '<div class="section-toggle" onclick="toggleSection(\'sec-chrono\')" style="margin-top:8px">FULL CHRONOLOGICAL VIEW (collapsed)</div>';
+        h += '<div id="sec-chrono" style="display:none">';
+        conv.forEach((m,i) => {
+            h += '<div class="conv-msg '+m.role+'">';
+            let label = m.role.toUpperCase();
+            if(m.tool_name) label += ': '+m.tool_name;
+            h += '<div class="conv-msg-role">'+label+'</div>';
+            h += '<div class="conv-msg-content" id="chrono-'+i+'" onclick="toggleExpand(\'chrono-'+i+'\')">'+esc(m.content)+'</div>';
+            if(m.content.length>300) h += '<div class="conv-expand" onclick="toggleExpand(\'chrono-'+i+'\')">expand/collapse</div>';
+            h += '</div>';
+        });
+        h += '</div>';
+
+        h += '</div></div>';
+    } else {
+        // No structured conversation — show raw output
+        h += '<div style="margin-top:16px">';
+        h += '<div class="section-toggle" onclick="toggleSection(\'sec-raw\')">RAW OUTPUT</div>';
+        if(r.raw_output) {
+            let parsed = r.raw_output;
+            try { parsed = JSON.stringify(JSON.parse(r.raw_output), null, 2); } catch(e) {}
+            h += '<div id="sec-raw" class="code-block" style="max-height:400px">'+esc(parsed)+'</div>';
+        } else {
+            h += '<div id="sec-raw" class="code-block">(no output captured)</div>';
+        }
+        h += '</div>';
     }
 
     h += '</div>';
     document.getElementById('run-detail').innerHTML = h;
     document.getElementById('run-detail').scrollIntoView({behavior:'smooth'});
+}
+
+function toggleSection(id) {
+    const el = document.getElementById(id);
+    if(el) el.style.display = el.style.display==='none'?'':'none';
+}
+
+function toggleExpand(id) {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('collapsed');
 }
 
 function df(lbl,val) { return '<div class="detail-field"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div></div>'; }

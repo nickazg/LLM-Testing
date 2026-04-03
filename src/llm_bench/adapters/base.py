@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from llm_bench.models import TokenUsage
+from llm_bench.models import TokenUsage, ConversationMessage
 
 
 @dataclass
@@ -16,6 +16,7 @@ class CLIOutput:
     tool_calls: int = 0
     cost_usd: float = 0.0
     raw_response: str = ""
+    conversation: list[ConversationMessage] = field(default_factory=list)
 
 
 class CLIAdapter:
@@ -26,7 +27,6 @@ class CLIAdapter:
         self.env_file = env_file
 
     def _load_env(self) -> dict | None:
-        """Load env file into a copy of the current environment."""
         if not self.env_file:
             return None
         import os
@@ -42,7 +42,6 @@ class CLIAdapter:
         return env
 
     def _resolve_model_id(self, env: dict | None) -> str:
-        """Get the CLI-specific model ID from env, falling back to self.model."""
         if env and "LLM_BENCH_MODEL_ID" in env:
             return env["LLM_BENCH_MODEL_ID"]
         return self.model

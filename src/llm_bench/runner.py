@@ -107,7 +107,8 @@ async def run_single_task(
             scores=scores,
             timestamp=datetime.now(timezone.utc).isoformat(),
             prompt=task.prompt,
-            raw_output=output.raw_response[:10000],  # Cap at 10k chars
+            raw_output=output.raw_response[:10000],
+            conversation=output.conversation,
             tier=task.tier,
         )
     finally:

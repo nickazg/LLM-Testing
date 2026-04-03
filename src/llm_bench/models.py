@@ -69,6 +69,13 @@ class TaskConfig:
 
 
 @dataclass
+class ConversationMessage:
+    role: str  # "thinking", "response", "tool_use", "tool_result", "error"
+    content: str
+    tool_name: str = ""
+
+
+@dataclass
 class RunResult:
     task_id: str
     model: str
@@ -78,6 +85,7 @@ class RunResult:
     timestamp: str
     prompt: str = ""
     raw_output: str = ""
+    conversation: list[ConversationMessage] = field(default_factory=list)
     tier: int = 0
 
     def to_dict(self) -> dict:
