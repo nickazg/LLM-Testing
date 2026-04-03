@@ -11,6 +11,7 @@ from llm_bench.runner import run_matrix
 MODELS = {
     "opus4.6": "Anthropic Opus 4.6 (frontier)",
     "qwen3-30b": "Qwen3 Coder 30B",
+    "qwen3-coder-next": "Qwen3 Coder Next (80B MoE, 3B active)",
     "minimax-m2.7": "MinimaxM2.7",
     "glm-5": "GLM-5",
     "gemma-4-31b": "Google Gemma 4 31B",
