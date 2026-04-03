@@ -32,6 +32,7 @@ def main():
     run_parser.add_argument("--tasks-dir", default="tasks", help="Path to tasks directory")
     run_parser.add_argument("--skills-dir", default="skills", help="Path to skills directory")
     run_parser.add_argument("--results-dir", default="results", help="Path to results directory")
+    run_parser.add_argument("--config-dir", default="config", help="Path to config directory (env files)")
 
     dash_parser = subparsers.add_parser("dashboard", help="Launch results dashboard")
     dash_parser.add_argument("--port", type=int, default=8080, help="Port number")
@@ -41,6 +42,7 @@ def main():
     info_parser.add_argument("--tasks-dir", default="tasks", help="Path to tasks directory")
     info_parser.add_argument("--skills-dir", default="skills", help="Path to skills directory")
     info_parser.add_argument("--results-dir", default="results", help="Path to results directory")
+    info_parser.add_argument("--config-dir", default="config", help="Path to config directory")
 
     args = parser.parse_args()
     if args.command is None:
@@ -59,6 +61,7 @@ def _handle_run(args):
     tasks_dir = Path(args.tasks_dir)
     skills_dir = Path(args.skills_dir)
     results_dir = Path(args.results_dir)
+    config_dir = Path(args.config_dir)
     tiers = [int(t) for t in args.tiers.split(",")]
     models = args.models.split(",")
     cli_names = args.clis.split(",")
@@ -69,8 +72,18 @@ def _handle_run(args):
         print(f"No tasks found in {tasks_dir} for tiers {tiers}")
         sys.exit(1)
 
+    # Check for missing env files
+    if config_dir.exists():
+        for cli_name in cli_names:
+            for model in models:
+                env_path = config_dir / f"{cli_name}.{model}.env"
+                if env_path.exists():
+                    print(f"  env: {env_path}")
+                else:
+                    print(f"  env: {env_path} (not found — using defaults)")
+
     total = len(tasks) * len(cli_names) * len(models)
-    print(f"Running {len(tasks)} tasks x {len(cli_names)} CLIs x {len(models)} models = {total} runs")
+    print(f"\nRunning {len(tasks)} tasks x {len(cli_names)} CLIs x {len(models)} models = {total} runs")
 
     results = asyncio.run(
         run_matrix(
@@ -79,6 +92,7 @@ def _handle_run(args):
             models=models,
             skills_dir=skills_dir,
             results_dir=results_dir,
+            config_dir=config_dir,
         )
     )
 
@@ -113,6 +127,7 @@ def _handle_info(args):
     tasks_dir = Path(args.tasks_dir)
     skills_dir = Path(args.skills_dir)
     results_dir = Path(args.results_dir)
+    config_dir = Path(args.config_dir)
 
     # Models
     print("MODELS")
@@ -126,6 +141,30 @@ def _handle_info(args):
     print("-" * 50)
     for cli_name in ADAPTERS:
         print(f"  {cli_name}")
+    print()
+
+    # Env configs
+    print("ENV CONFIGS")
+    print("-" * 50)
+    if config_dir.exists():
+        env_files = sorted(config_dir.glob("*.env"))
+        if env_files:
+            for env_file in env_files:
+                # Parse cli.model from filename
+                name = env_file.stem  # e.g. "claude-code.qwen3-30b"
+                # Read first comment line as description
+                desc = ""
+                for line in env_file.read_text().splitlines():
+                    if line.startswith("#"):
+                        desc = line.lstrip("# ").strip()
+                        break
+                ready = "ready" if "YOUR_" not in env_file.read_text() else "needs key"
+                print(f"  {name:<35} [{ready}] {desc}")
+            print(f"\n  Total: {len(env_files)} configs")
+        else:
+            print("  (none found)")
+    else:
+        print(f"  (config directory not found: {config_dir})")
     print()
 
     # Tasks

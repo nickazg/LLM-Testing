@@ -6,6 +6,8 @@ build/
 .venv/
 .env*
 !.env.example
+config/*.env
+!config/*.env.example
 temp/
 results/*.json
 .pytest_cache/

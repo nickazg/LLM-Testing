@@ -10,11 +10,20 @@ from llm_bench.scoring import run_validator, score_efficiency
 from llm_bench.workspace import prepare_workspace
 
 
+def _find_env_file(config_dir: Path, cli_name: str, model: str) -> str | None:
+    """Auto-discover env file at config/{cli}.{model}.env"""
+    env_path = config_dir / f"{cli_name}.{model}.env"
+    if env_path.exists():
+        return str(env_path)
+    return None
+
+
 async def run_single_task(
     task: TaskConfig,
     cli_name: str,
     model: str,
     skills_dir: Path | None = None,
+    config_dir: Path | None = None,
     **adapter_kwargs,
 ) -> RunResult:
     skill_path = None
@@ -31,6 +40,12 @@ async def run_single_task(
     workspace_path = Path(workspace.name)
 
     try:
+        # Auto-discover env file if not explicitly provided
+        if "env_file" not in adapter_kwargs and config_dir:
+            env_file = _find_env_file(config_dir, cli_name, model)
+            if env_file:
+                adapter_kwargs["env_file"] = env_file
+
         adapter = get_adapter(cli_name, model=model, **adapter_kwargs)
         output = await adapter.run(
             prompt=task.prompt,
@@ -67,6 +82,7 @@ async def run_matrix(
     models: list[str],
     skills_dir: Path | None = None,
     results_dir: Path | None = None,
+    config_dir: Path | None = None,
     **adapter_kwargs,
 ) -> list[RunResult]:
     results = []
@@ -78,6 +94,7 @@ async def run_matrix(
                     cli_name=cli_name,
                     model=model,
                     skills_dir=skills_dir,
+                    config_dir=config_dir,
                     **adapter_kwargs,
                 )
                 results.append(result)

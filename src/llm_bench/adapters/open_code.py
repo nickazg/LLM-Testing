@@ -40,6 +40,7 @@ class OpenCodeAdapter(CLIAdapter):
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
         cmd = self.build_command(prompt)
+        env = self._load_env()
 
         start = time.monotonic()
         proc = await asyncio.create_subprocess_exec(
@@ -47,6 +48,7 @@ class OpenCodeAdapter(CLIAdapter):
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             cwd=str(cwd),
+            env=env,
         )
 
         try:

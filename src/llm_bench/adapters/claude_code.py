@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import os
 import time
 from pathlib import Path
 
@@ -11,10 +10,6 @@ from llm_bench.adapters.base import CLIAdapter, CLIOutput
 
 class ClaudeCodeAdapter(CLIAdapter):
     name = "claude-code"
-
-    def __init__(self, model: str, env_file: str | None = None):
-        super().__init__(model)
-        self.env_file = env_file
 
     def build_command(self, prompt: str) -> list[str]:
         return [
@@ -51,17 +46,7 @@ class ClaudeCodeAdapter(CLIAdapter):
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
         cmd = self.build_command(prompt)
-        env = None
-
-        if self.env_file:
-            env = os.environ.copy()
-            env_path = Path(self.env_file)
-            if env_path.exists():
-                for line in env_path.read_text().splitlines():
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        key, _, value = line.partition("=")
-                        env[key.strip()] = value.strip()
+        env = self._load_env()
 
         start = time.monotonic()
         proc = await asyncio.create_subprocess_exec(
