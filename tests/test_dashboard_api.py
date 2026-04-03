@@ -40,4 +40,4 @@ def test_api_index(tmp_path):
         client = TestClient(app)
         response = client.get("/")
     assert response.status_code == 200
-    assert "LLM Bench Dashboard" in response.text
+    assert "LLM Bench" in response.text

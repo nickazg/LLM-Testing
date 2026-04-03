@@ -31,14 +31,20 @@ def test_parse_json_output():
         "usage": {
             "input_tokens": 2000,
             "output_tokens": 500,
-            "cache_read_input_tokens": 100
+            "thinking_tokens": 100,
+            "cache_read_input_tokens": 50
         }
     }"""
     parsed = adapter.parse_output(raw)
-    assert parsed.tokens == 2500
+    assert parsed.token_usage.input == 2000
+    assert parsed.token_usage.output == 500
+    assert parsed.token_usage.thinking == 100
+    assert parsed.token_usage.cache_read == 50
+    assert parsed.token_usage.total == 2600
     assert parsed.cost_usd == 0.05
     assert parsed.exit_code == 0
     assert "Done" in parsed.stdout
+    assert parsed.raw_response == raw
 
 
 def test_parse_json_output_error():

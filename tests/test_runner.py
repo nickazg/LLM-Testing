@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 from llm_bench.runner import run_single_task
-from llm_bench.models import TaskConfig
+from llm_bench.models import TaskConfig, TokenUsage
 from llm_bench.adapters.base import CLIOutput
 
 
@@ -33,8 +33,9 @@ def test_run_single_task(tmp_path):
     task = _make_task(tmp_path)
 
     mock_output = CLIOutput(
-        stdout="Done", stderr="", exit_code=0,
-        wall_time_s=10.0, tokens=500, tool_calls=3, cost_usd=0.01,
+        stdout="Done", stderr="", exit_code=0, wall_time_s=10.0,
+        token_usage=TokenUsage(input=400, output=100),
+        tool_calls=3, cost_usd=0.01, raw_response="raw",
     )
 
     with patch("llm_bench.runner.get_adapter") as mock_get:
@@ -49,4 +50,6 @@ def test_run_single_task(tmp_path):
     assert result.model == "opus"
     assert result.cli == "claude-code"
     assert result.scores.correctness == 1.0
-    assert result.scores.efficiency.tokens == 500
+    assert result.scores.efficiency.tokens.input == 400
+    assert result.prompt == "Write hello world"
+    assert result.tier == 1

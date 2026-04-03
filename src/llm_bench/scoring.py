@@ -45,7 +45,8 @@ async def run_validator(workspace: Path, timeout: int = 30) -> dict:
 
 def score_efficiency(output: CLIOutput) -> EfficiencyMetrics:
     return EfficiencyMetrics(
-        tokens=output.tokens,
+        tokens=output.token_usage,
         tool_calls=output.tool_calls,
         wall_time_s=output.wall_time_s,
+        cost_usd=output.cost_usd,
     )

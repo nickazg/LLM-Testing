@@ -29,13 +29,8 @@ class OpenCodeAdapter(CLIAdapter):
             result_text = raw
 
         return CLIOutput(
-            stdout=result_text,
-            stderr="",
-            exit_code=0,
-            wall_time_s=0,
-            tokens=0,
-            tool_calls=0,
-            cost_usd=0.0,
+            stdout=result_text, stderr="",
+            exit_code=0, wall_time_s=0, raw_response=raw,
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:

@@ -1,4 +1,4 @@
-from llm_bench.models import TaskConfig, RunResult, Scores, EfficiencyMetrics
+from llm_bench.models import TaskConfig, RunResult, Scores, EfficiencyMetrics, TokenUsage
 
 
 def test_task_config_from_yaml(tmp_path):
@@ -68,14 +68,30 @@ def test_run_result_to_json():
         scores=Scores(
             correctness=1.0,
             completion=1.0,
-            efficiency=EfficiencyMetrics(tokens=1500, tool_calls=3, wall_time_s=22.5),
+            efficiency=EfficiencyMetrics(
+                tokens=TokenUsage(input=1000, output=500, thinking=200),
+                tool_calls=3,
+                wall_time_s=22.5,
+            ),
             quality=None,
             instruction_following=None,
         ),
         timestamp="2026-04-03T14:30:00Z",
+        prompt="Write hello world",
+        raw_output="Done.",
+        tier=1,
     )
     data = result.to_dict()
     assert data["task_id"] == "tier1-hello"
     assert data["scores"]["correctness"] == 1.0
-    assert data["scores"]["efficiency"]["tokens"] == 1500
+    assert data["scores"]["efficiency"]["tokens"]["input"] == 1000
+    assert data["scores"]["efficiency"]["tokens"]["output"] == 500
+    assert data["scores"]["efficiency"]["tokens"]["thinking"] == 200
     assert data["scores"]["quality"] is None
+    assert data["prompt"] == "Write hello world"
+    assert data["tier"] == 1
+
+
+def test_token_usage_total():
+    t = TokenUsage(input=100, output=50, thinking=25)
+    assert t.total == 175

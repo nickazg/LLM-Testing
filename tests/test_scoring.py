@@ -1,7 +1,7 @@
 import asyncio
-from pathlib import Path
 from llm_bench.scoring import run_validator, score_efficiency
 from llm_bench.adapters.base import CLIOutput
+from llm_bench.models import TokenUsage
 
 
 def test_run_validator_pass(tmp_path):
@@ -36,9 +36,14 @@ def test_run_validator_crash(tmp_path):
 def test_score_efficiency():
     output = CLIOutput(
         stdout="done", stderr="", exit_code=0,
-        wall_time_s=30.0, tokens=2000, tool_calls=5, cost_usd=0.03,
+        wall_time_s=30.0,
+        token_usage=TokenUsage(input=1500, output=500, thinking=100),
+        tool_calls=5, cost_usd=0.03,
     )
     eff = score_efficiency(output)
-    assert eff.tokens == 2000
+    assert eff.tokens.input == 1500
+    assert eff.tokens.output == 500
+    assert eff.tokens.thinking == 100
     assert eff.tool_calls == 5
     assert eff.wall_time_s == 30.0
+    assert eff.cost_usd == 0.03

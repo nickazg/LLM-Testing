@@ -1,11 +1,11 @@
 import asyncio
-import json
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from llm_bench.loader import load_tasks
 from llm_bench.runner import run_matrix
 from llm_bench.adapters.base import CLIOutput
+from llm_bench.models import TokenUsage
 from llm_bench.results import load_results
 
 
@@ -30,6 +30,14 @@ scoring:
     return base / "tasks"
 
 
+def _mock_output():
+    return CLIOutput(
+        stdout="Created hello.py", stderr="", exit_code=0, wall_time_s=8.0,
+        token_usage=TokenUsage(input=300, output=100),
+        tool_calls=2, cost_usd=0.005, raw_response="raw",
+    )
+
+
 def test_e2e_pipeline(tmp_path):
     tasks_dir = _create_task_tree(tmp_path)
     results_dir = tmp_path / "results"
@@ -37,21 +45,14 @@ def test_e2e_pipeline(tmp_path):
     tasks = load_tasks(tasks_dir, tiers=[1])
     assert len(tasks) == 1
 
-    mock_output = CLIOutput(
-        stdout="Created hello.py", stderr="", exit_code=0,
-        wall_time_s=8.0, tokens=400, tool_calls=2, cost_usd=0.005,
-    )
-
     with patch("llm_bench.runner.get_adapter") as mock_get:
         mock_adapter = AsyncMock()
-        mock_adapter.run.return_value = mock_output
+        mock_adapter.run.return_value = _mock_output()
         mock_adapter.name = "claude-code"
         mock_get.return_value = mock_adapter
 
         results = asyncio.run(run_matrix(
-            tasks=tasks,
-            cli_names=["claude-code"],
-            models=["opus"],
+            tasks=tasks, cli_names=["claude-code"], models=["opus"],
             results_dir=results_dir,
         ))
 
@@ -59,7 +60,8 @@ def test_e2e_pipeline(tmp_path):
     r = results[0]
     assert r.task_id == "tier1-hello-world"
     assert r.scores.correctness == 1.0
-    assert r.scores.efficiency.tokens == 400
+    assert r.scores.efficiency.tokens.input == 300
+    assert r.prompt == "Create hello.py that prints Hello World"
 
     saved = load_results(results_dir)
     assert len(saved) == 1
@@ -69,25 +71,17 @@ def test_e2e_pipeline(tmp_path):
 def test_e2e_multi_model_multi_cli(tmp_path):
     tasks_dir = _create_task_tree(tmp_path)
     results_dir = tmp_path / "results"
-
     tasks = load_tasks(tasks_dir, tiers=[1])
-
-    mock_output = CLIOutput(
-        stdout="Done", stderr="", exit_code=0,
-        wall_time_s=10.0, tokens=600, tool_calls=4, cost_usd=0.01,
-    )
 
     with patch("llm_bench.runner.get_adapter") as mock_get:
         mock_adapter = AsyncMock()
-        mock_adapter.run.return_value = mock_output
+        mock_adapter.run.return_value = _mock_output()
         mock_adapter.name = "test"
         mock_get.return_value = mock_adapter
 
         results = asyncio.run(run_matrix(
-            tasks=tasks,
-            cli_names=["claude-code", "kilo"],
-            models=["opus", "qwen3-30b"],
-            results_dir=results_dir,
+            tasks=tasks, cli_names=["claude-code", "kilo"],
+            models=["opus", "qwen3-30b"], results_dir=results_dir,
         ))
 
     assert len(results) == 4

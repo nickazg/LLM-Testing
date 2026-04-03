@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import time
 from pathlib import Path
 
@@ -32,22 +33,15 @@ class KiloAdapter(CLIAdapter):
                 full_output.append(line)
 
         return CLIOutput(
-            stdout="\n".join(full_output),
-            stderr="",
-            exit_code=0,
-            wall_time_s=0,
-            tokens=0,
-            tool_calls=0,
-            cost_usd=0.0,
+            stdout="\n".join(full_output), stderr="",
+            exit_code=0, wall_time_s=0, raw_response=raw,
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
         cmd = self.build_command(prompt)
         env = self._load_env()
 
-        # Kilo has no --model flag; set model via env var
         if env is None:
-            import os
             env = os.environ.copy()
         env["KILOCODE_MODEL"] = self._resolve_model_id(env)
 

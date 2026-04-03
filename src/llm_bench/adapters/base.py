@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+
+from llm_bench.models import TokenUsage
 
 
 @dataclass
@@ -10,9 +12,10 @@ class CLIOutput:
     stderr: str
     exit_code: int
     wall_time_s: float
-    tokens: int = 0
+    token_usage: TokenUsage = field(default_factory=TokenUsage)
     tool_calls: int = 0
     cost_usd: float = 0.0
+    raw_response: str = ""
 
 
 class CLIAdapter:

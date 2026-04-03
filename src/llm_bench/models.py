@@ -8,10 +8,23 @@ from typing import Optional
 
 
 @dataclass
+class TokenUsage:
+    input: int = 0
+    output: int = 0
+    thinking: int = 0
+    cache_read: int = 0
+
+    @property
+    def total(self) -> int:
+        return self.input + self.output + self.thinking
+
+
+@dataclass
 class EfficiencyMetrics:
-    tokens: int = 0
+    tokens: TokenUsage = field(default_factory=TokenUsage)
     tool_calls: int = 0
     wall_time_s: float = 0.0
+    cost_usd: float = 0.0
 
 
 @dataclass
@@ -63,6 +76,9 @@ class RunResult:
     skill: Optional[str]
     scores: Scores
     timestamp: str
+    prompt: str = ""
+    raw_output: str = ""
+    tier: int = 0
 
     def to_dict(self) -> dict:
         return asdict(self)

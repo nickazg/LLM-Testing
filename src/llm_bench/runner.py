@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import sys
 import time
 from datetime import datetime, timezone
@@ -14,7 +13,6 @@ from llm_bench.workspace import prepare_workspace
 
 
 def _find_env_file(config_dir: Path, cli_name: str, model: str) -> str | None:
-    """Auto-discover env file at config/{cli}.{model}.env"""
     env_path = config_dir / f"{cli_name}.{model}.env"
     if env_path.exists():
         return str(env_path)
@@ -48,7 +46,6 @@ async def run_single_task(
     workspace_path = Path(workspace.name)
 
     try:
-        # Auto-discover env file if not explicitly provided
         if "env_file" not in adapter_kwargs and config_dir:
             env_file = _find_env_file(config_dir, cli_name, model)
             if env_file:
@@ -69,9 +66,26 @@ async def run_single_task(
             log(f"  TIMEOUT after {run_elapsed:.1f}s")
         elif output.exit_code != 0:
             log(f"  CLI exited with code {output.exit_code} ({run_elapsed:.1f}s)")
+            if output.stderr:
+                for line in output.stderr.strip().splitlines()[:5]:
+                    log(f"    stderr: {line}")
+            if output.stdout:
+                for line in output.stdout.strip().splitlines()[:5]:
+                    log(f"    stdout: {line}")
         else:
-            tokens_info = f", {output.tokens} tokens" if output.tokens else ""
+            t = output.token_usage
+            tokens_info = ""
+            if t.total:
+                parts = [f"{t.total} tokens"]
+                if t.thinking:
+                    parts.append(f"{t.thinking} thinking")
+                tokens_info = f", {', '.join(parts)}"
             log(f"  CLI finished ({run_elapsed:.1f}s{tokens_info})")
+            if not t.total and run_elapsed < 10:
+                preview = output.stdout[:200] if output.stdout else "(empty)"
+                log(f"  WARNING: Suspiciously fast response. Output preview:")
+                for line in preview.splitlines()[:5]:
+                    log(f"    {line}")
 
         log(f"  Validating...")
         validator_scores = await run_validator(workspace_path)
@@ -92,6 +106,9 @@ async def run_single_task(
             skill=task.skill,
             scores=scores,
             timestamp=datetime.now(timezone.utc).isoformat(),
+            prompt=task.prompt,
+            raw_output=output.raw_response[:10000],  # Cap at 10k chars
+            tier=task.tier,
         )
     finally:
         workspace.cleanup()
@@ -129,7 +146,6 @@ async def run_matrix(
                     )
                     results.append(result)
 
-                    # Print score summary
                     c = result.scores.correctness
                     status = "PASS" if c and c >= 0.5 else "FAIL"
                     log(f"  Result: {status} (correctness={c}, completion={result.scores.completion})")
