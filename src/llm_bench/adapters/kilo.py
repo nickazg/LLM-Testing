@@ -45,6 +45,12 @@ class KiloAdapter(CLIAdapter):
         cmd = self.build_command(prompt)
         env = self._load_env()
 
+        # Kilo has no --model flag; set model via env var
+        if env is None:
+            import os
+            env = os.environ.copy()
+        env["KILOCODE_MODEL"] = self._resolve_model_id(env)
+
         start = time.monotonic()
         proc = await asyncio.create_subprocess_exec(
             *cmd,

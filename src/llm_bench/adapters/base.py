@@ -38,6 +38,12 @@ class CLIAdapter:
                 env[key.strip()] = value.strip().strip('"').strip("'")
         return env
 
+    def _resolve_model_id(self, env: dict | None) -> str:
+        """Get the CLI-specific model ID from env, falling back to self.model."""
+        if env and "LLM_BENCH_MODEL_ID" in env:
+            return env["LLM_BENCH_MODEL_ID"]
+        return self.model
+
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
         raise NotImplementedError
 

@@ -11,11 +11,11 @@ from llm_bench.adapters.base import CLIAdapter, CLIOutput
 class OpenCodeAdapter(CLIAdapter):
     name = "open-code"
 
-    def build_command(self, prompt: str) -> list[str]:
+    def build_command(self, prompt: str, model_id: str | None = None) -> list[str]:
         return [
             "opencode",
             "run",
-            "--model", self.model,
+            "--model", model_id or self.model,
             "--format", "json",
             "-q",
             prompt,
@@ -39,8 +39,9 @@ class OpenCodeAdapter(CLIAdapter):
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
-        cmd = self.build_command(prompt)
         env = self._load_env()
+        model_id = self._resolve_model_id(env)
+        cmd = self.build_command(prompt, model_id=model_id)
 
         start = time.monotonic()
         proc = await asyncio.create_subprocess_exec(
