@@ -72,18 +72,31 @@ def _handle_run(args):
         print(f"No tasks found in {tasks_dir} for tiers {tiers}")
         sys.exit(1)
 
-    # Check for missing env files
+    total = len(tasks) * len(cli_names) * len(models)
+    print("=" * 60)
+    print("LLM BENCH RUN")
+    print("=" * 60)
+    print(f"  Models:  {', '.join(models)}")
+    print(f"  CLIs:    {', '.join(cli_names)}")
+    print(f"  Tasks:   {', '.join(t.id for t in tasks)}")
+    print(f"  Total:   {total} runs")
+    print()
+
+    # Check env files
     if config_dir.exists():
+        print("ENV CONFIGS:")
         for cli_name in cli_names:
             for model in models:
                 env_path = config_dir / f"{cli_name}.{model}.env"
                 if env_path.exists():
-                    print(f"  env: {env_path}")
+                    print(f"  {cli_name} + {model}: {env_path}")
                 else:
-                    print(f"  env: {env_path} (not found — using defaults)")
+                    print(f"  {cli_name} + {model}: (no env file — using defaults)")
+    print()
+    print("-" * 60)
 
-    total = len(tasks) * len(cli_names) * len(models)
-    print(f"\nRunning {len(tasks)} tasks x {len(cli_names)} CLIs x {len(models)} models = {total} runs")
+    import time
+    start = time.monotonic()
 
     results = asyncio.run(
         run_matrix(
@@ -96,8 +109,22 @@ def _handle_run(args):
         )
     )
 
+    elapsed = time.monotonic() - start
     passed = sum(1 for r in results if r.scores.correctness and r.scores.correctness >= 0.5)
-    print(f"\nComplete: {len(results)} runs, {passed} passed")
+    failed = len(results) - passed
+
+    print()
+    print("=" * 60)
+    print("SUMMARY")
+    print("=" * 60)
+    print(f"  Total runs:  {len(results)}")
+    print(f"  Passed:      {passed}")
+    print(f"  Failed:      {failed}")
+    print(f"  Duration:    {elapsed:.1f}s")
+    if results_dir.exists():
+        print(f"  Results in:  {results_dir}/")
+    print()
+    print("  Run `llm-bench dashboard` to view results.")
 
 
 def _handle_dashboard(args):
