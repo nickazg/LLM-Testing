@@ -37,6 +37,10 @@ models:
       auth_env: "GLM_API_KEY"
       model_id: "glm-5"
 
+  qwen3.6-plus:
+    name: "Qwen3.6 Plus (free)"
+    openrouter_id: "qwen/qwen3.6-plus:free"
+
   gemma-4-31b:
     name: "Google Gemma 4 31B"
     openrouter_id: "google/gemma-4-31b-it"
