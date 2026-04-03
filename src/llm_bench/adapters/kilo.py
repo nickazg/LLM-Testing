@@ -88,6 +88,16 @@ class KiloAdapter(CLIAdapter):
                 if text:
                     conversation.append(ConversationMessage(role="thinking", content=text))
 
+            elif msg_type == "error":
+                error = msg.get("error", {})
+                error_msg = error.get("data", {}).get("message", error.get("name", "Unknown error"))
+                conversation.append(ConversationMessage(role="error", content=error_msg))
+                return CLIOutput(
+                    stdout=error_msg, stderr=error_msg,
+                    exit_code=1, wall_time_s=0,
+                    raw_response=raw, conversation=conversation,
+                )
+
             elif msg_type == "step_finish":
                 tokens = part.get("tokens", {})
                 token_usage = TokenUsage(
