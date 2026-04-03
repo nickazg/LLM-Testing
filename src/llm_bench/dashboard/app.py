@@ -130,6 +130,25 @@ canvas { max-height: 260px; }
 .conv-expand { font-size: 10px; color: var(--accent); cursor: pointer; margin-top: 4px; }
 .section-toggle { font-size: 11px; color: var(--accent); cursor: pointer; margin-bottom: 8px; user-select: none; }
 
+/* Split detail layout */
+.detail-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.detail-left, .detail-right { min-width: 0; }
+
+/* File explorer */
+.file-explorer { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 8px; }
+.file-explorer-header { font-size: 11px; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+.file-item { padding: 5px 10px; font-size: 12px; font-family: 'SF Mono', Menlo, monospace; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); }
+.file-item:last-child { border-bottom: none; }
+.file-item:hover { background: rgba(88,166,255,0.08); }
+.file-item.active { background: rgba(88,166,255,0.15); color: var(--accent); }
+.file-icon { font-size: 10px; opacity: 0.6; }
+.file-lang { font-size: 9px; color: var(--muted); margin-left: auto; }
+.file-viewer { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; }
+.file-viewer-header { font-size: 11px; color: var(--accent); padding: 6px 10px; border-bottom: 1px solid var(--border); font-family: 'SF Mono', Menlo, monospace; display: flex; justify-content: space-between; }
+.file-viewer-content { padding: 10px; font-family: 'SF Mono', Menlo, monospace; font-size: 11px; white-space: pre-wrap; word-break: break-word; max-height: 500px; overflow-y: auto; line-height: 1.5; }
+.file-viewer-content .line-num { display: inline-block; width: 35px; color: var(--muted); text-align: right; margin-right: 12px; user-select: none; }
+.no-files { color: var(--muted); font-size: 12px; padding: 16px; text-align: center; }
+
 /* Compare */
 .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .compare-col { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; }
@@ -325,6 +344,7 @@ function showRunDetail(idx) {
     const t=e.tokens||{};
     const total=tokTotal(t);
     const conv=r.conversation||[];
+    const files=r.files||[];
 
     let h = '<div class="detail-panel">';
     h += '<h3>'+r.task_id+' | '+r.model+' | '+r.cli+'</h3>';
@@ -356,96 +376,101 @@ function showRunDetail(idx) {
         h += '</div>';
     }
 
-    // === INPUT PROMPT ===
-    h += '<div style="margin-top:16px">';
-    h += '<div class="section-toggle" onclick="toggleSection(\'sec-prompt\')">INPUT PROMPT</div>';
-    h += '<div id="sec-prompt" class="code-block">'+esc(r.prompt||'(no prompt)')+'</div>';
-    h += '</div>';
+    // === SPLIT LAYOUT: conversation left, files right ===
+    h += '<div class="detail-split">';
 
-    // === CONVERSATION THREAD ===
+    // LEFT: Prompt + Conversation
+    h += '<div class="detail-left">';
+
+    // Input prompt
+    h += '<div class="section-toggle" onclick="toggleSection(\'sec-prompt\')">INPUT PROMPT</div>';
+    h += '<div id="sec-prompt" class="code-block" style="max-height:120px">'+esc(r.prompt||'(no prompt)')+'</div>';
+
+    // Conversation
     if(conv.length) {
-        h += '<div style="margin-top:16px">';
+        h += '<div style="margin-top:12px">';
         h += '<div class="section-toggle" onclick="toggleSection(\'sec-conv\')">CONVERSATION ('+conv.length+' messages)</div>';
         h += '<div id="sec-conv" class="conv-thread">';
 
-        const thinkMsgs = conv.filter(m=>m.role==='thinking');
-        const toolMsgs = conv.filter(m=>m.role==='tool_use'||m.role==='tool_result');
-        const respMsgs = conv.filter(m=>m.role==='response');
-
-        // Thinking section
-        if(thinkMsgs.length) {
-            h += '<div class="section-toggle" onclick="toggleSection(\'sec-thinking\')" style="margin-top:8px">THINKING ('+thinkMsgs.length+' blocks)</div>';
-            h += '<div id="sec-thinking">';
-            thinkMsgs.forEach((m,i) => {
-                h += '<div class="conv-msg thinking">';
-                h += '<div class="conv-msg-role">Thinking #'+(i+1)+'</div>';
-                h += '<div class="conv-msg-content" id="think-'+i+'" onclick="toggleExpand(\'think-'+i+'\')">'+esc(m.content)+'</div>';
-                if(m.content.length>300) h += '<div class="conv-expand" onclick="toggleExpand(\'think-'+i+'\')">expand/collapse</div>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-
-        // Tool use section
-        if(toolMsgs.length) {
-            h += '<div class="section-toggle" onclick="toggleSection(\'sec-tools\')" style="margin-top:8px">TOOL CALLS ('+toolMsgs.length+')</div>';
-            h += '<div id="sec-tools">';
-            toolMsgs.forEach((m,i) => {
-                h += '<div class="conv-msg '+m.role+'">';
-                const label = m.role==='tool_use' ? 'Tool: '+(m.tool_name||'unknown') : 'Result'+(m.tool_name?' ('+m.tool_name+')':'');
-                h += '<div class="conv-msg-role">'+label+'</div>';
-                h += '<div class="conv-msg-content" id="tool-'+i+'" onclick="toggleExpand(\'tool-'+i+'\')">'+esc(m.content)+'</div>';
-                if(m.content.length>300) h += '<div class="conv-expand" onclick="toggleExpand(\'tool-'+i+'\')">expand/collapse</div>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-
-        // Response section
-        if(respMsgs.length) {
-            h += '<div class="section-toggle" onclick="toggleSection(\'sec-response\')" style="margin-top:8px">OUTPUT RESPONSE</div>';
-            h += '<div id="sec-response">';
-            respMsgs.forEach((m,i) => {
-                h += '<div class="conv-msg response">';
-                h += '<div class="conv-msg-role">Response'+(respMsgs.length>1?' #'+(i+1):'')+'</div>';
-                h += '<div class="conv-msg-content">'+esc(m.content)+'</div>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-
-        // Full chronological view (collapsed by default)
-        h += '<div class="section-toggle" onclick="toggleSection(\'sec-chrono\')" style="margin-top:8px">FULL CHRONOLOGICAL VIEW (collapsed)</div>';
-        h += '<div id="sec-chrono" style="display:none">';
-        conv.forEach((m,i) => {
+        // Render chronologically — each message in order
+        conv.forEach(function(m,i) {
             h += '<div class="conv-msg '+m.role+'">';
-            let label = m.role.toUpperCase();
+            var label = m.role.toUpperCase();
             if(m.tool_name) label += ': '+m.tool_name;
             h += '<div class="conv-msg-role">'+label+'</div>';
-            h += '<div class="conv-msg-content" id="chrono-'+i+'" onclick="toggleExpand(\'chrono-'+i+'\')">'+esc(m.content)+'</div>';
-            if(m.content.length>300) h += '<div class="conv-expand" onclick="toggleExpand(\'chrono-'+i+'\')">expand/collapse</div>';
+            h += '<div class="conv-msg-content'+(m.content.length>400?' collapsed':'')+'" id="conv-'+i+'" onclick="toggleExpand(\'conv-'+i+'\')">'+esc(m.content)+'</div>';
+            if(m.content.length>400) h += '<div class="conv-expand" onclick="toggleExpand(\'conv-'+i+'\')">click to expand</div>';
+            h += '</div>';
+        });
+
+        h += '</div></div>';
+    } else if(r.raw_output) {
+        h += '<div style="margin-top:12px">';
+        h += '<div class="section-toggle" onclick="toggleSection(\'sec-raw\')">RAW OUTPUT</div>';
+        var parsed = r.raw_output;
+        try { parsed = JSON.stringify(JSON.parse(r.raw_output), null, 2); } catch(e) {}
+        h += '<div id="sec-raw" class="code-block" style="max-height:400px">'+esc(parsed)+'</div>';
+        h += '</div>';
+    }
+
+    h += '</div>'; // end detail-left
+
+    // RIGHT: File explorer + viewer
+    h += '<div class="detail-right">';
+
+    if(files.length) {
+        // File explorer
+        h += '<div class="file-explorer">';
+        h += '<div class="file-explorer-header">Files Created ('+files.length+')</div>';
+        files.forEach(function(f,i) {
+            var icon = f.language==='python'?'py':f.language==='javascript'?'js':f.language||'f';
+            h += '<div class="file-item'+(i===0?' active':'')+'" onclick="selectFile('+idx+','+i+')" id="fitem-'+i+'">';
+            h += '<span class="file-icon">['+icon+']</span>';
+            h += '<span>'+esc(f.path)+'</span>';
+            if(f.language) h += '<span class="file-lang">'+f.language+'</span>';
             h += '</div>';
         });
         h += '</div>';
 
-        h += '</div></div>';
-    } else {
-        // No structured conversation — show raw output
-        h += '<div style="margin-top:16px">';
-        h += '<div class="section-toggle" onclick="toggleSection(\'sec-raw\')">RAW OUTPUT</div>';
-        if(r.raw_output) {
-            let parsed = r.raw_output;
-            try { parsed = JSON.stringify(JSON.parse(r.raw_output), null, 2); } catch(e) {}
-            h += '<div id="sec-raw" class="code-block" style="max-height:400px">'+esc(parsed)+'</div>';
-        } else {
-            h += '<div id="sec-raw" class="code-block">(no output captured)</div>';
-        }
+        // File viewer — show first file by default
+        h += '<div class="file-viewer">';
+        h += '<div class="file-viewer-header" id="fviewer-header">'+esc(files[0].path)+'<span class="file-lang">'+(files[0].language||'')+'</span></div>';
+        h += '<div class="file-viewer-content" id="fviewer-content">'+addLineNumbers(esc(files[0].content))+'</div>';
         h += '</div>';
+    } else {
+        h += '<div class="no-files">No files were created by the model in this run.</div>';
     }
 
-    h += '</div>';
+    h += '</div>'; // end detail-right
+    h += '</div>'; // end detail-split
+
+    h += '</div>'; // end detail-panel
     document.getElementById('run-detail').innerHTML = h;
     document.getElementById('run-detail').scrollIntoView({behavior:'smooth'});
+
+    // Store files for selection
+    window._detailFiles = files;
+}
+
+function selectFile(runIdx, fileIdx) {
+    const files = window._detailFiles || [];
+    const f = files[fileIdx];
+    if(!f) return;
+
+    // Update active state
+    document.querySelectorAll('.file-item').forEach(function(el,i) {
+        el.classList.toggle('active', i===fileIdx);
+    });
+
+    // Update viewer
+    document.getElementById('fviewer-header').innerHTML = esc(f.path)+'<span class="file-lang">'+(f.language||'')+'</span>';
+    document.getElementById('fviewer-content').innerHTML = addLineNumbers(esc(f.content));
+}
+
+function addLineNumbers(text) {
+    return text.split('\n').map(function(line, i) {
+        return '<span class="line-num">'+(i+1)+'</span>'+line;
+    }).join('\n');
 }
 
 function toggleSection(id) {

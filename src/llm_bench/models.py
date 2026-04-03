@@ -76,6 +76,13 @@ class ConversationMessage:
 
 
 @dataclass
+class OutputFile:
+    path: str  # relative path from workspace root
+    content: str
+    language: str = ""  # syntax hint: "python", "json", etc.
+
+
+@dataclass
 class RunResult:
     task_id: str
     model: str
@@ -86,6 +93,7 @@ class RunResult:
     prompt: str = ""
     raw_output: str = ""
     conversation: list[ConversationMessage] = field(default_factory=list)
+    files: list[OutputFile] = field(default_factory=list)
     tier: int = 0
 
     def to_dict(self) -> dict:

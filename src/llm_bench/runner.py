@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Callable
 
 from llm_bench.adapters import get_adapter
-from llm_bench.models import TaskConfig, RunResult, Scores
+from llm_bench.models import TaskConfig, RunResult, Scores, OutputFile
 from llm_bench.scoring import run_validator, score_efficiency
 from llm_bench.workspace import prepare_workspace
 
@@ -17,6 +17,38 @@ def _find_env_file(config_dir: Path, cli_name: str, model: str) -> str | None:
     if env_path.exists():
         return str(env_path)
     return None
+
+
+LANG_MAP = {
+    ".py": "python", ".js": "javascript", ".ts": "typescript", ".json": "json",
+    ".yaml": "yaml", ".yml": "yaml", ".md": "markdown", ".txt": "text",
+    ".sh": "bash", ".html": "html", ".css": "css", ".toml": "toml",
+    ".cfg": "ini", ".ini": "ini", ".rs": "rust", ".go": "go", ".cpp": "cpp",
+}
+
+# Files/dirs to skip when snapshotting workspace
+SKIP_NAMES = {".claude", ".git", "__pycache__", "validate.py", "CLAUDE.md", "AGENTS.md", ".gitkeep", "expected"}
+
+
+def _snapshot_files(workspace: Path, max_file_size: int = 50000) -> list[OutputFile]:
+    """Capture all files the model created/modified in the workspace."""
+    files = []
+    for f in sorted(workspace.rglob("*")):
+        if not f.is_file():
+            continue
+        rel = f.relative_to(workspace)
+        # Skip harness-injected files
+        if any(part in SKIP_NAMES for part in rel.parts):
+            continue
+        try:
+            content = f.read_text(errors="replace")
+            if len(content) > max_file_size:
+                content = content[:max_file_size] + "\n... (truncated)"
+        except Exception:
+            continue
+        lang = LANG_MAP.get(f.suffix.lower(), "")
+        files.append(OutputFile(path=str(rel), content=content, language=lang))
+    return files
 
 
 def _default_log(msg: str):
@@ -91,6 +123,11 @@ async def run_single_task(
         validator_scores = await run_validator(workspace_path)
         efficiency = score_efficiency(output)
 
+        # Snapshot files before cleanup
+        files = _snapshot_files(workspace_path)
+        if files:
+            log(f"  Files created: {', '.join(f.path for f in files)}")
+
         scores = Scores(
             correctness=validator_scores.get("correctness"),
             completion=validator_scores.get("completion"),
@@ -109,6 +146,7 @@ async def run_single_task(
             prompt=task.prompt,
             raw_output=output.raw_response[:10000],
             conversation=output.conversation,
+            files=files,
             tier=task.tier,
         )
     finally:
