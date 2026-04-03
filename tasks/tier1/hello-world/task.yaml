@@ -1,0 +1,15 @@
+id: tier1-hello-world
+name: "Hello World"
+tier: 1
+prompt: "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files."
+timeout: 120
+skill: null
+tags: [python, basics]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following
