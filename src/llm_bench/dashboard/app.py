@@ -187,7 +187,10 @@ canvas { max-height: 260px; }
     <!-- RUNS -->
     <div id="view-runs" class="view">
         <div class="filters" id="run-filters"></div>
-        <div id="run-table"></div>
+        <div class="runs-top" style="display:grid;grid-template-columns:1fr 380px;gap:12px;align-items:start;">
+            <div id="run-table"></div>
+            <div id="run-metrics"></div>
+        </div>
         <div id="run-detail"></div>
     </div>
 
@@ -346,53 +349,52 @@ function showRunDetail(idx) {
     const conv=r.conversation||[];
     const files=r.files||[];
 
-    let h = '<div class="detail-panel">';
-    h += '<h3>'+r.task_id+' | '+r.model+' | '+r.cli+'</h3>';
-
-    // Metrics grid
-    h += '<div class="detail-grid">';
-    h += df('Task ID', r.task_id) + df('Model', r.model) + df('CLI', r.cli);
-    h += df('Tier', r.tier||'-') + df('Skill', r.skill||'none') + df('Timestamp', r.timestamp);
-    h += df('Correctness', '<span class="'+sc(r.scores.correctness||0)+'">'+fmt(r.scores.correctness)+'</span>');
-    h += df('Completion', fmt(r.scores.completion));
-    h += df('Wall Time', e.wall_time_s?fmt(e.wall_time_s,1)+'s':'-');
-    h += df('Cost', e.cost_usd?'$'+fmt(e.cost_usd,4):'-');
-    h += df('Tool Calls', e.tool_calls||0);
-    h += df('Total Tokens', total);
-    h += '</div>';
+    // === METRICS PANEL (right of table) ===
+    let mp = '<div class="detail-panel" style="position:sticky;top:16px;">';
+    mp += '<h3>'+r.task_id+'</h3>';
+    mp += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">';
+    mp += df('Model', '<b>'+r.model+'</b>') + df('CLI', r.cli);
+    mp += df('Tier', r.tier||'-') + df('Skill', r.skill||'none');
+    mp += df('Correctness', '<span class="'+sc(r.scores.correctness||0)+'"><b>'+fmt(r.scores.correctness)+'</b></span>');
+    mp += df('Completion', fmt(r.scores.completion));
+    mp += df('Wall Time', e.wall_time_s?'<b>'+fmt(e.wall_time_s,1)+'s</b>':'-');
+    mp += df('Cost', e.cost_usd?'<b>$'+fmt(e.cost_usd,4)+'</b>':'-');
+    mp += df('Tool Calls', e.tool_calls||0);
+    mp += df('Total Tokens', '<b>'+total+'</b>');
+    mp += '</div>';
 
     // Token breakdown bar
     if(total) {
-        h += '<div class="detail-field"><div class="lbl">Token Breakdown</div>';
-        h += '<div class="token-bar">';
+        mp += '<div class="detail-field" style="margin-top:8px"><div class="lbl">Token Breakdown</div>';
+        mp += '<div class="token-bar">';
         const pIn=((t.input||0)/total*100);
         const pTh=((t.thinking||0)/total*100);
         const pOut=((t.output||0)/total*100);
-        if(pIn>2) h+='<div class="tok-in" style="width:'+pIn+'%">IN '+(t.input||0)+'</div>';
-        if(pTh>2) h+='<div class="tok-think" style="width:'+pTh+'%">THINK '+(t.thinking||0)+'</div>';
-        if(pOut>2) h+='<div class="tok-out" style="width:'+pOut+'%">OUT '+(t.output||0)+'</div>';
-        h += '</div>';
-        if(t.cache_read) h+='<div style="font-size:11px;color:var(--muted);margin-top:4px;">Cache read: '+t.cache_read+' tokens</div>';
-        h += '</div>';
+        if(pIn>2) mp+='<div class="tok-in" style="width:'+pIn+'%">IN '+(t.input||0)+'</div>';
+        if(pTh>2) mp+='<div class="tok-think" style="width:'+pTh+'%">THINK '+(t.thinking||0)+'</div>';
+        if(pOut>2) mp+='<div class="tok-out" style="width:'+pOut+'%">OUT '+(t.output||0)+'</div>';
+        mp += '</div>';
+        if(t.cache_read) mp+='<div style="font-size:11px;color:var(--muted);margin-top:4px;">Cache read: '+t.cache_read+'</div>';
+        mp += '</div>';
     }
 
-    // === SPLIT LAYOUT: conversation left, files right ===
+    mp += '<div style="font-size:10px;color:var(--muted);margin-top:8px;">'+r.timestamp+'</div>';
+    mp += '</div>';
+    document.getElementById('run-metrics').innerHTML = mp;
+
+    // === DETAIL PANEL (below, full width): conversation left, files right ===
+    let h = '<div class="detail-panel">';
     h += '<div class="detail-split">';
 
     // LEFT: Prompt + Conversation
     h += '<div class="detail-left">';
-
-    // Input prompt
     h += '<div class="section-toggle" onclick="toggleSection(\'sec-prompt\')">INPUT PROMPT</div>';
     h += '<div id="sec-prompt" class="code-block" style="max-height:120px">'+esc(r.prompt||'(no prompt)')+'</div>';
 
-    // Conversation
     if(conv.length) {
         h += '<div style="margin-top:12px">';
         h += '<div class="section-toggle" onclick="toggleSection(\'sec-conv\')">CONVERSATION ('+conv.length+' messages)</div>';
         h += '<div id="sec-conv" class="conv-thread">';
-
-        // Render chronologically — each message in order
         conv.forEach(function(m,i) {
             h += '<div class="conv-msg '+m.role+'">';
             var label = m.role.toUpperCase();
@@ -402,7 +404,6 @@ function showRunDetail(idx) {
             if(m.content.length>400) h += '<div class="conv-expand" onclick="toggleExpand(\'conv-'+i+'\')">click to expand</div>';
             h += '</div>';
         });
-
         h += '</div></div>';
     } else if(r.raw_output) {
         h += '<div style="margin-top:12px">';
@@ -412,14 +413,11 @@ function showRunDetail(idx) {
         h += '<div id="sec-raw" class="code-block" style="max-height:400px">'+esc(parsed)+'</div>';
         h += '</div>';
     }
-
     h += '</div>'; // end detail-left
 
     // RIGHT: File explorer + viewer
     h += '<div class="detail-right">';
-
     if(files.length) {
-        // File explorer
         h += '<div class="file-explorer">';
         h += '<div class="file-explorer-header">Files Created ('+files.length+')</div>';
         files.forEach(function(f,i) {
@@ -431,8 +429,6 @@ function showRunDetail(idx) {
             h += '</div>';
         });
         h += '</div>';
-
-        // File viewer — show first file by default
         h += '<div class="file-viewer">';
         h += '<div class="file-viewer-header" id="fviewer-header">'+esc(files[0].path)+'<span class="file-lang">'+(files[0].language||'')+'</span></div>';
         h += '<div class="file-viewer-content" id="fviewer-content">'+addLineNumbers(esc(files[0].content))+'</div>';
@@ -440,15 +436,12 @@ function showRunDetail(idx) {
     } else {
         h += '<div class="no-files">No files were created by the model in this run.</div>';
     }
-
     h += '</div>'; // end detail-right
-    h += '</div>'; // end detail-split
 
+    h += '</div>'; // end detail-split
     h += '</div>'; // end detail-panel
     document.getElementById('run-detail').innerHTML = h;
-    document.getElementById('run-detail').scrollIntoView({behavior:'smooth'});
 
-    // Store files for selection
     window._detailFiles = files;
 }
 
