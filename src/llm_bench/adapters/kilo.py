@@ -36,6 +36,31 @@ class KiloAdapter(CLIAdapter):
         }
         (Path(cwd) / "kilo.json").write_text(json.dumps(config, indent=2))
 
+    @staticmethod
+    def ensure_kilo_token():
+        """Ensure kilocodeToken exists in secrets.json.
+
+        Kilo CLI --auto mode hangs without this token, even when using
+        OpenRouter. The token doesn't need to be valid — just present.
+        See: https://github.com/Kilo-Org/kilocode/issues/3668
+        """
+        secrets_dir = Path.home() / ".kilocode" / "cli" / "global"
+        secrets_file = secrets_dir / "secrets.json"
+
+        if secrets_file.exists():
+            try:
+                data = json.loads(secrets_file.read_text())
+                if data.get("kilocodeToken"):
+                    return  # Already set
+            except (json.JSONDecodeError, KeyError):
+                data = {}
+        else:
+            secrets_dir.mkdir(parents=True, exist_ok=True)
+            data = {}
+
+        data["kilocodeToken"] = "llm-bench-placeholder"
+        secrets_file.write_text(json.dumps(data, indent=2))
+
     def parse_output(self, raw: str) -> CLIOutput:
         conversation: list[ConversationMessage] = []
         token_usage = TokenUsage()
@@ -116,6 +141,8 @@ class KiloAdapter(CLIAdapter):
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
+        self.ensure_kilo_token()
+
         env = self._get_env()
         if env is None:
             env = os.environ.copy()
