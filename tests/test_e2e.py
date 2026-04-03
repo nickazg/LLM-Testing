@@ -45,7 +45,9 @@ def test_e2e_pipeline(tmp_path):
     tasks = load_tasks(tasks_dir, tiers=[1])
     assert len(tasks) == 1
 
-    with patch("llm_bench.runner.get_adapter") as mock_get:
+    with patch("llm_bench.runner.resolve_model") as mock_resolve, \
+         patch("llm_bench.runner.get_adapter") as mock_get:
+        mock_resolve.return_value = type("MC", (), {"env": None})()
         mock_adapter = AsyncMock()
         mock_adapter.run.return_value = _mock_output()
         mock_adapter.name = "claude-code"
@@ -73,7 +75,9 @@ def test_e2e_multi_model_multi_cli(tmp_path):
     results_dir = tmp_path / "results"
     tasks = load_tasks(tasks_dir, tiers=[1])
 
-    with patch("llm_bench.runner.get_adapter") as mock_get:
+    with patch("llm_bench.runner.resolve_model") as mock_resolve, \
+         patch("llm_bench.runner.get_adapter") as mock_get:
+        mock_resolve.return_value = type("MC", (), {"env": None})()
         mock_adapter = AsyncMock()
         mock_adapter.run.return_value = _mock_output()
         mock_adapter.name = "test"

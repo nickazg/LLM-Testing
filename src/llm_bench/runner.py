@@ -1,22 +1,15 @@
 from __future__ import annotations
 
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
 from llm_bench.adapters import get_adapter
+from llm_bench.config import resolve_model
 from llm_bench.models import TaskConfig, RunResult, Scores, OutputFile
 from llm_bench.scoring import run_validator, score_efficiency
 from llm_bench.workspace import prepare_workspace
-
-
-def _find_env_file(config_dir: Path, cli_name: str, model: str) -> str | None:
-    env_path = config_dir / f"{cli_name}.{model}.env"
-    if env_path.exists():
-        return str(env_path)
-    return None
 
 
 LANG_MAP = {
@@ -26,18 +19,15 @@ LANG_MAP = {
     ".cfg": "ini", ".ini": "ini", ".rs": "rust", ".go": "go", ".cpp": "cpp",
 }
 
-# Files/dirs to skip when snapshotting workspace
 SKIP_NAMES = {".claude", ".git", "__pycache__", "validate.py", "CLAUDE.md", "AGENTS.md", ".gitkeep", "expected", "kilo.json"}
 
 
 def _snapshot_files(workspace: Path, max_file_size: int = 50000) -> list[OutputFile]:
-    """Capture all files the model created/modified in the workspace."""
     files = []
     for f in sorted(workspace.rglob("*")):
         if not f.is_file():
             continue
         rel = f.relative_to(workspace)
-        # Skip harness-injected files
         if any(part in SKIP_NAMES for part in rel.parts):
             continue
         try:
@@ -62,7 +52,6 @@ async def run_single_task(
     skills_dir: Path | None = None,
     config_dir: Path | None = None,
     log: Callable[[str], None] = _default_log,
-    **adapter_kwargs,
 ) -> RunResult:
     skill_path = None
     if task.skill and skills_dir:
@@ -78,12 +67,9 @@ async def run_single_task(
     workspace_path = Path(workspace.name)
 
     try:
-        if "env_file" not in adapter_kwargs and config_dir:
-            env_file = _find_env_file(config_dir, cli_name, model)
-            if env_file:
-                adapter_kwargs["env_file"] = env_file
-
-        adapter = get_adapter(cli_name, model=model, **adapter_kwargs)
+        # Resolve model config from models.yaml + .env
+        model_config = resolve_model(model, cli_name, config_dir or Path("config"))
+        adapter = get_adapter(cli_name, model=model, env=model_config.env)
 
         log(f"  Running CLI...")
         run_start = time.monotonic()
@@ -123,7 +109,6 @@ async def run_single_task(
         validator_scores = await run_validator(workspace_path)
         efficiency = score_efficiency(output)
 
-        # Snapshot files before cleanup
         files = _snapshot_files(workspace_path)
         if files:
             log(f"  Files created: {', '.join(f.path for f in files)}")
@@ -161,7 +146,6 @@ async def run_matrix(
     results_dir: Path | None = None,
     config_dir: Path | None = None,
     log: Callable[[str], None] = _default_log,
-    **adapter_kwargs,
 ) -> list[RunResult]:
     results = []
     total = len(tasks) * len(cli_names) * len(models)
@@ -181,7 +165,6 @@ async def run_matrix(
                         skills_dir=skills_dir,
                         config_dir=config_dir,
                         log=log,
-                        **adapter_kwargs,
                     )
                     results.append(result)
 

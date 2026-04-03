@@ -22,28 +22,18 @@ class CLIOutput:
 class CLIAdapter:
     name: str = "base"
 
-    def __init__(self, model: str, env_file: str | None = None):
+    def __init__(self, model: str, env: dict | None = None):
         self.model = model
-        self.env_file = env_file
+        self.env = env
 
-    def _load_env(self) -> dict | None:
-        if not self.env_file:
-            return None
-        import os
-        env_path = Path(self.env_file)
-        if not env_path.exists():
-            return None
-        env = os.environ.copy()
-        for line in env_path.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                key, _, value = line.partition("=")
-                env[key.strip()] = value.strip().strip('"').strip("'")
-        return env
+    def _get_env(self) -> dict | None:
+        """Return the resolved env dict."""
+        return self.env
 
-    def _resolve_model_id(self, env: dict | None) -> str:
-        if env and "LLM_BENCH_MODEL_ID" in env:
-            return env["LLM_BENCH_MODEL_ID"]
+    def _resolve_model_id(self) -> str:
+        """Get CLI-specific model ID from env, falling back to self.model."""
+        if self.env and "LLM_BENCH_MODEL_ID" in self.env:
+            return self.env["LLM_BENCH_MODEL_ID"]
         return self.model
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:

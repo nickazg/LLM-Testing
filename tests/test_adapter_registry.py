@@ -11,7 +11,7 @@ def test_get_claude_code_adapter():
 
 
 def test_get_open_code_adapter():
-    adapter = get_adapter("open-code", model="anthropic/claude-sonnet-4-20250514")
+    adapter = get_adapter("open-code", model="test")
     assert isinstance(adapter, OpenCodeAdapter)
 
 
@@ -26,3 +26,9 @@ def test_get_unknown_adapter():
         assert False, "Should have raised ValueError"
     except ValueError:
         pass
+
+
+def test_env_passed_to_adapter():
+    env = {"OPENROUTER_API_KEY": "test-key"}
+    adapter = get_adapter("claude-code", model="test", env=env)
+    assert adapter._get_env() == env

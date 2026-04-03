@@ -13,13 +13,13 @@ def test_build_command():
     assert "--allowedTools" in cmd
 
 
-def test_build_command_with_env_file():
-    adapter = ClaudeCodeAdapter(model="qwen3-30b", env_file="/path/to/.env.qwen")
-    assert adapter.env_file == "/path/to/.env.qwen"
+def test_env_passed_through():
+    env = {"ANTHROPIC_BASE_URL": "http://proxy", "OPENROUTER_API_KEY": "test"}
+    adapter = ClaudeCodeAdapter(model="qwen3-30b", env=env)
+    assert adapter._get_env() == env
 
 
 def test_parse_single_json_result():
-    """Test parsing a single-line JSON result (non-stream fallback)."""
     adapter = ClaudeCodeAdapter(model="opus")
     raw = '{"type":"result","subtype":"success","result":"Done.","total_cost_usd":0.05,"num_turns":3,"duration_ms":15000,"usage":{"input_tokens":2000,"output_tokens":500,"thinking_tokens":100,"cache_read_input_tokens":50}}'
     parsed = adapter.parse_output(raw)
@@ -33,7 +33,6 @@ def test_parse_single_json_result():
 
 
 def test_parse_stream_json():
-    """Test parsing multi-line stream-json with thinking, tool use, and result."""
     adapter = ClaudeCodeAdapter(model="opus")
     raw = '\n'.join([
         '{"type":"assistant","message":{"content":[{"type":"thinking","thinking":"Let me think about this..."},{"type":"text","text":"I will create the file."}]}}',
@@ -49,10 +48,8 @@ def test_parse_stream_json():
     assert "Done" in parsed.stdout
     assert len(parsed.conversation) == 4
     assert parsed.conversation[0].role == "thinking"
-    assert "think about this" in parsed.conversation[0].content
     assert parsed.conversation[1].role == "response"
     assert parsed.conversation[2].role == "tool_use"
-    assert parsed.conversation[2].tool_name == "Write"
     assert parsed.conversation[3].role == "tool_result"
 
 

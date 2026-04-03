@@ -3,19 +3,18 @@ import asyncio
 import sys
 from pathlib import Path
 
+from llm_bench.config import load_models_config
 from llm_bench.loader import load_tasks
 from llm_bench.runner import run_matrix
 
 
-# Models available for benchmarking
-MODELS = {
-    "opus4.6": "Anthropic Opus 4.6 (frontier)",
-    "qwen3-30b": "Qwen3 Coder 30B",
-    "qwen3-coder-next": "Qwen3 Coder Next (80B MoE, 3B active)",
-    "minimax-m2.7": "MinimaxM2.7",
-    "glm-5": "GLM-5",
-    "gemma-4-31b": "Google Gemma 4 31B",
-}
+def _get_models(config_dir: Path) -> dict[str, str]:
+    """Load model registry from models.yaml."""
+    config = load_models_config(config_dir)
+    return {
+        mid: mdef.get("name", mid)
+        for mid, mdef in config.get("models", {}).items()
+    }
 
 
 def main():
@@ -33,7 +32,7 @@ def main():
     run_parser.add_argument("--tasks-dir", default="tasks", help="Path to tasks directory")
     run_parser.add_argument("--skills-dir", default="skills", help="Path to skills directory")
     run_parser.add_argument("--results-dir", default="results", help="Path to results directory")
-    run_parser.add_argument("--config-dir", default="config", help="Path to config directory (env files)")
+    run_parser.add_argument("--config-dir", default="config", help="Path to config directory")
 
     dash_parser = subparsers.add_parser("dashboard", help="Launch results dashboard")
     dash_parser.add_argument("--port", type=int, default=8080, help="Port number")
@@ -73,6 +72,7 @@ def _handle_run(args):
         print(f"No tasks found in {tasks_dir} for tiers {tiers}")
         sys.exit(1)
 
+    model_registry = _get_models(config_dir)
     total = len(tasks) * len(cli_names) * len(models)
     print("=" * 60)
     print("LLM BENCH RUN")
@@ -80,19 +80,14 @@ def _handle_run(args):
     print(f"  Models:  {', '.join(models)}")
     print(f"  CLIs:    {', '.join(cli_names)}")
     print(f"  Tasks:   {', '.join(t.id for t in tasks)}")
+    print(f"  Config:  {config_dir}/models.yaml + {config_dir}/.env")
     print(f"  Total:   {total} runs")
-    print()
 
-    # Check env files
-    if config_dir.exists():
-        print("ENV CONFIGS:")
-        for cli_name in cli_names:
-            for model in models:
-                env_path = config_dir / f"{cli_name}.{model}.env"
-                if env_path.exists():
-                    print(f"  {cli_name} + {model}: {env_path}")
-                else:
-                    print(f"  {cli_name} + {model}: (no env file — using defaults)")
+    # Warn about unknown models
+    for m in models:
+        if m not in model_registry:
+            print(f"\n  WARNING: '{m}' not in models.yaml — will use defaults")
+
     print()
     print("-" * 60)
 
@@ -157,47 +152,51 @@ def _handle_info(args):
     results_dir = Path(args.results_dir)
     config_dir = Path(args.config_dir)
 
+    config = load_models_config(config_dir)
+    models_def = config.get("models", {})
+    defaults = config.get("defaults", {})
+
     # Models
-    print("MODELS")
-    print("-" * 50)
-    for model_id, desc in MODELS.items():
-        print(f"  {model_id:<20} {desc}")
+    print("MODELS (from config/models.yaml)")
+    print("-" * 60)
+    for model_id, mdef in models_def.items():
+        name = mdef.get("name", model_id)
+        provider = mdef.get("provider", defaults.get("provider", "openrouter"))
+        or_id = mdef.get("openrouter_id", "")
+        print(f"  {model_id:<22} {name}")
+        print(f"  {'':22} provider={provider}  id={or_id}")
+        # Show CLI-specific overrides
+        for cli in ADAPTERS:
+            if cli in mdef:
+                override = mdef[cli]
+                print(f"  {'':22} {cli}: {override}")
+    print()
+
+    # API Keys
+    print("API KEYS (from config/.env)")
+    print("-" * 60)
+    env_path = config_dir / ".env"
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, _, val = line.partition("=")
+                masked = val[:8] + "..." if len(val) > 8 else val
+                print(f"  {key.strip():<25} {masked}")
+    else:
+        print(f"  (not found — create {env_path})")
     print()
 
     # CLIs
     print("CLIs")
-    print("-" * 50)
+    print("-" * 60)
     for cli_name in ADAPTERS:
         print(f"  {cli_name}")
     print()
 
-    # Env configs
-    print("ENV CONFIGS")
-    print("-" * 50)
-    if config_dir.exists():
-        env_files = sorted(config_dir.glob("*.env"))
-        if env_files:
-            for env_file in env_files:
-                # Parse cli.model from filename
-                name = env_file.stem  # e.g. "claude-code.qwen3-30b"
-                # Read first comment line as description
-                desc = ""
-                for line in env_file.read_text().splitlines():
-                    if line.startswith("#"):
-                        desc = line.lstrip("# ").strip()
-                        break
-                ready = "ready" if "YOUR_" not in env_file.read_text() else "needs key"
-                print(f"  {name:<35} [{ready}] {desc}")
-            print(f"\n  Total: {len(env_files)} configs")
-        else:
-            print("  (none found)")
-    else:
-        print(f"  (config directory not found: {config_dir})")
-    print()
-
     # Tasks
     print("TASKS")
-    print("-" * 50)
+    print("-" * 60)
     if tasks_dir.exists():
         tasks = load_tasks(tasks_dir)
         if tasks:
@@ -218,12 +217,11 @@ def _handle_info(args):
 
     # Skills
     print("SKILLS")
-    print("-" * 50)
+    print("-" * 60)
     if skills_dir.exists():
         skill_dirs = [d for d in sorted(skills_dir.iterdir()) if d.is_dir() and (d / "SKILL.md").exists()]
         if skill_dirs:
             for skill_dir in skill_dirs:
-                # Read first line of description from SKILL.md
                 skill_md = skill_dir / "SKILL.md"
                 desc = ""
                 for line in skill_md.read_text().splitlines():
@@ -239,9 +237,9 @@ def _handle_info(args):
         print(f"  (skills directory not found: {skills_dir})")
     print()
 
-    # Results summary
+    # Results
     print("RESULTS")
-    print("-" * 50)
+    print("-" * 60)
     results = load_results(results_dir)
     if results:
         models_seen = sorted(set(r["model"] for r in results))
@@ -254,11 +252,11 @@ def _handle_info(args):
         print("  (no results yet)")
     print()
 
-    # Example command
-    model_ids = ",".join(list(MODELS.keys())[:2])
+    # Example
+    model_ids = ",".join(list(models_def.keys())[:2])
     cli_ids = ",".join(list(ADAPTERS.keys())[:2])
     print("EXAMPLE")
-    print("-" * 50)
+    print("-" * 60)
     print(f"  llm-bench run --models {model_ids} --clis {cli_ids} --tiers 1")
 
 

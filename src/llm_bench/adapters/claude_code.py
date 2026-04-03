@@ -25,7 +25,6 @@ class ClaudeCodeAdapter(CLIAdapter):
         ]
 
     def parse_stream_output(self, raw: str) -> CLIOutput:
-        """Parse stream-json output into structured CLIOutput with conversation."""
         conversation: list[ConversationMessage] = []
         token_usage = TokenUsage()
         cost_usd = 0.0
@@ -46,21 +45,17 @@ class ClaudeCodeAdapter(CLIAdapter):
             msg_type = msg.get("type", "")
 
             if msg_type == "assistant":
-                # Assistant message — may contain thinking and/or text
                 content = msg.get("message", {})
                 if isinstance(content, dict):
-                    # Content blocks
                     for block in content.get("content", []):
                         block_type = block.get("type", "")
                         if block_type == "thinking":
                             conversation.append(ConversationMessage(
-                                role="thinking",
-                                content=block.get("thinking", ""),
+                                role="thinking", content=block.get("thinking", ""),
                             ))
                         elif block_type == "text":
                             conversation.append(ConversationMessage(
-                                role="response",
-                                content=block.get("text", ""),
+                                role="response", content=block.get("text", ""),
                             ))
                         elif block_type == "tool_use":
                             conversation.append(ConversationMessage(
@@ -69,21 +64,16 @@ class ClaudeCodeAdapter(CLIAdapter):
                                 tool_name=block.get("name", "unknown"),
                             ))
                 elif isinstance(content, str) and content:
-                    conversation.append(ConversationMessage(
-                        role="response", content=content,
-                    ))
+                    conversation.append(ConversationMessage(role="response", content=content))
 
             elif msg_type == "tool_result":
                 content = msg.get("content", "")
                 if isinstance(content, list):
-                    content = "\n".join(
-                        b.get("text", "") for b in content if isinstance(b, dict)
-                    )
+                    content = "\n".join(b.get("text", "") for b in content if isinstance(b, dict))
                 elif not isinstance(content, str):
                     content = str(content)
                 conversation.append(ConversationMessage(
-                    role="tool_result",
-                    content=content[:2000],  # Cap tool output
+                    role="tool_result", content=content[:2000],
                     tool_name=msg.get("tool_name", ""),
                 ))
 
@@ -114,9 +104,7 @@ class ClaudeCodeAdapter(CLIAdapter):
         )
 
     def parse_output(self, raw: str) -> CLIOutput:
-        """Parse either stream-json (multi-line) or single JSON result."""
         stripped = raw.strip()
-        # Single-line JSON with a "result" key = old format
         if "\n" not in stripped:
             try:
                 data = json.loads(stripped)
@@ -141,12 +129,12 @@ class ClaudeCodeAdapter(CLIAdapter):
                     )
             except json.JSONDecodeError:
                 pass
-        # Multi-line = stream-json format
         return self.parse_stream_output(raw)
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
-        env = self._load_env()
+        env = self._get_env()
 
+        # When env overrides model tiers, pass a valid tier name
         if env and any(k.startswith("ANTHROPIC_DEFAULT_") and k.endswith("_MODEL") for k in env):
             cmd = self.build_command(prompt, model_override="sonnet")
         else:
@@ -172,14 +160,10 @@ class ClaudeCodeAdapter(CLIAdapter):
             except asyncio.TimeoutError:
                 proc.kill()
             elapsed = time.monotonic() - start
-            return CLIOutput(
-                stdout="", stderr="TIMEOUT",
-                exit_code=-1, wall_time_s=elapsed,
-            )
+            return CLIOutput(stdout="", stderr="TIMEOUT", exit_code=-1, wall_time_s=elapsed)
 
         elapsed = time.monotonic() - start
         stdout = stdout_bytes.decode("utf-8", errors="replace")
-
         output = self.parse_stream_output(stdout)
         output.wall_time_s = elapsed
         return output

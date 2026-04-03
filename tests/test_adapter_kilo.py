@@ -55,7 +55,7 @@ def test_parse_output_with_tool_use():
 def test_write_kilo_config(tmp_path):
     import json
     adapter = KiloAdapter(model="test")
-    adapter._write_kilo_config(tmp_path, "openrouter/qwen/qwen3-coder-30b", None)
+    adapter._write_kilo_config(tmp_path, "openrouter/qwen/qwen3-coder-30b")
     config = json.loads((tmp_path / "kilo.json").read_text())
     assert config["model"] == "openrouter/qwen/qwen3-coder-30b"
     assert "openrouter" in config["provider"]

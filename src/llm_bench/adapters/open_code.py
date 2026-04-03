@@ -34,8 +34,8 @@ class OpenCodeAdapter(CLIAdapter):
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
-        env = self._load_env()
-        model_id = self._resolve_model_id(env)
+        env = self._get_env()
+        model_id = self._resolve_model_id()
         cmd = self.build_command(prompt, model_id=model_id)
 
         start = time.monotonic()
@@ -58,14 +58,10 @@ class OpenCodeAdapter(CLIAdapter):
             except asyncio.TimeoutError:
                 proc.kill()
             elapsed = time.monotonic() - start
-            return CLIOutput(
-                stdout="", stderr="TIMEOUT",
-                exit_code=-1, wall_time_s=elapsed,
-            )
+            return CLIOutput(stdout="", stderr="TIMEOUT", exit_code=-1, wall_time_s=elapsed)
 
         elapsed = time.monotonic() - start
         stdout = stdout_bytes.decode("utf-8", errors="replace")
-
         output = self.parse_output(stdout)
         output.wall_time_s = elapsed
         output.exit_code = proc.returncode or 0

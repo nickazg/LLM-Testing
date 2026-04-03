@@ -6,6 +6,7 @@ build/
 .venv/
 .env*
 !.env.example
+config/.env
 config/*.env
 !config/*.env.example
 temp/

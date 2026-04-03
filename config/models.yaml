@@ -1,0 +1,42 @@
+# Model configuration for llm-bench
+# Each model defines how it's accessed through each CLI.
+#
+# Most models route through OpenRouter — just set openrouter_id.
+# For direct API access, add a cli-specific override block.
+
+defaults:
+  provider: openrouter
+  claude_code_proxy: "http://127.0.0.1:3456"
+
+models:
+  opus4.6:
+    name: "Anthropic Opus 4.6 (frontier)"
+    provider: anthropic
+    # Claude Code uses Opus natively — no routing needed
+    # Open Code / Kilo use the Anthropic provider directly
+    openrouter_id: "anthropic/claude-opus-4-6"
+
+  qwen3-30b:
+    name: "Qwen3 Coder 30B"
+    openrouter_id: "qwen/qwen3-coder-30b-a3b-instruct"
+
+  qwen3-coder-next:
+    name: "Qwen3 Coder Next (80B MoE, 3B active)"
+    openrouter_id: "qwen/qwen3-coder-next"
+
+  minimax-m2.7:
+    name: "MinimaxM2.7"
+    openrouter_id: "minimax/minimax-m2-7"
+
+  glm-5:
+    name: "GLM-5"
+    openrouter_id: "z-ai/glm-5"
+    # Claude Code uses GLM's direct API instead of OpenRouter
+    claude-code:
+      base_url: "https://api.z.ai/api/anthropic"
+      auth_env: "GLM_API_KEY"
+      model_id: "glm-5"
+
+  gemma-4-31b:
+    name: "Google Gemma 4 31B"
+    openrouter_id: "google/gemma-4-31b-it"

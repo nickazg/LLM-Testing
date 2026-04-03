@@ -10,11 +10,11 @@ ADAPTERS: dict[str, type[CLIAdapter]] = {
 }
 
 
-def get_adapter(cli_name: str, model: str, **kwargs) -> CLIAdapter:
+def get_adapter(cli_name: str, model: str, env: dict | None = None) -> CLIAdapter:
     cls = ADAPTERS.get(cli_name)
     if cls is None:
         raise ValueError(f"Unknown CLI: {cli_name}. Available: {list(ADAPTERS.keys())}")
-    return cls(model=model, **kwargs)
+    return cls(model=model, env=env)
 
 
 __all__ = ["CLIAdapter", "CLIOutput", "get_adapter"]

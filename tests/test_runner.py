@@ -38,7 +38,9 @@ def test_run_single_task(tmp_path):
         tool_calls=3, cost_usd=0.01, raw_response="raw",
     )
 
-    with patch("llm_bench.runner.get_adapter") as mock_get:
+    with patch("llm_bench.runner.resolve_model") as mock_resolve, \
+         patch("llm_bench.runner.get_adapter") as mock_get:
+        mock_resolve.return_value = type("MC", (), {"env": None})()
         mock_adapter = AsyncMock()
         mock_adapter.run.return_value = mock_output
         mock_adapter.name = "claude-code"
