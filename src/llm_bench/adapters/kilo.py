@@ -12,14 +12,16 @@ from llm_bench.adapters.base import CLIAdapter, CLIOutput
 class KiloAdapter(CLIAdapter):
     name = "kilo"
 
-    def build_command(self, prompt: str) -> list[str]:
-        return [
+    def build_command(self, prompt: str, model_id: str | None = None) -> list[str]:
+        cmd = [
             "kilo",
             "run",
-            "--auto",
-            "--json",
-            prompt,
+            "--format", "json",
         ]
+        if model_id:
+            cmd += ["--model", model_id]
+        cmd.append(prompt)
+        return cmd
 
     def _write_kilo_config(self, cwd: Path, model_id: str, env: dict | None):
         """Write kilo.json into the workspace with provider and model config."""
@@ -50,13 +52,12 @@ class KiloAdapter(CLIAdapter):
         )
 
     async def run(self, prompt: str, cwd: str | Path, timeout: int = 300) -> CLIOutput:
-        cmd = self.build_command(prompt)
         env = self._load_env()
-
         if env is None:
             env = os.environ.copy()
 
         model_id = self._resolve_model_id(env)
+        cmd = self.build_command(prompt, model_id=model_id)
 
         # Write kilo.json config into workspace
         self._write_kilo_config(cwd, model_id, env)
