@@ -1,0 +1,21 @@
+name,department,salary,status
+Alice Johnson,Engineering,95000,active
+Bob Smith,Marketing,72000,active
+Carol White,Engineering,88000,active
+Dave Brown,Sales,65000,inactive
+Eve Davis,Marketing,78000,active
+Frank Miller,Engineering,102000,active
+Grace Wilson,Sales,71000,active
+Henry Taylor,Marketing,69000,inactive
+Iris Anderson,Engineering,91000,active
+Jack Thomas,Sales,68000,active
+Karen Jackson,HR,82000,active
+Leo Harris,Engineering,97000,inactive
+Mia Martin,HR,79000,active
+Nathan Clark,Sales,73000,active
+Olivia Lewis,Marketing,85000,active
+Patrick Robinson,HR,76000,active
+Quinn Walker,Engineering,105000,active
+Rachel Hall,Sales,62000,inactive
+Sam Young,Marketing,71000,active
+Tina King,HR,88000,active

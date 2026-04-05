@@ -1,0 +1,10 @@
+id: tier2-cli-tool
+name: "CLI Word Count Tool"
+tier: 2
+prompt: "Create a Python script called `wordcount.py` that works like a simplified `wc` command. It should accept one or more file paths as positional arguments and optional flags: `--lines` (or `-l`), `--words` (or `-w`), `--chars` (or `-c`). If no flags are given, show all three counts. For each file, print a line with the requested counts followed by the filename, separated by tabs. If multiple files are given, also print a 'total' line summing all counts. Use `argparse` for argument parsing. Exit with code 0 on success, 1 if any file is not found."
+timeout: 120
+skill: null
+tags: [python, cli, argparse, tier2]
+scoring:
+  automated: [correctness, completion, efficiency]
+  flagged: [quality, instruction_following]

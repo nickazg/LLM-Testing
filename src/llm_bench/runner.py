@@ -17,6 +17,8 @@ LANG_MAP = {
     ".yaml": "yaml", ".yml": "yaml", ".md": "markdown", ".txt": "text",
     ".sh": "bash", ".html": "html", ".css": "css", ".toml": "toml",
     ".cfg": "ini", ".ini": "ini", ".rs": "rust", ".go": "go", ".cpp": "cpp",
+    ".usda": "usd", ".usdc": "usd", ".usd": "usd",
+    ".c": "c", ".h": "c", ".makefile": "makefile",
 }
 
 SKIP_NAMES = {".claude", ".git", "__pycache__", "validate.py", "CLAUDE.md", "AGENTS.md", ".gitkeep", "expected", "kilo.json"}

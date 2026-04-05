@@ -1,0 +1,6 @@
+The quick brown fox jumps over the lazy dog.
+Python is a versatile programming language.
+It supports multiple paradigms including procedural and object-oriented.
+Many developers choose Python for data science and automation.
+This sample file is used for testing a word count tool.
+Each line contains a different number of words.

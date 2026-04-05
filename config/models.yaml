@@ -9,13 +9,13 @@ defaults:
   claude_code_proxy: "http://127.0.0.1:3456"
 
 models:
+  # ── Frontier (expensive, reference only) ──────────────────────
   opus4.6:
     name: "Anthropic Opus 4.6 (frontier)"
     provider: anthropic
-    # Claude Code uses Opus natively — no routing needed
-    # Open Code / Kilo use the Anthropic provider directly
     openrouter_id: "anthropic/claude-opus-4-6"
 
+  # ── Budget / paid ─────────────────────────────────────────────
   qwen3-30b:
     name: "Qwen3 Coder 30B"
     openrouter_id: "qwen/qwen3-coder-30b-a3b-instruct"
@@ -31,16 +31,28 @@ models:
   glm-5:
     name: "GLM-5"
     openrouter_id: "z-ai/glm-5"
-    # Claude Code uses GLM's direct API instead of OpenRouter
     claude-code:
       base_url: "https://api.z.ai/api/anthropic"
       auth_env: "GLM_API_KEY"
       model_id: "glm-5"
 
-  qwen3.6-plus:
-    name: "Qwen3.6 Plus (free)"
-    openrouter_id: "qwen/qwen3.6-plus:free"
-
   gemma-4-31b:
     name: "Google Gemma 4 31B"
     openrouter_id: "google/gemma-4-31b-it"
+
+  # ── Free tier (zero cost) ─────────────────────────────────────
+  qwen3-coder-free:
+    name: "Qwen3 Coder (free)"
+    openrouter_id: "qwen/qwen3-coder:free"
+
+  glm-4.5-air-free:
+    name: "GLM 4.5 Air (free)"
+    openrouter_id: "z-ai/glm-4.5-air:free"
+
+  glm-4.7-flash:
+    name: "GLM 4.7 Flash (ultra-cheap)"
+    openrouter_id: "z-ai/glm-4.7-flash"
+
+  qwen3-next-80b-free:
+    name: "Qwen3 Next 80B MoE (free)"
+    openrouter_id: "qwen/qwen3-next-80b-a3b-instruct:free"

@@ -1,0 +1,15 @@
+id: tier2-log-processor
+name: "Bash Log Analyzer"
+tier: 2
+prompt: "Create a bash script called analyze.sh that reads an Apache-format access.log file (passed as first argument, or reads from ./access.log if no argument given) and outputs three sections:\n\n1. '=== Top 5 IPs ===' followed by the top 5 IP addresses by request count, one per line as 'COUNT IP' (sorted descending by count)\n\n2. '=== Status Codes ===' followed by status code counts, one per line as 'COUNT STATUS_CODE' (sorted descending by count)\n\n3. '=== Top 3 Paths ===' followed by the top 3 requested paths by count, one per line as 'COUNT PATH' (sorted descending by count)\n\nUse POSIX-compatible commands only (no GNU-specific flags). The script must be executable."
+timeout: 180
+skill: null
+tags: [bash, cli, log-analysis]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following
