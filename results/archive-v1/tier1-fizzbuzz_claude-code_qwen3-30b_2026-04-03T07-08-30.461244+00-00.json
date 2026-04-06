@@ -1,0 +1,18 @@
+{
+  "task_id": "tier1-fizzbuzz",
+  "model": "qwen3-30b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": 67543,
+      "tool_calls": 2,
+      "wall_time_s": 25.85134279198246
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-03T07:08:30.461244+00:00"
+}

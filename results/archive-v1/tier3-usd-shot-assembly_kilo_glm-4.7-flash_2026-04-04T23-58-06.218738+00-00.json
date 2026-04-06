@@ -1,0 +1,85 @@
+{
+  "task_id": "tier3-usd-shot-assembly",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.8,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00822854199214,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-04T23:58:06.218738+00:00",
+  "prompt": "Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:\n\n1. assets.usda \u2014 contains:\n   - Default prim /Assets\n   - /Assets/Chair \u2014 an Xform with a child Mesh (/Assets/Chair/Geo) representing a simple chair (8-point cube is fine)\n   - /Assets/Chair has a variant set 'modelVariant' with variants 'simple' and 'detailed' (both can contain the same geo, this tests the variant mechanism)\n\n2. shot.usda \u2014 contains:\n   - Default prim /Shot\n   - Sublayers assets.usda\n   - /Shot/Set \u2014 an Xform\n   - /Shot/Set/ChairA \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (-2, 0, 0)\n   - /Shot/Set/ChairB \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (2, 0, 0)\n   - /Shot/Lighting \u2014 an Xform with a variant set 'lightingVariant' containing 'day' and 'night' variants\n   - In 'day' variant: a DistantLight at /Shot/Lighting/Sun with intensity=50000\n   - In 'night' variant: a DomeLight at /Shot/Lighting/Sky with intensity=500\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/16328135321266026844",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-7cix4p93\u0003\u0012verify_assembly.py\ufffd\u03ccF4K-\ufffd7\ufffdU\ufffd\ufffdZ\ufffd\u0001\u0000\u0000\u0000\u0001\u0010assemble_shot.py\ufffd9\ufffdi4h4\ufffd\ufffd\ufffd^j\ufffdZ\ufffd\u0001\u0000\u0000\u0000\u0001\u000btest_pxr.py\ufffd}XJR\ufffd<\n\ufffd\ufffd\ufffd\ufffd\ufffdZ\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "assemble_shot.py",
+      "content": "#!/usr/bin/env python3\nfrom pxr import Usd, UsdGeom, UsdLux, Sdf, Gf\nimport sys\nimport os\n\n\ndef create_assets_usda(filepath):\n    \"\"\"Create assets.usda with chair model and variant set.\"\"\"\n    stage = Usd.Stage.CreateNew(filepath)\n\n    assetsPrim = stage.DefinePrim(\"/Assets\", \"Xform\")\n\n    chairPrim = stage.DefinePrim(\"/Assets/Chair\", \"Xform\")\n    variantSet = chairPrim.GetVariantSet(\"modelVariant\")\n    variantSet.AddVariant(\"simple\")\n    variantSet.AddVariant(\"detailed\")\n\n    geoPrim = stage.DefinePrim(\"/Assets/Chair/Geo\", \"Mesh\")\n\n    chairXformPrim = stage.DefinePrim(\"/Assets/Chair_Xform\", \"Xform\")\n\n    meshPrim = stage.DefinePrim(\"/Assets/Chair_Xform/Geo\", \"Mesh\")\n\n    boxSchema = UsdGeom.Mesh(meshPrim)\n    boxSchema.CreatePointsAttr(\n        [\n            (-0.5, -0.5, -0.5),\n            (0.5, -0.5, -0.5),\n            (0.5, 0.5, -0.5),\n            (-0.5, 0.5, -0.5),\n            (-0.5, 0.5, 0.5),\n            (0.5, 0.5, 0.5),\n            (0.5, -0.5, 0.5),\n            (-0.5, -0.5, 0.5),\n        ]\n    )\n    boxSchema.CreateFaceVertexCountsAttr([4, 4, 4, 4])\n    boxSchema.CreateFaceVertexIndicesAttr([0, 1, 2, 3, 4, 5, 6, 7])\n\n    stage.GetRootLayer().subLayerPath = \"\"\n\n    stage.GetRootLayer().Save()\n\n    print(f\"Created: {filepath}\")\n\n\ndef create_shot_usda(filepath, assets_path):\n    \"\"\"Create shot.usda that references assets.usda and composes the scene.\"\"\"\n    stage = Usd.Stage.CreateNew(filepath)\n\n    shotPrim = stage.DefinePrim(\"/Shot\", \"Xform\")\n\n    root_layer = stage.GetRootLayer()\n    root_layer.subLayerPaths = [assets_path]\n\n    setPrim = stage.DefinePrim(\"/Shot/Set\", \"Xform\")\n\n    chairAPrim = stage.DefinePrim(\"/Shot/Set/ChairA\", \"Xform\")\n    xformableA = UsdGeom.Xformable(chairAPrim)\n    xformableA.AddTranslateOp().Set(Gf.Vec3d(-2, 0, 0))\n\n    chairBPrim = stage.DefinePrim(\"/Shot/Set/ChairB\", \"Xform\")\n    xformableB = UsdGeom.Xformable(chairBPrim)\n    xformableB.AddTranslateOp().Set(Gf.Vec3d(2, 0, 0))\n\n    lightingPrim = stage.DefinePrim(\"/Shot/Lighting\", \"Xform\")\n    lightingVariantSet = lightingPrim.GetVariantSet(\"lightingVariant\")\n    lightingVariantSet.AddVariant(\"day\")\n    lightingVariantSet.AddVariant(\"night\")\n\n    lightingPrim.GetVariantSet(\"lightingVariant\").SetVariantSelection(\"day\")\n\n    sunPrim = stage.DefinePrim(\"/Shot/Lighting/Sun\", \"DistantLight\")\n    sunLight = UsdLux.DistantLight(sunPrim)\n    sunLight.GetIntensityAttr().Set(50000.0)\n\n    lightingPrim.GetVariantSet(\"lightingVariant\").SetVariantSelection(\"night\")\n\n    skyPrim = stage.DefinePrim(\"/Shot/Lighting/Sky\", \"DomeLight\")\n    skyLight = UsdLux.DomeLight(skyPrim)\n    skyLight.GetIntensityAttr().Set(500.0)\n\n    stage.GetRootLayer().Save()\n\n    print(f\"Created: {filepath}\")\n\n\ndef main():\n    script_dir = os.path.dirname(os.path.abspath(__file__))\n    assets_usda_path = os.path.join(script_dir, \"assets.usda\")\n    shot_usda_path = os.path.join(script_dir, \"shot.usda\")\n\n    create_assets_usda(assets_usda_path)\n    create_shot_usda(shot_usda_path, assets_usda_path)\n\n    print(\"\\nSuccessfully created:\")\n    print(f\"  - {assets_usda_path}\")\n    print(f\"  - {shot_usda_path}\")\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "language": "python"
+    },
+    {
+      "path": "assets.usda",
+      "content": "#usda 1.0\n\ndef Xform \"Assets\"\n{\n    def Xform \"Chair\" (\n        prepend variantSets = \"modelVariant\"\n    )\n    {\n        def Mesh \"Geo\"\n        {\n        }\n        variantSet \"modelVariant\" = {\n            \"detailed\" {\n\n            }\n            \"simple\" {\n\n            }\n        }\n    }\n\n    def Xform \"Chair_Xform\"\n    {\n        def Mesh \"Geo\"\n        {\n            int[] faceVertexCounts = [4, 4, 4, 4]\n            int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 7]\n            point3f[] points = [(-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (0.5, 0.5, -0.5), (-0.5, 0.5, -0.5), (-0.5, 0.5, 0.5), (0.5, 0.5, 0.5), (0.5, -0.5, 0.5), (-0.5, -0.5, 0.5)]\n        }\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "shot.usda",
+      "content": "#usda 1.0\n(\n    subLayers = [\n        @/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-7cix4p93/assets.usda@\n    ]\n)\n\ndef Xform \"Shot\"\n{\n    def Xform \"Set\"\n    {\n        def Xform \"ChairA\"\n        {\n            double3 xformOp:translate = (-2, 0, 0)\n            uniform token[] xformOpOrder = [\"xformOp:translate\"]\n        }\n\n        def Xform \"ChairB\"\n        {\n            double3 xformOp:translate = (2, 0, 0)\n            uniform token[] xformOpOrder = [\"xformOp:translate\"]\n        }\n    }\n\n    def Xform \"Lighting\" (\n        variants = {\n            string lightingVariant = \"night\"\n        }\n        prepend variantSets = \"lightingVariant\"\n    )\n    {\n        def DistantLight \"Sun\"\n        {\n            float inputs:intensity = 50000\n        }\n\n        def DomeLight \"Sky\"\n        {\n            float inputs:intensity = 500\n        }\n        variantSet \"lightingVariant\" = {\n            \"day\" {\n\n            }\n            \"night\" {\n\n            }\n        }\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "test.usda",
+      "content": "#usda 1.0\n\ndef Xform \"Test\" (\n    variants = {\n        string test = \"a\"\n    }\n    prepend variantSets = \"test\"\n)\n{\n    variantSet \"test\" = {\n        \"a\" {\n\n        }\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "test_pxr.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nTest script to verify pxr library is available and working correctly.\n\"\"\"\n\ntry:\n    from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf\n\n    print(\"\u2713 Successfully imported pxr modules\")\n    print(f\"  - Usd version: {Usd.Version.GetVersionString()}\")\n    print(f\"  - Sdf Layer type: {Sdf.LayerType}\")\n    print(f\"  - Gf Vec3d type: {Gf.Vec3d}\")\n    print(f\"  - UsdGeom Mesh type: {UsdGeom.Mesh}\")\n    print(f\"  - UsdLux DistantLight type: {UsdLux.DistantLight}\")\n    print(f\"  - UsdLux DomeLight type: {UsdLux.DomeLight}\")\nexcept ImportError as e:\n    print(f\"\u2717 Failed to import pxr: {e}\")\n    print(\"\\nPlease install pxr using:\")\n    print(\"  pip install pxr\")\n    sys.exit(1)\n\nexcept Exception as e:\n    print(f\"\u2717 Error checking pxr: {e}\")\n    sys.exit(1)\n",
+      "language": "python"
+    },
+    {
+      "path": "test_sublayer.usda",
+      "content": "#usda 1.0\n(\n    \"Test root layer\"\n    subLayers = [\n        @assets.usda@\n    ]\n)\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "test_variants.usda",
+      "content": "#usda 1.0\n\ndef Xform \"Chair\" (\n    prepend variantSets = \"test\"\n)\n{\n    variantSet \"test\" = {\n        \"a\" {\n\n        }\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "verify_assembly.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nVerification script to check that the USD files have the required structure.\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, UsdLux\nimport os\n\n\ndef verify_assets_usda(filepath):\n    \"\"\"Verify that assets.usda has the expected structure.\"\"\"\n    print(\"\\n=== Verifying assets.usda ===\")\n    stage = Usd.Stage.Open(filepath)\n\n    expected_prims = [\n        \"/Assets\",\n        \"/Assets/Chair\",\n        \"/Assets/Chair/Geo\",\n        \"/Assets/Chair_Xform\",\n        \"/Assets/Chair_Xform/Geo\",\n    ]\n\n    for prim_path in expected_prims:\n        if stage.GetPrimAtPath(prim_path):\n            print(f\"\u2713 Found: {prim_path}\")\n        else:\n            print(f\"\u2717 Missing: {prim_path}\")\n            return False\n\n    if (\n        \"/Assets/Chair\"\n        not in stage.GetPrimAtPath(\"/Assets/Chair\").GetVariantSets().GetNames()\n    ):\n        print(\"\u2717 Chair missing variant set 'modelVariant'\")\n        return False\n    else:\n        print(\"\u2713 Chair has variant set 'modelVariant'\")\n\n    vs = stage.GetPrimAtPath(\"/Assets/Chair\").GetVariantSet(\"modelVariant\")\n    if \"simple\" not in vs.GetVariantNames():\n        print(\"\u2717 Chair missing variant 'simple'\")\n        return False\n    else:\n        print(\"\u2713 Chair has variant 'simple'\")\n\n    if \"detailed\" not in vs.GetVariantNames():\n        print(\"\u2717 Chair missing variant 'detailed'\")\n        return False\n    else:\n        print(\"\u2713 Chair has variant 'detailed'\")\n\n    mesh_prim = stage.GetPrimAtPath(\"/Assets/Chair_Xform/Geo\")\n    if mesh_prim.IsValid() and mesh_prim.GetTypeName() == \"Mesh\":\n        print(\"\u2713 Chair_Xform/Geo is a Mesh\")\n    else:\n        print(\"\u2717 Chair_Xform/Geo is not a Mesh\")\n        return False\n\n    return True\n\n\ndef verify_shot_usda(filepath, assets_path):\n    \"\"\"Verify that shot.usda has the expected structure.\"\"\"\n    print(\"\\n=== Verifying shot.usda ===\")\n    stage = Usd.Stage.Open(filepath)\n\n    expected_prims = [\n        \"/Shot\",\n        \"/Shot/Set\",\n        \"/Shot/Set/ChairA\",\n        \"/Shot/Set/ChairB\",\n        \"/Shot/Lighting\",\n    ]\n\n    for prim_path in expected_prims:\n        if stage.GetPrimAtPath(prim_path):\n            print(f\"\u2713 Found: {prim_path}\")\n        else:\n            print(f\"\u2717 Missing: {prim_path}\")\n            return False\n\n    if (\n        not stage.GetRootLayer().subLayerPaths\n        or assets_path not in stage.GetRootLayer().subLayerPaths\n    ):\n        print(\"\u2717 Missing sublayer to assets.usda\")\n        return False\n    else:\n        print(f\"\u2713 Has sublayer: {assets_path}\")\n\n    chairA_prim = stage.GetPrimAtPath(\"/Shot/Set/ChairA\")\n    if chairA_prim.IsValid():\n        xformable = UsdGeom.Xformable(chairA_prim)\n        if xformable.GetXformOps():\n            print(\"\u2713 ChairA has xformOp:translate\")\n        else:\n            print(\"\u2717 ChairA missing xformOp:translate\")\n            return False\n    else:\n        print(\"\u2717 ChairA not found\")\n        return False\n\n    chairB_prim = stage.GetPrimAtPath(\"/Shot/Set/ChairB\")\n    if chairB_prim.IsValid():\n        xformable = UsdGeom.Xformable(chairB_prim)\n        if xformable.GetXformOps():\n            print(\"\u2713 ChairB has xformOp:translate\")\n        else:\n            print(\"\u2717 ChairB missing xformOp:translate\")\n            return False\n    else:\n        print(\"\u2717 ChairB not found\")\n        return False\n\n    lighting_prim = stage.GetPrimAtPath(\"/Shot/Lighting\")\n    if lighting_prim.IsValid():\n        if \"lightingVariant\" not in lighting_prim.GetVariantSets().GetNames():\n            print(\"\u2717 Lighting missing variant set 'lightingVariant'\")\n            return False\n        else:\n            print(\"\u2713 Lighting has variant set 'lightingVariant'\")\n    else:\n        print(\"\u2717 Lighting not found\")\n        return False\n\n    variant_set = lighting_prim.GetVariantSet(\"lightingVariant\")\n    if \"day\" not in variant_set.GetVariantNames():\n        print(\"\u2717 Lighting missing variant 'day'\")\n        return False\n    else:\n        print(\"\u2713 Lighting has variant 'day'\")\n\n    if \"night\" not in variant_set.GetVariantNames():\n        print(\"\u2717 Lighting missing variant 'night'\")\n        return False\n    else:\n        print(\"\u2713 Lighting has variant 'night'\")\n\n    day_light = stage.GetPrimAtPath(\"/Shot/Lighting/Sun\")\n    if day_light.IsValid() and day_light.GetTypeName() == \"DistantLight\":\n        intensity_attr = UsdLux.DistantLight(day_light).GetIntensityAttr()\n        if intensity_attr:\n            print(f\"\u2713 Sun light exists with intensity={intensity_attr.Get()}\")\n        else:\n            print(\"\u2717 Sun light missing intensity\")\n            return False\n    else:\n        print(\"\u2717 Sun light not found or not DistantLight\")\n        return False\n\n    night_light = stage.GetPrimAtPath(\"/Shot/Lighting/Sky\")\n    if night_light.IsValid() and night_light.GetTypeName() == \"DomeLight\":\n        intensity_attr = UsdLux.DomeLight(night_light).GetIntensityAttr()\n        if intensity_attr:\n            print(f\"\u2713 Sky light exists with intensity={intensity_attr.Get()}\")\n        else:\n            print(\"\u2717 Sky light missing intensity\")\n            return False\n    else:\n        print(\"\u2717 Sky light not found or not DomeLight\")\n        return False\n\n    return True\n\n\ndef main():\n    script_dir = os.path.dirname(os.path.abspath(__file__))\n    assets_path = os.path.join(script_dir, \"assets.usda\")\n    shot_path = os.path.join(script_dir, \"shot.usda\")\n\n    if not os.path.exists(assets_path):\n        print(f\"\u2717 assets.usda not found at {assets_path}\")\n        return False\n\n    if not os.path.exists(shot_path):\n        print(f\"\u2717 shot.usda not found at {shot_path}\")\n        return False\n\n    assets_ok = verify_assets_usda(assets_path)\n    shot_ok = verify_shot_usda(shot_path, assets_path)\n\n    if assets_ok and shot_ok:\n        print(\"\\n\u2713\u2713\u2713 All verifications passed! \u2713\u2713\u2713\")\n        return True\n    else:\n        print(\"\\n\u2717\u2717\u2717 Some verifications failed! \u2717\u2717\u2717\")\n        return False\n\n\nif __name__ == \"__main__\":\n    success = main()\n    exit(0 if success else 1)\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3
+}

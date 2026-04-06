@@ -1,0 +1,35 @@
+{
+  "task_id": "tier4-usd-shot-assembly-hints",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": "usd-composition:task-hints",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.25581062491983,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-05T22:28:24.567600+00:00",
+  "prompt": "Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:\n\n1. assets.usda \u2014 contains:\n   - Default prim /Assets\n   - /Assets/Chair \u2014 an Xform with a child Mesh (/Assets/Chair/Geo) representing a simple chair (8-point cube is fine)\n   - /Assets/Chair has a variant set 'modelVariant' with variants 'simple' and 'detailed' (both can contain the same geo, this tests the variant mechanism)\n\n2. shot.usda \u2014 contains:\n   - Default prim /Shot\n   - Sublayers assets.usda\n   - /Shot/Set \u2014 an Xform\n   - /Shot/Set/ChairA \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (-2, 0, 0)\n   - /Shot/Set/ChairB \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (2, 0, 0)\n   - /Shot/Lighting \u2014 an Xform with a variant set 'lightingVariant' containing 'day' and 'night' variants\n   - In 'day' variant: a DistantLight at /Shot/Lighting/Sun with intensity=50000\n   - In 'night' variant: a DomeLight at /Shot/Lighting/Sky with intensity=500\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "assemble_shot.py",
+      "content": "#!/usr/bin/env python3\n\nfrom pxr import Usd, UsdGeom, UsdLux, Sdf, Gf\nimport os\n\ndef create_assets_file():\n    \"\"\"Create assets.usda with chair model and variants\"\"\"\n    # Create stage\n    stage = Usd.Stage.CreateInMemory()\n\n    # Create default prim /Assets\n    assets_prim = UsdGeom.Xform.Define(stage, \"/Assets\")\n    stage.SetDefaultPrim(assets_prim.GetPrim())\n\n    # Create chair\n    chair_prim = UsdGeom.Xform.Define(stage, \"/Assets/Chair\")\n\n    # Create chair geometry (8-point cube)\n    chair_geo = UsdGeom.Cube.Define(stage, \"/Assets/Chair/Geo\")\n    chair_geo.CreateSizeAttr(1.0)\n\n    # Create variant set for chair\n    variant_set = chair_prim.GetPrim().GetVariantSets().AddVariantSet(\"modelVariant\")\n\n    # Create 'simple' variant\n    simple_layer = Sdf.Layer.CreateAnonymous()\n    simple_variant = variant_set.GetVariant(\"simple\")\n    simple_layer.ImportToStage(stage, \"/Assets/Chair/Geo\")\n    stage.GetPrimAtPath(\"/Assets/Chair/Geo\").GetReferences().AddAnonymousReference(simple_layer.identifier)\n    variant_set.SetVariantSelection(\"simple\")\n\n    # Create 'detailed' variant\n    detailed_layer = Sdf.Layer.CreateAnonymous()\n    detailed_variant = variant_set.GetVariant(\"detailed\")\n    detailed_layer.ImportToStage(stage, \"/Assets/Chair/Geo\")\n    stage.GetPrimAtPath(\"/Assets/Chair/Geo\").GetReferences().AddAnonymousReference(detailed_layer.identifier)\n    variant_set.SetVariantSelection(\"detailed\")\n\n    # Export to assets.usda\n    usda_path = \"assets.usda\"\n    stage.Export(usda_path)\n    print(f\"Created {usda_path}\")\n    return usda_path\n\ndef create_shot_file():\n    \"\"\"Create shot.usda with references to assets and lighting variants\"\"\"\n    # Create stage\n    stage = Usd.Stage.CreateInMemory()\n\n    # Create default prim /Shot\n    shot_prim = UsdGeom.Xform.Define(stage, \"/Shot\")\n    stage.SetDefaultPrim(shot_prim.GetPrim())\n\n    # Sublayer assets.usda\n    stage.GetRootLayer().subLayerPaths.append(\"assets.usda\")\n\n    # Create Set xform\n    set_prim = UsdGeom.Xform.Define(stage, \"/Shot/Set\")\n\n    # Create ChairA reference at (-2, 0, 0)\n    chair_a = UsdGeom.Xform.Define(stage, \"/Shot/Set/ChairA\")\n    reference_a = chair_a.GetPrim().GetReferences().AddReference(\"assets.usda\", \"/Assets/Chair\")\n\n    # Apply translation\n    translate_op = UsdGeom.XformOp.Create(chair_a.GetPrim(), UsdGeom.Tokens.xformOpTranslate)\n    translate_op.Set(Gf.Vec3f(-2, 0, 0))\n\n    # Create ChairB reference at (2, 0, 0)\n    chair_b = UsdGeom.Xform.Define(stage, \"/Shot/Set/ChairB\")\n    reference_b = chair_b.GetPrim().GetReferences().AddReference(\"assets.usda\", \"/Assets/Chair\")\n\n    # Apply translation\n    translate_op_b = UsdGeom.XformOp.Create(chair_b.GetPrim(), UsdGeom.Tokens.xformOpTranslate)\n    translate_op_b.Set(Gf.Vec3f(2, 0, 0))\n\n    # Create Lighting xform with variant set\n    lighting_prim = UsdGeom.Xform.Define(stage, \"/Shot/Lighting\")\n    lighting_variant_set = lighting_prim.GetPrim().GetVariantSets().AddVariantSet(\"lightingVariant\")\n\n    # Create 'day' variant\n    day_layer = Sdf.Layer.CreateAnonymous()\n    day_variant = lighting_variant_set.GetVariant(\"day\")\n    day_layer.ImportToStage(stage, \"/Shot/Lighting/Sun\")\n    stage.GetPrimAtPath(\"/Shot/Lighting/Sun\").GetReferences().AddAnonymousReference(day_layer.identifier)\n    lighting_variant_set.SetVariantSelection(\"day\")\n\n    # Create 'night' variant\n    night_layer = Sdf.Layer.CreateAnonymous()\n    night_variant = lighting_variant_set.GetVariant(\"night\")\n    night_layer.ImportToStage(stage, \"/Shot/Lighting/Sky\")\n    stage.GetPrimAtPath(\"/Shot/Lighting/Sky\").GetReferences().AddAnonymousReference(night_layer.identifier)\n    lighting_variant_set.SetVariantSelection(\"night\")\n\n    # Export to shot.usda\n    usda_path = \"shot.usda\"\n    stage.Export(usda_path)\n    print(f\"Created {usda_path}\")\n    return usda_path\n\ndef main():\n    \"\"\"Main function to create both USD files\"\"\"\n    print(\"Building USD shot assembly...\")\n\n    # Create assets.usda\n    assets_path = create_assets_file()\n\n    # Create shot.usda\n    shot_path = create_shot_file()\n\n    print(\"\\nUSD shot assembly complete!\")\n    print(f\"Created files:\")\n    print(f\"  - {assets_path}\")\n    print(f\"  - {shot_path}\")\n\n    # Show file sizes\n    if os.path.exists(assets_path):\n        print(f\"  Size: {os.path.getsize(assets_path)} bytes\")\n    if os.path.exists(shot_path):\n        print(f\"  Size: {os.path.getsize(shot_path)} bytes\")\n\nif __name__ == \"__main__\":\n    main()",
+      "language": "python"
+    }
+  ],
+  "tier": 4
+}

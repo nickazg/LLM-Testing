@@ -1,0 +1,29 @@
+{
+  "task_id": "tier2-usd-scene",
+  "model": "qwen3-coder-free",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0108534169849,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-04T20:51:10.581417+00:00",
+  "prompt": "Create a Python file called build_scene.py that uses the pxr library (Pixar USD) to programmatically build a USD scene and export it as scene.usda. The scene must contain:\n\n1. A root prim /World (Xform) set as the default prim\n2. /World/Ground \u2014 a Mesh prim representing a ground plane (UsdGeom.Mesh with points for a quad, faceVertexCounts=[4], faceVertexIndices=[0,1,2,3])\n3. /World/Ground with xformOp:translate set to (0, 0, 0)\n4. /World/Character \u2014 an Xform prim with xformOp:translate at (0, 1, 0)\n5. /World/Character/Body \u2014 a Mesh prim (can be a simple cube with 8 points, 6 faces)\n6. /World/Light \u2014 a DomeLight (UsdLux.DomeLight) with intensity=1000\n7. /World/Looks/GroundMaterial \u2014 a UsdShade.Material with a UsdPreviewSurface shader that has diffuseColor=(0.3, 0.3, 0.3)\n8. The Ground mesh must be bound to GroundMaterial using UsdShade.MaterialBindingAPI\n\nUse: from pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 2
+}

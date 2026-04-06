@@ -1,0 +1,60 @@
+{
+  "task_id": "tier4-usd-shot-assembly-compiled-live",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": "usd-composition:compiled-live-glm45",
+  "scores": {
+    "correctness": 0.2,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00789145892486,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-05T23:49:49.288996+00:00",
+  "prompt": "Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:\n\n1. assets.usda \u2014 contains:\n   - Default prim /Assets\n   - /Assets/Chair \u2014 an Xform with a child Mesh (/Assets/Chair/Geo) representing a simple chair (8-point cube is fine)\n   - /Assets/Chair has a variant set 'modelVariant' with variants 'simple' and 'detailed' (both can contain the same geo, this tests the variant mechanism)\n\n2. shot.usda \u2014 contains:\n   - Default prim /Shot\n   - Sublayers assets.usda\n   - /Shot/Set \u2014 an Xform\n   - /Shot/Set/ChairA \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (-2, 0, 0)\n   - /Shot/Set/ChairB \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (2, 0, 0)\n   - /Shot/Lighting \u2014 an Xform with a variant set 'lightingVariant' containing 'day' and 'night' variants\n   - In 'day' variant: a DistantLight at /Shot/Lighting/Sun with intensity=50000\n   - In 'night' variant: a DomeLight at /Shot/Lighting/Sky with intensity=500\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/16642627588763767148",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-n686pd9v\u0001\u0010assemble_shot.py\ufffd\ufffdI%\ufffd\ufffd\ufffd\u0012\"\ufffd\ufffd^\n`\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "assemble_shot.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nScript to assemble a multi-file shot using Pixar USD (pxr library).\nCreates assets.usda and shot.usda files with the specified structure.\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, UsdLux, Sdf, Gf\n\n\ndef create_assets_file():\n    \"\"\"Create assets.usda with chair model and variants.\"\"\"\n    stage = Usd.Stage.CreateNew(\"assets.usda\")\n\n    # Create default prim /Assets\n    assets_prim = stage.DefinePrim(\"/Assets\", \"Xform\")\n\n    # Create chair xform and geometry\n    chair_prim = stage.DefinePrim(\"/Assets/Chair\", \"Xform\")\n\n    # Create simple cube geometry for chair\n    cube = UsdGeom.Cube.Define(stage, \"/Assets/Chair/Geo\")\n    cube.CreateSizeAttr(1.0)\n\n    # Create variant set for chair\n    variant_set = chair_prim.GetVariantSets().AddVariantSet(\"modelVariant\")\n    variant_set.AddVariant(\"simple\")\n    variant_set.AddVariant(\"detailed\")\n\n    # Set selection to simple variant\n    variant_set.SetVariantSelection(\"simple\")\n\n    # Save the stage\n    stage.GetRootLayer().Save()\n\n\ndef create_shot_file():\n    \"\"\"Create shot.usda with shot setup and references to assets.\"\"\"\n    stage = Usd.Stage.CreateNew(\"shot.usda\")\n\n    # Create default prim /Shot\n    shot_prim = stage.DefinePrim(\"/Shot\", \"Xform\")\n\n    # Add assets.usda as sublayer\n    stage.GetRootLayer().subLayerPaths.append(\"assets.usda\")\n\n    # Create set xform\n    set_prim = stage.DefinePrim(\"/Shot/Set\", \"Xform\")\n\n    # Create chair references with transforms\n    chair_a_ref = stage.DefinePrim(\"/Shot/Set/ChairA\", \"Reference\")\n    chair_a_ref.GetReferences().AddInternalReference(\"/Assets/Chair\")\n\n    # Add translate op for ChairA\n    xform_a = UsdGeom.Xformable(chair_a_ref)\n    translate_op = xform_a.AddTranslateOp()\n    translate_op.Set(Gf.Vec3f(-2, 0, 0))\n\n    # Create ChairB reference\n    chair_b_ref = stage.DefinePrim(\"/Shot/Set/ChairB\", \"Reference\")\n    chair_b_ref.GetReferences().AddInternalReference(\"/Assets/Chair\")\n\n    # Add translate op for ChairB\n    xform_b = UsdGeom.Xformable(chair_b_ref)\n    translate_op = xform_b.AddTranslateOp()\n    translate_op.Set(Gf.Vec3f(2, 0, 0))\n\n    # Create lighting xform with variant set\n    lighting_prim = stage.DefinePrim(\"/Shot/Lighting\", \"Xform\")\n    lighting_variant_set = lighting_prim.GetVariantSets().AddVariantSet(\n        \"lightingVariant\"\n    )\n    lighting_variant_set.AddVariant(\"day\")\n    lighting_variant_set.AddVariant(\"night\")\n\n    # Set default selection to day\n    lighting_variant_set.SetVariantSelection(\"day\")\n    # Create day lighting elements\n    sun_prim = stage.DefinePrim(\"/Shot/Lighting/Sun\", \"DistantLight\")\n    sun_prim.GetLight().CreateIntensityAttr(50000)\n\n    # Save the stage\n    stage.GetRootLayer().Save()\n\n\nif __name__ == \"__main__\":\n    create_assets_file()\n    create_shot_file()\n    print(\"Successfully created assets.usda and shot.usda\")\n",
+      "language": "python"
+    },
+    {
+      "path": "assets.usda",
+      "content": "#usda 1.0\n\ndef Xform \"Assets\"\n{\n    def Xform \"Chair\" (\n        variants = {\n            string modelVariant = \"simple\"\n        }\n        prepend variantSets = \"modelVariant\"\n    )\n    {\n        def Cube \"Geo\"\n        {\n            double size = 1\n        }\n        variantSet \"modelVariant\" = {\n            \"detailed\" {\n\n            }\n            \"simple\" {\n\n            }\n        }\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "shot.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 4
+}

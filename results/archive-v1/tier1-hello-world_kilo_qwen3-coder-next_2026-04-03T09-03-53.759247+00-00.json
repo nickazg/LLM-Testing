@@ -1,0 +1,29 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "qwen3-coder-next",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.4471365000354126,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-03T09:03:53.759247+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775207032611,\"sessionID\":\"ses_2ad6a5e43ffehtZt9qqJ733Xh5\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: openrouter/qwen/qwen3-coder-next.\"}}}\n",
+  "conversation": [],
+  "files": [],
+  "tier": 1
+}

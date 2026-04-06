@@ -1,0 +1,60 @@
+{
+  "task_id": "tier2-cli-tool",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.5,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 129.08146083296742,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-04T19:24:25.656049+00:00",
+  "prompt": "Create a Python script called `wordcount.py` that works like a simplified `wc` command. It should accept one or more file paths as positional arguments and optional flags: `--lines` (or `-l`), `--words` (or `-w`), `--chars` (or `-c`). If no flags are given, show all three counts. For each file, print a line with the requested counts followed by the filename, separated by tabs. If multiple files are given, also print a 'total' line summing all counts. Use `argparse` for argument parsing. Exit with code 0 on success, 1 if any file is not found.",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/12755802161224366634",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-b4ahtnk6\u0001\fwordcount.py\ufffd\ufffd\ufffd\u072f\ufffdn;z\ufffd!\ufffd\ufffdY\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "sample1.txt",
+      "content": "The quick brown fox jumps over the lazy dog.\nPython is a versatile programming language.\nIt supports multiple paradigms including procedural and object-oriented.\nMany developers choose Python for data science and automation.\nThis sample file is used for testing a word count tool.\nEach line contains a different number of words.\n",
+      "language": "text"
+    },
+    {
+      "path": "sample2.txt",
+      "content": "Short lines here.\nAnother brief line of text.\nThe third line is slightly longer than the others.\nDone.\n",
+      "language": "text"
+    },
+    {
+      "path": "wordcount.py",
+      "content": "#!/usr/bin/env python3\nimport argparse\nimport sys\nimport os\n\n\ndef count_file(file_path):\n    \"\"\"Count lines, words, and characters in a file.\"\"\"\n    try:\n        with open(file_path, \"r\", encoding=\"utf-8\") as file:\n            content = file.read()\n            lines = content.count(\"\\n\") + (1 if content else 0)\n            words = len(content.split())\n            chars = len(content)\n            return lines, words, chars\n    except FileNotFoundError:\n        print(f\"wordcount.py: {file_path}: No such file or directory\", file=sys.stderr)\n        return None, None, None\n\n\ndef main():\n    parser = argparse.ArgumentParser(description=\"Word count utility\")\n    parser.add_argument(\"--lines\", \"-l\", action=\"store_true\", help=\"Count lines\")\n    parser.add_argument(\"--words\", \"-w\", action=\"store_true\", help=\"Count words\")\n    parser.add_argument(\"--chars\", \"-c\", action=\"store_true\", help=\"Count characters\")\n    parser.add_argument(\"files\", nargs=\"+\", help=\"Files to count\")\n\n    args = parser.parse_args()\n\n    # If no flags are given, show all three counts\n    if not any([args.lines, args.words, args.chars]):\n        args.lines = args.words = args.chars = True\n\n    total_lines = 0\n    total_words = 0\n    total_chars = 0\n    has_error = False\n\n    # Process each file\n    for file_path in args.files:\n        lines, words, chars = count_file(file_path)\n\n        if lines is None:\n            has_error = True\n            continue\n\n        # Print counts for current file\n        output = []\n        if args.lines:\n            output.append(str(lines))\n        if args.words:\n            output.append(str(words))\n        if args.chars:\n            output.append(str(chars))\n\n        print(\"\\t\".join(output) + \"\\t\" + file_path)\n\n        # Update totals\n        if args.lines and lines is not None:\n            total_lines += lines\n        if args.words and words is not None:\n            total_words += words\n        if args.chars and chars is not None:\n            total_chars += chars\n\n    # Print total line if multiple files\n    if len(args.files) > 1 and (args.lines or args.words or args.chars):\n        output = []\n        if args.lines:\n            output.append(str(total_lines))\n        if args.words:\n            output.append(str(total_words))\n        if args.chars:\n            output.append(str(total_chars))\n\n        print(\"\\t\".join(output) + \"\\ttotal\")\n\n    # Exit with appropriate code\n    sys.exit(1 if has_error else 0)\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2
+}

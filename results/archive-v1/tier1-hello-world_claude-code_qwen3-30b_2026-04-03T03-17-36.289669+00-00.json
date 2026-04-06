@@ -1,0 +1,18 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "qwen3-30b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": 0,
+      "tool_calls": 1,
+      "wall_time_s": 3.5159102919860743
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-03T03:17:36.289669+00:00"
+}

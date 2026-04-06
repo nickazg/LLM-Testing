@@ -1,0 +1,136 @@
+{
+  "task_id": "tier3-service-generator",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.875,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 41,
+        "output": 188,
+        "thinking": 20,
+        "cache_read": 15424
+      },
+      "tool_calls": 0,
+      "wall_time_s": 28.98760333302198,
+      "cost_usd": 0.0027112000237056
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-04T23:22:24.935951+00:00",
+  "prompt": "Create a Python file called generate_service.py that generates systemd service unit files from command-line arguments. Usage:\n\n  python generate_service.py --name myapp --exec /usr/bin/myapp --user www-data --description 'My Application' --after network.target --restart on-failure --output myapp.service\n\nRequired args: --name, --exec\nOptional args with defaults:\n  --user (default: root)\n  --description (default: '{name} service')\n  --after (default: network.target, can specify multiple)\n  --restart (default: on-failure, choices: no, on-success, on-failure, on-abnormal, on-watchdog, on-abort, always)\n  --restart-sec (default: 5)\n  --output (default: {name}.service)\n  --wanted-by (default: multi-user.target)\n  --env (repeatable, KEY=VALUE pairs to add as Environment= lines)\n  --working-dir (optional WorkingDirectory=)\n\nThe generated .service file must be valid systemd unit format with [Unit], [Service], and [Install] sections.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775344919145,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acda264001L4leeiD54rTCE7\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acd9cfe001OtFrVYd50a97sB\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775344928237,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acda976001uNs65TGY2gkIoy\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acd9cfe001OtFrVYd50a97sB\",\"type\":\"text\",\"text\":\"I'll create a Python script to generate systemd service unit files from command-line arguments.\",\"time\":{\"start\":1775344928236,\"end\":1775344928236}}}\n{\"type\":\"tool_use\",\"timestamp\":1775344929104,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdc5d7001fbN2yKY13m8Z3M\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acd9cfe001OtFrVYd50a97sB\",\"type\":\"tool\",\"callID\":\"call_a37b\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"#!/usr/bin/env python3\\n\\\"\\\"\\\"\\nGenerate systemd service unit files from command-line arguments.\\n\\\"\\\"\\\"\\n\\nimport argparse\\nimport sys\\n\\n\\ndef parse_args():\\n    parser = argparse.ArgumentParser(\\n        description='Generate systemd service unit files',\\n        formatter_class=argparse.ArgumentDefaultsHelpFormatter\\n    )\\n\\n    required_args = parser.add_argument_group('Required Arguments')\\n    required_args.add_argument(\\n        '--name',\\n        required=True,\\n        help='Service name (without .service extension)'\\n    )\\n    required_args.add_argument(\\n        '--exec',\\n        required=True,\\n        help='Executable path to run'\\n    )\\n\\n    optional_args = parser.add_argument_group('Optional Arguments')\\n    optional_args.add_argument(\\n        '--user',\\n        default='root',\\n        help='User to run as'\\n    )\\n    optional_args.add_argument(\\n        '--description',\\n        default='{name} service',\\n        help='Service description'\\n    )\\n    optional_args.add_argument(\\n        '--after',\\n        nargs='+',\\n        default=['network.target'],\\n        help='Services to start after (can specify multiple)'\\n    )\\n    optional_args.add_argument(\\n        '--restart',\\n        choices=['no', 'on-success', 'on-failure', 'on-abnormal', 'on-watchdog', 'on-abort', 'always'],\\n        default='on-failure',\\n        help='Restart policy'\\n    )\\n    optional_args.add_argument(\\n        '--restart-sec',\\n        type=int,\\n        default=5,\\n        help='Seconds to wait before restart'\\n    )\\n    optional_args.add_argument(\\n        '--output',\\n        default='{name}.service',\\n        help='Output file name'\\n    )\\n    optional_args.add_argument(\\n        '--wanted-by',\\n        default='multi-user.target',\\n        help='Target to enable the service for'\\n    )\\n    optional_args.add_argument(\\n        '--env',\\n        action='append',\\n        metavar='KEY=VALUE',\\n        help='Environment variables (can be specified multiple times)'\\n    )\\n    optional_args.add_argument(\\n        '--working-dir',\\n        help='Working directory'\\n    )\\n\\n    return parser.parse_args()\\n\\n\\ndef generate_service(args):\\n    description = args.description.format(name=args.name)\\n\\n    content = f\\\"\\\"\\\"[Unit]\\nDescription={description}\\nAfter={' '.join(args.after)}\\n\\n[Service]\\nType=simple\\nUser={args.user}\\nExecStart={args.exec}\\nRestart={args.restart}\\nRestartSec={args.restart_sec}\\n{' '.join([f'WorkingDirectory={args.working_dir}' for args.working_dir in [args.working_dir] if args.working_dir])}\\n\\\"\\\"\\\"\\n\\n    if args.env:\\n        for env_var in args.env:\\n            content += f\\\"Environment={env_var}\\\\n\\\"\\n\\n    content += f\\\"\\\"\\\"\\\\n[Install]\\nWantedBy={args.wanted_by}\\n\\\"\\\"\\\"\\n\\n    return content\\n\\n\\ndef main():\\n    args = parse_args()\\n\\n    output = args.output.format(name=args.name)\\n    service_content = generate_service(args)\\n\\n    try:\\n        with open(output, 'w') as f:\\n            f.write(service_content)\\n        print(f\\\"Generated systemd service file: {output}\\\")\\n        print(f\\\"Size: {len(service_content)} bytes\\\")\\n        return 0\\n    except IOError as e:\\n        print(f\\\"Error writing output file: {e}\\\", file=sys.stderr)\\n        return 1\\n\\n\\nif __name__ == '__main__':\\n    sys.exit(main())\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/generate_service.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/generate_service.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/generate_service.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/generate_service.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775344928230,\"end\":1775344929101}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Let me break down this task:\\n\\n1. Create a Python file called `generate_service.py`\\n2. It needs to parse command-line arguments and generate systemd service unit files\\n3. Required args: --name, --exec\\n4. Optional args with defaults:\\n   - --user (default: root)\\n   - --description (default: '{name} service')\\n   - --after (default: network.target, can specify multiple)\\n   - --restart (default: on-failure, choices: no, on-success, on-failure, on-abnormal, on-watchdog, on-abort, always)\\n   - --restart-sec (default: 5)\\n   - --output (default: {name}.service)\\n   - --wanted-by (default: multi-user.target)\\n   - --env (repeatable, KEY=VALUE pairs)\\n   - --working-dir (optional WorkingDirectory=)\\n5. Generated .service file must be valid systemd format with [Unit], [Service], and [Install] sections\\n\\nFirst, let me check if there are any existing files in the directory.\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775344929109,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdc951001q6lez61Ev1q3WT\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acd9cfe001OtFrVYd50a97sB\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0011921200000128,\"tokens\":{\"total\":14363,\"input\":13318,\"output\":981,\"reasoning\":230,\"cache\":{\"read\":64,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775344930867,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdd032001IVhmxaXt6s3h3G\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acdc958001zPEbqYDKtpowLN\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775344931777,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdd374001XTQU7dK7n6Jth8\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acdc958001zPEbqYDKtpowLN\",\"type\":\"tool\",\"callID\":\"call_d92b\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"python3 generate_service.py --name myapp --exec /usr/bin/myapp --user www-data --description 'My Application' --after network.target --restart on-failure --output myapp.service\",\"description\":\"Test generate_service.py with example args\"},\"output\":\"Generated systemd service file: myapp.service\\nSize: 188 bytes\\n\",\"title\":\"Test generate_service.py with example args\",\"metadata\":{\"output\":\"Generated systemd service file: myapp.service\\nSize: 188 bytes\\n\",\"exit\":0,\"description\":\"Test generate_service.py with example args\",\"truncated\":false},\"time\":{\"start\":1775344931726,\"end\":1775344931777}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Good! I've created the generate_service.py file. Let me test it with the example usage provided to make sure it works correctly.\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775344931779,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdd3c1001Q8WYlKVj7RQzeg\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acdc958001zPEbqYDKtpowLN\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0001839800028544,\"tokens\":{\"total\":14461,\"input\":101,\"output\":88,\"reasoning\":32,\"cache\":{\"read\":14272,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775344932903,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdd824001nPZoC3U6dYrPby\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acdd3c5001e2tKQE242tMakZ\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775344933436,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdda29001OrTGTFMORkieXa\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acdd3c5001e2tKQE242tMakZ\",\"type\":\"tool\",\"callID\":\"call_30df\",\"tool\":\"read\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/myapp.service\"},\"output\":\"<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/myapp.service</path>\\n<type>file</type>\\n<content>1: [Unit]\\n2: Description=My Application\\n3: After=network.target\\n4: \\n5: [Service]\\n6: Type=simple\\n7: User=www-data\\n8: ExecStart=/usr/bin/myapp\\n9: Restart=on-failure\\n10: RestartSec=5\\n11: \\n12: \\n13: [Install]\\n14: WantedBy=multi-user.target\\n\\n(End of file - total 14 lines)\\n</content>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/myapp.service\",\"metadata\":{\"preview\":\"[Unit]\\nDescription=My Application\\nAfter=network.target\\n\\n[Service]\\nType=simple\\nUser=www-data\\nExecStart=/usr/bin/myapp\\nRestart=on-failure\\nRestartSec=5\\n\\n\\n[Install]\\nWantedBy=multi-user.target\",\"truncated\":false,\"loaded\":[]},\"time\":{\"start\":1775344933425,\"end\":1775344933435}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Great! Let me verify the generated file looks correct.\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775344933438,\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"part\":{\"id\":\"prt_d5acdda3c001AxusN7KM65ycH8\",\"sessionID\":\"ses_2a5326722ffeWzxIY9XYQbOC0l\",\"messageID\":\"msg_d5acdd3c5001e2tKQE242tMakZ\",\"type\":\"step-finish\",\"reas",
+  "conversation": [
+    {
+      "role": "response",
+      "content": "I'll create a Python script to generate systemd service unit files from command-line arguments.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"#!/usr/bin/env python3\\n\\\"\\\"\\\"\\nGenerate systemd service unit files from command-line arguments.\\n\\\"\\\"\\\"\\n\\nimport argparse\\nimport sys\\n\\n\\ndef parse_args():\\n    parser = argparse.ArgumentParser(\\n        description='Generate systemd service unit files',\\n        formatter_class=argparse.ArgumentDefaultsHelpFormatter\\n    )\\n\\n    required_args = parser.add_argument_group('Required Arguments')\\n    required_args.add_argument(\\n        '--name',\\n        required=True,\\n        help='Service name (without .service extension)'\\n    )\\n    required_args.add_argument(\\n        '--exec',\\n        required=True,\\n        help='Executable path to run'\\n    )\\n\\n    optional_args = parser.add_argument_group('Optional Arguments')\\n    optional_args.add_argument(\\n        '--user',\\n        default='root',\\n        help='User to run as'\\n    )\\n    optional_args.add_argument(\\n        '--description',\\n        default='{name} service',\\n        help='Service description'\\n    )\\n    optional_args.add_argument(\\n        '--after',\\n        nargs='+',\\n        default=['network.target'],\\n        help='Services to start after (can specify multiple)'\\n    )\\n    optional_args.add_argument(\\n        '--restart',\\n        choices=['no', 'on-success', 'on-failure', 'on-abnormal', 'on-watchdog', 'on-abort', 'always'],\\n        default='on-failure',\\n        help='Restart policy'\\n    )\\n    optional_args.add_argument(\\n        '--restart-sec',\\n        type=int,\\n        default=5,\\n        help='Seconds to wait before restart'\\n    )\\n    optional_args.add_argument(\\n        '--output',\\n        default='{name}.service',\\n        help='Output file name'\\n    )\\n    optional_args.add_argument(\\n        '--wanted-by',\\n        default='multi-user.target',\\n        help='Target to enable the service for'\\n    )\\n    optional_args.add_argument(\\n        '--env',\\n        action='append',\\n        metavar='KEY=VALUE',\\n        help='Environment variables (can be specified multiple times)'\\n    )\\n    optional_args.add_argument(\\n        '--working-dir',\\n        help='Working directory'\\n    )\\n\\n    return parser.parse_args()\\n\\n\\ndef generate_service(args):\\n    description = args.description.format(name=args.name)\\n\\n    content = f\\\"\\\"\\\"[Unit]\\nDescription={description}\\nAfter={' '.join(args.after)}\\n\\n[Service]\\nType=simple\\nUser={args.user}\\nExecStart={args.exec}\\nRestart={args.restart}\\nRestartSec={args.restart_sec}\\n{' '.join([f'WorkingDirectory={args.working_dir}' for args.working_dir in [args.working_dir] if args.working_dir])}\\n\\\"\\\"\\\"\\n\\n    if args.env:\\n        for env_var in args.env:\\n            content += f\\\"Environment={env_var}\\\\n\\\"\\n\\n    content += f\\\"\\\"\\\"\\\\n[Install]\\nWantedBy={args.wanted_by}\\n\\\"\\\"\\\"\\n\\n    return content\\n\\n\\ndef main():\\n    args = parse_args()\\n\\n    output = args.output.format(name=args.name)\\n    service_content = generate_service(args)\\n\\n    try:\\n        with open(output, 'w') as f:\\n            f.write(service_content)\\n        print(f\\\"Generated systemd service file: {output}\\\")\\n        print(f\\\"Size: {len(service_content)} bytes\\\")\\n        return 0\\n    except IOError as e:\\n        print(f\\\"Error writing output file: {e}\\\", file=sys.stderr)\\n        return 1\\n\\n\\nif __name__ == '__main__':\\n    sys.exit(main())\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/generate_service.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 generate_service.py --name myapp --exec /usr/bin/myapp --user www-data --description 'My Application' --after network.target --restart on-failure --output myapp.service\",\n  \"description\": \"Test generate_service.py with example args\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "Generated systemd service file: myapp.service\nSize: 188 bytes\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/myapp.service\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/myapp.service</path>\n<type>file</type>\n<content>1: [Unit]\n2: Description=My Application\n3: After=network.target\n4: \n5: [Service]\n6: Type=simple\n7: User=www-data\n8: ExecStart=/usr/bin/myapp\n9: Restart=on-failure\n10: RestartSec=5\n11: \n12: \n13: [Install]\n14: WantedBy=multi-user.target\n\n(End of file - total 14 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 generate_service.py --name testapp --exec /opt/testapp/bin/start\",\n  \"description\": \"Test with defaults only\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "Generated systemd service file: testapp.service\nSize: 193 bytes\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/testapp.service\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/testapp.service</path>\n<type>file</type>\n<content>1: [Unit]\n2: Description=testapp service\n3: After=network.target\n4: \n5: [Service]\n6: Type=simple\n7: User=root\n8: ExecStart=/opt/testapp/bin/start\n9: Restart=on-failure\n10: RestartSec=5\n11: \n12: \n13: [Install]\n14: WantedBy=multi-user.target\n\n(End of file - total 14 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 generate_service.py --name api-server --exec /usr/bin/api-server --user postgres --description 'API Server' --after network.target network-online.target --restart on-failure --restart-sec 10 --output api-server.service --working-dir /var/lib/api-server --env DATABASE_URL=postgresql://localhost/mydb --env PORT=8080 --env RUST_LOG=info\",\n  \"description\": \"Test with multiple advanced options\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "Generated systemd service file: api-server.service\nSize: 349 bytes\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/api-server.service\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby/api-server.service</path>\n<type>file</type>\n<content>1: [Unit]\n2: Description=API Server\n3: After=network.target network-online.target\n4: \n5: [Service]\n6: Type=simple\n7: User=postgres\n8: ExecStart=/usr/bin/api-server\n9: Restart=on-failure\n10: RestartSec=10\n11: WorkingDirectory=/var/lib/api-server\n12: Environment=DATABASE_URL=postgresql://localhost/mydb\n13: Environment=PORT=8080\n14: Environment=RUST_LOG=info\n15: \n16: [Install]\n17: WantedBy=multi-user.target\n\n(End of file - total 17 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"chmod +x generate_service.py && rm myapp.service testapp.service api-server.service\",\n  \"description\": \"Make script executable and cleanup test files\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "response",
+      "content": "Created `generate_service.py` that generates systemd service unit files from command-line arguments.\n\n**Features:**\n- Required args: `--name`, `--exec`\n- Optional args with defaults: `--user` (root), `--description`, `--after` (network.target), `--restart` (on-failure), `--restart-sec` (5), `--output`, `--wanted-by` (multi-user.target)\n- Repeatable `--env` for environment variables\n- Optional `--working-dir`\n- Generates valid systemd .service files with [Unit], [Service], and [Install] sections\n\n**Tested:**\n- Basic usage with required args\n- All defaults\n- Multiple --after values\n- Multiple --env variables\n- --working-dir option\n\nAll generated files follow systemd unit format.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/7126524735835880566",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-wt5qmlby\u0001\u0013generate_service.py\ufffd\ufffd\ufffdA\ufffd.\ufffd)\ufffd\u001a\ufffd\ufffdZ\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "generate_service.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nGenerate systemd service unit files from command-line arguments.\n\"\"\"\n\nimport argparse\nimport sys\n\n\ndef parse_args():\n    parser = argparse.ArgumentParser(\n        description=\"Generate systemd service unit files\",\n        formatter_class=argparse.ArgumentDefaultsHelpFormatter,\n    )\n\n    required_args = parser.add_argument_group(\"Required Arguments\")\n    required_args.add_argument(\n        \"--name\", required=True, help=\"Service name (without .service extension)\"\n    )\n    required_args.add_argument(\"--exec\", required=True, help=\"Executable path to run\")\n\n    optional_args = parser.add_argument_group(\"Optional Arguments\")\n    optional_args.add_argument(\"--user\", default=\"root\", help=\"User to run as\")\n    optional_args.add_argument(\n        \"--description\", default=\"{name} service\", help=\"Service description\"\n    )\n    optional_args.add_argument(\n        \"--after\",\n        nargs=\"+\",\n        default=[\"network.target\"],\n        help=\"Services to start after (can specify multiple)\",\n    )\n    optional_args.add_argument(\n        \"--restart\",\n        choices=[\n            \"no\",\n            \"on-success\",\n            \"on-failure\",\n            \"on-abnormal\",\n            \"on-watchdog\",\n            \"on-abort\",\n            \"always\",\n        ],\n        default=\"on-failure\",\n        help=\"Restart policy\",\n    )\n    optional_args.add_argument(\n        \"--restart-sec\", type=int, default=5, help=\"Seconds to wait before restart\"\n    )\n    optional_args.add_argument(\n        \"--output\", default=\"{name}.service\", help=\"Output file name\"\n    )\n    optional_args.add_argument(\n        \"--wanted-by\",\n        default=\"multi-user.target\",\n        help=\"Target to enable the service for\",\n    )\n    optional_args.add_argument(\n        \"--env\",\n        action=\"append\",\n        metavar=\"KEY=VALUE\",\n        help=\"Environment variables (can be specified multiple times)\",\n    )\n    optional_args.add_argument(\"--working-dir\", help=\"Working directory\")\n\n    return parser.parse_args()\n\n\ndef generate_service(args):\n    description = args.description.format(name=args.name)\n\n    content = f\"\"\"[Unit]\nDescription={description}\nAfter={\" \".join(args.after)}\n\n[Service]\nType=simple\nUser={args.user}\nExecStart={args.exec}\nRestart={args.restart}\nRestartSec={args.restart_sec}\n{\" \".join([f\"WorkingDirectory={args.working_dir}\" for args.working_dir in [args.working_dir] if args.working_dir])}\n\"\"\"\n\n    if args.env:\n        for env_var in args.env:\n            content += f\"Environment={env_var}\\n\"\n\n    content += f\"\"\"\\n[Install]\nWantedBy={args.wanted_by}\n\"\"\"\n\n    return content\n\n\ndef main():\n    args = parse_args()\n\n    output = args.output.format(name=args.name)\n    service_content = generate_service(args)\n\n    try:\n        with open(output, \"w\") as f:\n            f.write(service_content)\n        print(f\"Generated systemd service file: {output}\")\n        print(f\"Size: {len(service_content)} bytes\")\n        return 0\n    except IOError as e:\n        print(f\"Error writing output file: {e}\", file=sys.stderr)\n        return 1\n\n\nif __name__ == \"__main__\":\n    sys.exit(main())\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3
+}

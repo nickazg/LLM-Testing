@@ -1,0 +1,66 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 11,
+        "output": 22,
+        "thinking": 1,
+        "cache_read": 13206
+      },
+      "tool_calls": 0,
+      "wall_time_s": 14.366147083987016,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-04T01:15:32.433029+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775265324384,\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"part\":{\"id\":\"prt_d560f1d5d001I7YXSI74WeweCj\",\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"messageID\":\"msg_d560f0dbb001QxfCfJgV5hCu0o\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775265328951,\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"part\":{\"id\":\"prt_d560f2a260019n47Negp4GkNW7\",\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"messageID\":\"msg_d560f0dbb001QxfCfJgV5hCu0o\",\"type\":\"tool\",\"callID\":\"call_9953ac5830734e1cb4b26443\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"print('Hello, World!')\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-z1cyfapu/hello.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-z1cyfapu/hello.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-z1cyfapu/hello.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-z1cyfapu/hello.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775265327672,\"end\":1775265328949}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"\\n\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775265328954,\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"part\":{\"id\":\"prt_d560f2f38001yBvfmyImcn3wQV\",\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"messageID\":\"msg_d560f0dbb001QxfCfJgV5hCu0o\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13207,\"input\":13093,\"output\":71,\"reasoning\":1,\"cache\":{\"read\":43,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775265330931,\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"part\":{\"id\":\"prt_d560f36f1001U5J01rz1hsTXHC\",\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"messageID\":\"msg_d560f2f3d001dkqxxNmjdSvi51\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775265331737,\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"part\":{\"id\":\"prt_d560f375e001aUfOpIy70w6xf1\",\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"messageID\":\"msg_d560f2f3d001dkqxxNmjdSvi51\",\"type\":\"text\",\"text\":\"Created hello.py with a print statement that outputs 'Hello, World!' to stdout.\",\"time\":{\"start\":1775265331736,\"end\":1775265331736}}}\n{\"type\":\"step_finish\",\"timestamp\":1775265331738,\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"part\":{\"id\":\"prt_d560f3a19001n7lQic0mnftdXE\",\"sessionID\":\"ses_2a9f0f72affeJLwoBgfIJrqhs4\",\"messageID\":\"msg_d560f2f3d001dkqxxNmjdSvi51\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0,\"tokens\":{\"total\":13239,\"input\":11,\"output\":22,\"reasoning\":1,\"cache\":{\"read\":13206,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"print('Hello, World!')\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-z1cyfapu/hello.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "Created hello.py with a print statement that outputs 'Hello, World!' to stdout.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/8004340243660665577",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-z1cyfapu\u0001\bhello.py\ufffd\u001av\ufffd\ufffd49\ufffd3\ufffd\ufffd*\u000fV\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "hello.py",
+      "content": "print(\"Hello, World!\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 1
+}

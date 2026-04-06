@@ -1,0 +1,29 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "qwen3-30b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 8.103845792007633,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-03T08:02:08.241567+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775203326176,\"sessionID\":\"ses_2ada2fad7ffeJKa3ZxQCcbggg8\",\"part\":{\"id\":\"prt_d525d18df001E5QojSrQfsg93N\",\"sessionID\":\"ses_2ada2fad7ffeJKa3ZxQCcbggg8\",\"messageID\":\"msg_d525d0f260011VUFdZibYLGcuz\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775203327092,\"sessionID\":\"ses_2ada2fad7ffeJKa3ZxQCcbggg8\",\"part\":{\"id\":\"prt_d525d18e0001TjT0vyrTiUNE6M\",\"sessionID\":\"ses_2ada2fad7ffeJKa3ZxQCcbggg8\",\"messageID\":\"msg_d525d0f260011VUFdZibYLGcuz\",\"type\":\"text\",\"text\":\"I'll create a Python file called hello.py that prints 'Hello, World!' to stdout.\\n\\n<function=write>\\n<parameter=content>\\nprint(\\\"Hello, World!\\\")\\n</parameter>\\n<parameter=filePath>\\n/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-et398gcn/hello.py\\n</parameter>\\n</function>\\n</tool_call>\",\"time\":{\"start\":1775203327091,\"end\":1775203327091}}}\n{\"type\":\"step_finish\",\"timestamp\":1775203327094,\"sessionID\":\"ses_2ada2fad7ffeJKa3ZxQCcbggg8\",\"part\":{\"id\":\"prt_d525d1c7500114YT7N05JTeUJC\",\"sessionID\":\"ses_2ada2fad7ffeJKa3ZxQCcbggg8\",\"messageID\":\"msg_d525d0f260011VUFdZibYLGcuz\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00095845,\"tokens\":{\"total\":13415,\"input\":13318,\"output\":97,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [],
+  "files": [],
+  "tier": 1
+}

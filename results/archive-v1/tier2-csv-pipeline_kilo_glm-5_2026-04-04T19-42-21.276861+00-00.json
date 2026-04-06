@@ -1,0 +1,116 @@
+{
+  "task_id": "tier2-csv-pipeline",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 221,
+        "output": 370,
+        "thinking": 200,
+        "cache_read": 14912
+      },
+      "tool_calls": 0,
+      "wall_time_s": 53.678398874995764,
+      "cost_usd": 0.0316963
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-04T19:42:21.276861+00:00",
+  "prompt": "Create a Python script called `pipeline.py` that reads `input.csv` (columns: name, department, salary, status), filters rows where status equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department,avg_salary,count`. Sort rows alphabetically by department name. Include a header row. Use only the Python standard library (csv module).",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775331695905,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a03dd1e001BD1NBPmpXzGdfq\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a03c6ea001FN20PFy3TVYtEm\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775331705725,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a03e95b001OUlC7A7oA7gyWF\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a03c6ea001FN20PFy3TVYtEm\",\"type\":\"tool\",\"callID\":\"019d5a03e88daf7bcdd75f7ce4bf00a5\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\",\"content\":\"import csv\\nfrom collections import defaultdict\\n\\ndef main():\\n    departments = defaultdict(lambda: {'salaries': [], 'count': 0})\\n    \\n    with open('input.csv', 'r', newline='') as infile:\\n        reader = csv.DictReader(infile)\\n        for row in reader:\\n            if row['status'] == 'active':\\n                dept = row['department']\\n                salary = float(row['salary'])\\n                departments[dept]['salaries'].append(salary)\\n                departments[dept]['count'] += 1\\n    \\n    results = []\\n    for dept, data in departments.items():\\n        avg_salary = round(sum(data['salaries']) / data['count'], 2)\\n        results.append({\\n            'department': dept,\\n            'avg_salary': avg_salary,\\n            'count': data['count']\\n        })\\n    \\n    results.sort(key=lambda x: x['department'])\\n    \\n    with open('output.csv', 'w', newline='') as outfile:\\n        writer = csv.DictWriter(outfile, fieldnames=['department', 'avg_salary', 'count'])\\n        writer.writeheader()\\n        writer.writerows(results)\\n\\nif __name__ == '__main__':\\n    main()\\n\"},\"output\":\"Wrote file successfully.\\n\\nLSP errors detected in this file, please fix:\\n<diagnostics file=\\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\\\">\\nERROR [14:47] Cannot access attribute \\\"append\\\" for class \\\"int\\\"\\n\u00a0\u00a0Attribute \\\"append\\\" is unknown\\nERROR [15:17] Operator \\\"+=\\\" not supported for types \\\"int | list[Any]\\\" and \\\"Literal[1]\\\"\\n\u00a0\u00a0Operator \\\"+\\\" not supported for types \\\"list[Any]\\\" and \\\"Literal[1]\\\"\\nERROR [19:28] No overloads for \\\"sum\\\" match the provided arguments\\nERROR [19:32] Argument of type \\\"int | list[Any]\\\" cannot be assigned to parameter \\\"iterable\\\" of type \\\"Iterable[_SupportsSumNoDefaultT@sum]\\\" in function \\\"sum\\\"\\n\u00a0\u00a0Type \\\"int | list[Any]\\\" is not assignable to type \\\"Iterable[_SupportsSumNoDefaultT@sum]\\\"\\n\u00a0\u00a0\u00a0\u00a0\\\"int\\\" is incompatible with protocol \\\"Iterable[_SupportsSumNoDefaultT@sum]\\\"\\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\\\"__iter__\\\" is not present\\n</diagnostics>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\":[{\"range\":{\"start\":{\"line\":13,\"character\":46},\"end\":{\"line\":13,\"character\":52}},\"message\":\"Cannot access attribute \\\"append\\\" for class \\\"int\\\"\\n\u00a0\u00a0Attribute \\\"append\\\" is unknown\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":14,\"character\":16},\"end\":{\"line\":14,\"character\":47}},\"message\":\"Operator \\\"+=\\\" not supported for types \\\"int | list[Any]\\\" and \\\"Literal[1]\\\"\\n\u00a0\u00a0Operator \\\"+\\\" not supported for types \\\"list[Any]\\\" and \\\"Literal[1]\\\"\",\"severity\":1,\"code\":\"reportOperatorIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportOperatorIssue\"}},{\"range\":{\"start\":{\"line\":18,\"character\":27},\"end\":{\"line\":18,\"character\":48}},\"message\":\"No overloads for \\\"sum\\\" match the provided arguments\",\"severity\":1,\"code\":\"reportCallIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportCallIssue\"},\"relatedInformation\":[{\"location\":{\"uri\":\"file:///Users/nickgrobler/.local/share/kilo/bin/node_modules/pyright/dist/typeshed-fallback/stdlib/builtins.pyi\",\"range\":{\"start\":{\"line\":1937,\"character\":4},\"end\":{\"line\":1937,\"character\":7}}},\"message\":\"Overload 2 is the closest match\"}]},{\"range\":{\"start\":{\"line\":18,\"character\":31},\"end\":{\"line\":18,\"character\":47}},\"message\":\"Argument of type \\\"int | list[Any]\\\" cannot be assigned to parameter \\\"iterable\\\" of type \\\"Iterable[_SupportsSumNoDefaultT@sum]\\\" in function \\\"sum\\\"\\n\u00a0\u00a0Type \\\"int | list[Any]\\\" is not assignable to type \\\"Iterable[_SupportsSumNoDefaultT@sum]\\\"\\n\u00a0\u00a0\u00a0\u00a0\\\"int\\\" is incompatible with protocol \\\"Iterable[_SupportsSumNoDefaultT@sum]\\\"\\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\\\"__iter__\\\" is not present\",\"severity\":1,\"code\":\"reportArgumentType\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportArgumentType\"}}]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775331704783,\"end\":1775331705724}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The user wants me to create a Python script that:\\n1. Reads `input.csv` with columns: name, department, salary, status\\n2. Filters rows where status equals 'active'\\n3. Groups by department\\n4. Computes average salary per department (rounded to 2 decimal places)\\n5. Counts employees per department\\n6. Writes results to `output.csv` with columns: department, avg_salary, count\\n7. Sorts rows alphabetically by department name\\n8. Includes a header row\\n9. Uses only Python standard library (csv module)\\n\\nThis is a straightforward task. Let me create the script directly.\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775331705727,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a04037e001rPX8hIQTHMQaMI\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a03c6ea001FN20PFy3TVYtEm\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0135547,\"tokens\":{\"total\":13714,\"input\":13103,\"output\":419,\"reasoning\":149,\"cache\":{\"read\":192,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775331709877,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a0413b40012Qp9Wo0vXdeco6\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a0403810018onSB0wPwLhiIU\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775331715487,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a041f1e001ZBL0FI6FDcrv1k\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a0403810018onSB0wPwLhiIU\",\"type\":\"tool\",\"callID\":\"019d5a041e4ea4b4e2c3391c7b36bdf9\",\"tool\":\"write\",\"state\":{\"status\":\"error\",\"input\":{\"content\":\"name,department,salary,status\\nAlice,Engineering,80000,active\\nBob,Engineering,90000,active\\nCharlie,Sales,50000,inactive\\nDiana,Sales,60000,active\\nEve,Marketing,55000,active\\nFrank,Engineering,85000,active\\nGrace,Sales,65000,active\\nHenry,Marketing,58000,inactive\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/input.csv\"},\"error\":\"Error: You must read file /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/input.csv before overwriting it. Use the Read tool first\",\"time\":{\"start\":1775331715481,\"end\":1775331715485}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"The LSP errors are false positives due to type inference issues with defaultdict. The code is functionally correct. Let me verify by creating a sample input.csv and running the script to test it works properly.\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775331715549,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a0429da001sg2LaFLhFbXGwR\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a0403810018onSB0wPwLhiIU\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0037916,\"tokens\":{\"total\":14152,\"input\":727,\"output\":177,\"reasoning\":53,\"cache\":{\"read\":13248,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775331718862,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a0436cd001h9pAJ7Aq3ZSalP\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a0429e2001iIZ6apzxFQCdUY\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775331720034,\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"part\":{\"id\":\"prt_d5a043996001uAG5QYpOkokB10\",\"sessionID\":\"ses_2a5fc3e8fffeOpsoqhg0dUDHbS\",\"messageID\":\"msg_d5a0429e2001iIZ6apzxFQCdUY\",\"type\":\"tool\",\"callID\":\"019d5a0438c571cd93276e3fb710f589\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"ls -la\",\"description\":\"List files in current directory\"},\"output\":\"total 40\\ndrwxr-xr-x@   8 nickgrobler  staff    256  5 Apr 07:41 .\\ndrwx------@ 432 nickgrobler  staff  13824  5 Apr 07:41 ..\\ndrwxr-xr-x@   5 nickgrobler  staff    160  5 Apr 07:41 .ruff_cache\\n-rw-r--r--@   1 nickgrobler  staff     65  5 Apr 07:41 AGENTS.md\\n-rw-r--r--@   1 nickgrobler  staff    710  4 Apr 20:44 input.csv\\n-rw-r--r--@   1 nickgrobler  staff    185  5 Apr 07:41 kilo.json\\n-rw-r--r--@   1 nickgrobler  staff   1060  5 Apr 07:41 pipeline.py\\n-rw-r--r--@   1 nickgrobler  staff   2166  4 Apr 20:45 validate.py\\n\",\"title\":\"List files in current directory\",\"metadata\":{\"output\":\"total 40\\ndrwxr-xr-x@   8 nickgrobler  staff    256  5 Apr 07:41 .\\ndrwx------@ 432 nickgrobler  staff  13824  5 Apr 07:41 ..\\ndrwxr-xr-x@   5 nickgrobler  staff    160  5 Apr 07:41 .ruff_cache\\n-rw-r--r--@   1 nickgrobler  staff     65  5 Apr 07:41 AGENTS.md\\n-rw-r--r--@   1 nickgrobler  staff    710  4 Apr 20:44 input.csv\\n-rw-r--r--@   1 nickgrobler  staff    185  5 Apr 07:41 kilo.json\\n-rw-r--r--@   1 nickgrobler  staff   1060  5 Apr 07:41 pipeline.py\\n-rw-r--r--@   1 nickgrobler  staff   2166  4 Apr 20:45 validate.py\\n\",\"exit\":0,\"description\":\"List files in current d",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\",\n  \"content\": \"import csv\\nfrom collections import defaultdict\\n\\ndef main():\\n    departments = defaultdict(lambda: {'salaries': [], 'count': 0})\\n    \\n    with open('input.csv', 'r', newline='') as infile:\\n        reader = csv.DictReader(infile)\\n        for row in reader:\\n            if row['status'] == 'active':\\n                dept = row['department']\\n                salary = float(row['salary'])\\n                departments[dept]['salaries'].append(salary)\\n                departments[dept]['count'] += 1\\n    \\n    results = []\\n    for dept, data in departments.items():\\n        avg_salary = round(sum(data['salaries']) / data['count'], 2)\\n        results.append({\\n            'department': dept,\\n            'avg_salary': avg_salary,\\n            'count': data['count']\\n        })\\n    \\n    results.sort(key=lambda x: x['department'])\\n    \\n    with open('output.csv', 'w', newline='') as outfile:\\n        writer = csv.DictWriter(outfile, fieldnames=['department', 'avg_salary', 'count'])\\n        writer.writeheader()\\n        writer.writerows(results)\\n\\nif __name__ == '__main__':\\n    main()\\n\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/pipeline.py\">\nERROR [14:47] Cannot access attribute \"append\" for class \"int\"\n\u00a0\u00a0Attribute \"append\" is unknown\nERROR [15:17] Operator \"+=\" not supported for types \"int | list[Any]\" and \"Literal[1]\"\n\u00a0\u00a0Operator \"+\" not supported for types \"list[Any]\" and \"Literal[1]\"\nERROR [19:28] No overloads for \"sum\" match the provided arguments\nERROR [19:32] Argument of type \"int | list[Any]\" cannot be assigned to parameter \"iterable\" of type \"Iterable[_SupportsSumNoDefaultT@sum]\" in function \"sum\"\n\u00a0\u00a0Type \"int | list[Any]\" is not assignable to type \"Iterable[_SupportsSumNoDefaultT@sum]\"\n\u00a0\u00a0\u00a0\u00a0\"int\" is incompatible with protocol \"Iterable[_SupportsSumNoDefaultT@sum]\"\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__iter__\" is not present\n</diagnostics>",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"name,department,salary,status\\nAlice,Engineering,80000,active\\nBob,Engineering,90000,active\\nCharlie,Sales,50000,inactive\\nDiana,Sales,60000,active\\nEve,Marketing,55000,active\\nFrank,Engineering,85000,active\\nGrace,Sales,65000,active\\nHenry,Marketing,58000,inactive\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/input.csv\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"ls -la\",\n  \"description\": \"List files in current directory\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "total 40\ndrwxr-xr-x@   8 nickgrobler  staff    256  5 Apr 07:41 .\ndrwx------@ 432 nickgrobler  staff  13824  5 Apr 07:41 ..\ndrwxr-xr-x@   5 nickgrobler  staff    160  5 Apr 07:41 .ruff_cache\n-rw-r--r--@   1 nickgrobler  staff     65  5 Apr 07:41 AGENTS.md\n-rw-r--r--@   1 nickgrobler  staff    710  4 Apr 20:44 input.csv\n-rw-r--r--@   1 nickgrobler  staff    185  5 Apr 07:41 kilo.json\n-rw-r--r--@   1 nickgrobler  staff   1060  5 Apr 07:41 pipeline.py\n-rw-r--r--@   1 nickgrobler  staff   2166  4 Apr 20:45 validate.py\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/input.csv\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/input.csv</path>\n<type>file</type>\n<content>1: name,department,salary,status\n2: Alice Johnson,Engineering,95000,active\n3: Bob Smith,Marketing,72000,active\n4: Carol White,Engineering,88000,active\n5: Dave Brown,Sales,65000,inactive\n6: Eve Davis,Marketing,78000,active\n7: Frank Miller,Engineering,102000,active\n8: Grace Wilson,Sales,71000,active\n9: Henry Taylor,Marketing,69000,inactive\n10: Iris Anderson,Engineering,91000,active\n11: Jack Thomas,Sales,68000,active\n12: Karen Jackson,HR,82000,active\n13: Leo Harris,Engineering,97000,inactive\n14: Mia Martin,HR,79000,active\n15: Nathan Clark,Sales,73000,active\n16: Olivia Lewis,Marketing,85000,active\n17: Patrick Robinson,HR,76000,active\n18: Quinn Walker,Engineering,105000,active\n19: Rachel Hall,Sales,62000,inactive\n20: Sam Young,Marketing,71000,active\n21: Tina King,HR,88000,active\n\n(End of file - total 21 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python pipeline.py\",\n  \"description\": \"Run the pipeline script\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/output.csv\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb/output.csv</path>\n<type>file</type>\n<content>1: department,avg_salary,count\n2: Engineering,96200.0,5\n3: HR,81250.0,4\n4: Marketing,76500.0,4\n5: Sales,70666.67,3\n\n(End of file - total 5 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "response",
+      "content": "Created `pipeline.py`. The script processes the existing `input.csv` and generated `output.csv` with correct results:\n- Engineering: avg 96200.0, count 5\n- HR: avg 81250.0, count 4  \n- Marketing: avg 76500.0, count 4\n- Sales: avg 70666.67, count 3",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/7748595677648539257",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vkpv2frb\u0001\u000bpipeline.py\ufffdq\ufffd\u0013\ufffd\ufffd\ufffd\u001ez\ufffd,\u0000\u0004Z\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "input.csv",
+      "content": "name,department,salary,status\nAlice Johnson,Engineering,95000,active\nBob Smith,Marketing,72000,active\nCarol White,Engineering,88000,active\nDave Brown,Sales,65000,inactive\nEve Davis,Marketing,78000,active\nFrank Miller,Engineering,102000,active\nGrace Wilson,Sales,71000,active\nHenry Taylor,Marketing,69000,inactive\nIris Anderson,Engineering,91000,active\nJack Thomas,Sales,68000,active\nKaren Jackson,HR,82000,active\nLeo Harris,Engineering,97000,inactive\nMia Martin,HR,79000,active\nNathan Clark,Sales,73000,active\nOlivia Lewis,Marketing,85000,active\nPatrick Robinson,HR,76000,active\nQuinn Walker,Engineering,105000,active\nRachel Hall,Sales,62000,inactive\nSam Young,Marketing,71000,active\nTina King,HR,88000,active\n",
+      "language": ""
+    },
+    {
+      "path": "output.csv",
+      "content": "department,avg_salary,count\nEngineering,96200.0,5\nHR,81250.0,4\nMarketing,76500.0,4\nSales,70666.67,3\n",
+      "language": ""
+    },
+    {
+      "path": "pipeline.py",
+      "content": "import csv\nfrom collections import defaultdict\n\n\ndef main():\n    departments = defaultdict(lambda: {\"salaries\": [], \"count\": 0})\n\n    with open(\"input.csv\", \"r\", newline=\"\") as infile:\n        reader = csv.DictReader(infile)\n        for row in reader:\n            if row[\"status\"] == \"active\":\n                dept = row[\"department\"]\n                salary = float(row[\"salary\"])\n                departments[dept][\"salaries\"].append(salary)\n                departments[dept][\"count\"] += 1\n\n    results = []\n    for dept, data in departments.items():\n        avg_salary = round(sum(data[\"salaries\"]) / data[\"count\"], 2)\n        results.append(\n            {\"department\": dept, \"avg_salary\": avg_salary, \"count\": data[\"count\"]}\n        )\n\n    results.sort(key=lambda x: x[\"department\"])\n\n    with open(\"output.csv\", \"w\", newline=\"\") as outfile:\n        writer = csv.DictWriter(\n            outfile, fieldnames=[\"department\", \"avg_salary\", \"count\"]\n        )\n        writer.writeheader()\n        writer.writerows(results)\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2
+}

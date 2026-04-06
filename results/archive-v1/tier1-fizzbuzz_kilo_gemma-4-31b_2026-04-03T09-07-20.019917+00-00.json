@@ -1,0 +1,35 @@
+{
+  "task_id": "tier1-fizzbuzz",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.5864282500115223,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-03T09:07:20.019917+00:00",
+  "prompt": "Create a Python file called fizzbuzz.py that prints numbers 1 to 100, but prints 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, and 'FizzBuzz' for multiples of both. One value per line.",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775207238870,\"sessionID\":\"ses_2ad673881ffeC3ID0ttFiQtex1\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: openrouter/google/gemma-4-31b-it.\"}}}\n",
+  "conversation": [
+    {
+      "role": "error",
+      "content": "Model not found: openrouter/google/gemma-4-31b-it.",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 1
+}

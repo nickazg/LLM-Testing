@@ -1,0 +1,29 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "qwen3-30b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 0.8997458329540677,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-03T07:57:27.212968+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "kilo run [message..]\n\nrun kilo with a message\n\nPositionals:\n  message  message to send                                                     [array] [default: []]\n\nOptions:\n  -h, --help        show help                                                              [boolean]\n  -v, --version     show version number                                                    [boolean]\n      --print-logs  print logs to stderr                                                   [boolean]\n      --log-level   log level                   [string] [choices: \"DEBUG\", \"INFO\", \"WARN\", \"ERROR\"]\n      --command     the command to run, use message for args                                [string]\n  -c, --continue    continue the last session                                              [boolean]\n  -s, --session     session id to continue                                                  [string]\n      --fork        fork the session before continuing (requires --continue or --session)  [boolean]\n      --cloud-fork  fetch session from cloud and continue locally (requires --session)     [boolean]\n      --share       share the session                                                      [boolean]\n  -m, --model       model to use in the format of provider/model                            [string]\n      --agent       agent to use                                                            [string]\n      --format      format: default (formatted) or json (raw JSON events)\n                                          [string] [choices: \"default\", \"json\"] [default: \"default\"]\n  -f, --file        file(s) to attach to message                                             [array]\n      --title       title for the session (uses truncated prompt if no value provided)      [string]\n      --attach      attach to a running opencode server (e.g., http://localhost:4096)       [string]\n  -p, --password    basic auth password (defaults to KILO_SERVER_PASSWORD)                  [string]\n      --dir         directory to run in, path on remote server if attaching                 [string]\n      --port        port for the local server (defaults to random port if no value provided)[number]\n      --variant     model variant (provider-specific reasoning effort, e.g., high, max, minimal)\n                                                                                            [string]\n      --thinking    show thinking blocks                                  [boolean] [default: false]\n      --auto        auto-approve all permissions (for autonomous/pipeline usage)\n                                                                          [boolean] [default: false]\n",
+  "conversation": [],
+  "files": [],
+  "tier": 1
+}
