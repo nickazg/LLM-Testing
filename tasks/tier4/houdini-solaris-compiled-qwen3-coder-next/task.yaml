@@ -1,0 +1,15 @@
+id: tier4-houdini-solaris-compiled-qwen3-coder-next
+name: "Solaris Python Script LOP (DSPy-compiled qwen3-coder-next)"
+tier: 4
+prompt: "Create a Python file called solaris_lop.py that implements Houdini Solaris Python Script LOP code. This code runs inside Houdini's Solaris context where hou.pwd().editableStage() provides a USD stage to write to.\n\nThe script should:\n\n1. Get the stage: stage = hou.pwd().editableStage()\n2. Create a root Xform: /Scene (set as default prim)\n3. Create /Scene/Ground — a UsdGeom.Mesh ground plane (quad: 4 points, 1 face)\n4. Create /Scene/Hero — a UsdGeom.Xform with xformOp:translate at (0, 1, 0)\n5. Create /Scene/Hero/Body — a UsdGeom.Mesh (simple cube: 8 points, 6 faces)\n6. Create /Scene/Lighting/KeyLight — a UsdLux.DistantLight with intensity=50000 and xformOp:rotateXYZ at (-45, 30, 0)\n7. Create /Scene/Lighting/FillLight — a UsdLux.DomeLight with intensity=500\n8. Create /Scene/Materials/HeroMat — a UsdShade.Material with UsdPreviewSurface shader (diffuseColor=(0.8, 0.2, 0.1), roughness=0.4, metallic=0.0)\n9. Bind HeroMat to /Scene/Hero/Body using UsdShade.MaterialBindingAPI\n10. Apply UsdGeom.ModelAPI kind 'component' to /Scene/Hero\n\nUse: from pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf, Kind\nThe hou module is provided — import it with 'import hou'"
+timeout: 300
+skill: "houdini-solaris:compiled-qwen3-coder-next"
+tags: [python, houdini, sidefx, solaris, usd, lops]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following

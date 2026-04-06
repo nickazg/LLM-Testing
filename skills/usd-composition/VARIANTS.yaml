@@ -12,3 +12,13 @@ variants:
     description: DSPy-compiled for glm-4.5-air-free (score=1.00)
   compiled-qwen3-30b:
     description: DSPy-compiled for qwen3-30b (score=1.00)
+  compiled-glm-5:
+    description: DSPy-compiled for glm-5 (score=1.00)
+  compiled-glm-4.7-flash:
+    description: DSPy-compiled for glm-4.7-flash (score=1.00)
+  compiled-gemma-4-31b:
+    description: DSPy-compiled for gemma-4-31b (score=1.00)
+  compiled-qwen3-coder-next:
+    description: DSPy-compiled for qwen3-coder-next (score=1.00)
+  compiled-minimax-m2.7:
+    description: DSPy-compiled for minimax-m2.7 (score=1.00)

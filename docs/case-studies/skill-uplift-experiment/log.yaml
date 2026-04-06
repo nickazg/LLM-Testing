@@ -679,6 +679,64 @@ entries:
     conclusions are unreliable. Statistical significance requires multiple
     runs per configuration, which we haven't done systematically.
   evidence:
+    - "results/archive-v1/tier4-usd-shot-assembly-hints_claude-code_qwen3-30b*.json"
+  tags: [variance, statistical-validity, methodology-limitation]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# ██ PHASE 2 CHECKPOINT — Clean Benchmark
+# ══════════════════════════════════════════════════════════════
+# All prior results (268 files) archived to results/archive-v1/
+# Phase 1 was exploratory: framework development, hypothesis
+# generation, and methodology refinement.
+# Phase 2 is the definitive run: clean data, all models, all
+# tasks, all skill variants, both CLIs, from a known baseline.
+# ══════════════════════════════════════════════════════════════
+
+- id: "038"
+  date: "2026-04-06"
+  category: method
+  title: "CHECKPOINT — Phase 2: Clean Benchmark begins"
+  body: >
+    Archived all 268 Phase 1 result files to results/archive-v1/.
+    Phase 1 was exploratory — framework development, hypothesis generation,
+    and methodology refinement across 259 runs. Key theories established:
+    capability threshold, skill harm zones, CLI confound, proxy metric
+    limitations. Phase 2 is the definitive benchmark: clean data, 8 models
+    (dropping 2 non-functional), all tasks with all skill variants, both
+    CLIs, Opus 4.6 ceiling reference. DSPy compilation extended to all
+    models missing variants. This is the dataset the case study reports from.
+  evidence:
+    - "results/archive-v1/"
+  tags: [checkpoint, phase-2, clean-benchmark]
+  session: "2026-04-06-phase2-clean-benchmark"
+  retrospective: false
+
+- id: "039"
+  date: "2026-04-06"
+  category: context
+  title: "Phase 2 model lineup — 8 models including Opus 4.6 ceiling"
+  body: >
+    8 models for Phase 2 (dropped qwen3-coder-free and qwen3-next-80b-free,
+    both 100% timeout in Phase 1). Budget: qwen3-30b, qwen3-coder-next,
+    minimax-m2.7, gemma-4-31b, glm-5, glm-4.5-air-free, glm-4.7-flash.
+    Frontier ceiling: opus4.6 (CC uses Anthropic subscription, only Kilo
+    incurs OpenRouter cost). All models run on all 23+ tasks × both CLIs.
+  evidence:
+    - "config/models.yaml"
+  tags: [phase-2, model-selection]
+  session: "2026-04-06-phase2-clean-benchmark"
+  retrospective: false
+  date: "2026-04-06"
+  category: finding
+  title: "Run-to-run variance is high — task-hints scored both 0.0 and 0.9 on CC"
+  body: >
+    The task-hints variant with qwen3-30b on CC produced scores of 0.0
+    and 0.9 across two separate runs. This high variance means single-run
+    conclusions are unreliable. Statistical significance requires multiple
+    runs per configuration, which we haven't done systematically.
+  evidence:
     - "results/tier4-usd-shot-assembly-hints_claude-code_qwen3-30b*.json"
   tags: [variance, statistical-validity, methodology-limitation]
   session: "2026-04-06-qwen3-experiment"

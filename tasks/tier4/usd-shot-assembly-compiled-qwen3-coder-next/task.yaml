@@ -1,0 +1,15 @@
+id: tier4-usd-shot-assembly-compiled-qwen3-coder-next
+name: "Shot Assembly + Variants (DSPy-compiled qwen3-coder-next)"
+tier: 4
+prompt: "Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:\n\n1. assets.usda — contains:\n   - Default prim /Assets\n   - /Assets/Chair — an Xform with a child Mesh (/Assets/Chair/Geo) representing a simple chair (8-point cube is fine)\n   - /Assets/Chair has a variant set 'modelVariant' with variants 'simple' and 'detailed' (both can contain the same geo, this tests the variant mechanism)\n\n2. shot.usda — contains:\n   - Default prim /Shot\n   - Sublayers assets.usda\n   - /Shot/Set — an Xform\n   - /Shot/Set/ChairA — a reference to /Assets/Chair from assets.usda, with xformOp:translate at (-2, 0, 0)\n   - /Shot/Set/ChairB — a reference to /Assets/Chair from assets.usda, with xformOp:translate at (2, 0, 0)\n   - /Shot/Lighting — an Xform with a variant set 'lightingVariant' containing 'day' and 'night' variants\n   - In 'day' variant: a DistantLight at /Shot/Lighting/Sun with intensity=50000\n   - In 'night' variant: a DomeLight at /Shot/Lighting/Sky with intensity=500\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf"
+timeout: 300
+skill: "usd-composition:compiled-qwen3-coder-next"
+tags: [python, usd, pixar, composition, variants]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following
