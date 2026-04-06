@@ -1,0 +1,12 @@
+default: reference
+variants:
+  reference:
+    description: "Full API reference (144 lines) \u2014 broad coverage of USD composition\
+      \ patterns"
+  task-hints:
+    description: "Task-scoped hints \u2014 only APIs needed for shot-assembly (~20\
+      \ lines)"
+  compiled-glm45:
+    description: DSPy-compiled for glm-4.5-air-free (score=0.80)
+  compiled-live-glm45:
+    description: DSPy-compiled for glm-4.5-air-free (score=1.00)

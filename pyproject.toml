@@ -15,13 +15,17 @@ dependencies = [
 
 [project.optional-dependencies]
 usd = ["usd-core>=25.5"]
+compile = [
+    "dspy>=2.6",
+    "pydantic>=2.0",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
     "httpx",
 ]
 all = [
-    "llm-bench[usd,dev]",
+    "llm-bench[usd,dev,compile]",
 ]
 
 [project.scripts]

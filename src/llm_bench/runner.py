@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import yaml
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -22,6 +23,36 @@ LANG_MAP = {
 }
 
 SKIP_NAMES = {".claude", ".git", "__pycache__", "validate.py", "CLAUDE.md", "AGENTS.md", ".gitkeep", "expected", "kilo.json"}
+
+
+def resolve_skill_path(skills_dir: Path, skill_spec: str) -> Path | None:
+    """Resolve 'domain' or 'domain:variant' to a skill .md file path.
+
+    Resolution order:
+    1. Explicit variant: skills/{domain}/{variant}.md
+    2. VARIANTS.yaml default: skills/{domain}/{default}.md
+    3. Legacy fallback: skills/{domain}/SKILL.md
+    """
+    parts = skill_spec.split(":", 1)
+    domain = parts[0]
+    variant = parts[1] if len(parts) > 1 else None
+    domain_dir = skills_dir / domain
+    if not domain_dir.is_dir():
+        return None
+    if variant:
+        path = domain_dir / f"{variant}.md"
+        return path if path.exists() else None
+    # Check VARIANTS.yaml for default
+    variants_yaml = domain_dir / "VARIANTS.yaml"
+    if variants_yaml.exists():
+        meta = yaml.safe_load(variants_yaml.read_text()) or {}
+        default = meta.get("default", "reference")
+        path = domain_dir / f"{default}.md"
+        if path.exists():
+            return path
+    # Legacy fallback
+    legacy = domain_dir / "SKILL.md"
+    return legacy if legacy.exists() else None
 
 
 def _snapshot_files(workspace: Path, max_file_size: int = 50000) -> list[OutputFile]:
@@ -53,13 +84,12 @@ async def run_single_task(
     model: str,
     skills_dir: Path | None = None,
     config_dir: Path | None = None,
+    skill_path_override: Path | None = None,
     log: Callable[[str], None] = _default_log,
 ) -> RunResult:
-    skill_path = None
-    if task.skill and skills_dir:
-        skill_path = skills_dir / task.skill / "SKILL.md"
-        if not skill_path.exists():
-            skill_path = None
+    skill_path = skill_path_override
+    if skill_path is None and task.skill and skills_dir:
+        skill_path = resolve_skill_path(skills_dir, task.skill)
 
     workspace = prepare_workspace(
         task_dir=task.task_dir,

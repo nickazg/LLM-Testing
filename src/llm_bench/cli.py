@@ -44,6 +44,22 @@ def main():
     info_parser.add_argument("--results-dir", default="results", help="Path to results directory")
     info_parser.add_argument("--config-dir", default="config", help="Path to config directory")
 
+    compile_parser = subparsers.add_parser(
+        "compile-skill", help="Optimize a skill for a target model using DSPy"
+    )
+    compile_parser.add_argument("--skill", required=True, help="Skill domain (e.g., usd-composition)")
+    compile_parser.add_argument("--target-model", required=True, help="Model to optimize for")
+    compile_parser.add_argument("--teacher-model", required=True, help="Strong model for optimization")
+    compile_parser.add_argument("--task", required=True, help="Task ID for training signal")
+    compile_parser.add_argument("--output-variant", required=True, help="Name for output variant")
+    compile_parser.add_argument("--metric", default="proxy", choices=["proxy", "live"],
+                                help="Metric mode: proxy (fast) or live (runs benchmark)")
+    compile_parser.add_argument("--iterations", type=int, default=10, help="Optimization iterations")
+    compile_parser.add_argument("--cli", default="claude-code", help="CLI for live metric (default: claude-code)")
+    compile_parser.add_argument("--skills-dir", default="skills", help="Path to skills directory")
+    compile_parser.add_argument("--results-dir", default="results", help="Path to results directory")
+    compile_parser.add_argument("--config-dir", default="config", help="Path to config directory")
+
     args = parser.parse_args()
     if args.command is None:
         parser.print_help()
@@ -55,6 +71,8 @@ def main():
         _handle_dashboard(args)
     elif args.command == "info":
         _handle_info(args)
+    elif args.command == "compile-skill":
+        _handle_compile_skill(args)
 
 
 def _handle_run(args):
@@ -219,17 +237,26 @@ def _handle_info(args):
     print("SKILLS")
     print("-" * 60)
     if skills_dir.exists():
-        skill_dirs = [d for d in sorted(skills_dir.iterdir()) if d.is_dir() and (d / "SKILL.md").exists()]
+        skill_dirs = [
+            d for d in sorted(skills_dir.iterdir())
+            if d.is_dir() and (
+                (d / "SKILL.md").exists()
+                or (d / "VARIANTS.yaml").exists()
+                or any(f.suffix == ".md" for f in d.iterdir() if f.is_file())
+            )
+        ]
         if skill_dirs:
             for skill_dir in skill_dirs:
-                skill_md = skill_dir / "SKILL.md"
-                desc = ""
-                for line in skill_md.read_text().splitlines():
-                    line = line.strip()
-                    if line.startswith("description:"):
-                        desc = line.split(":", 1)[1].strip().strip('"').strip("'")
-                        break
-                print(f"  {skill_dir.name:<25} {desc}")
+                variants_yaml = skill_dir / "VARIANTS.yaml"
+                variants = []
+                if variants_yaml.exists():
+                    import yaml as _yaml
+                    meta = _yaml.safe_load(variants_yaml.read_text()) or {}
+                    variants = list((meta.get("variants") or {}).keys())
+                else:
+                    variants = [f.stem for f in skill_dir.glob("*.md")]
+                variant_str = f"  variants: {', '.join(variants)}" if variants else ""
+                print(f"  {skill_dir.name:<25}{variant_str}")
             print(f"\n  Total: {len(skill_dirs)} skills")
         else:
             print("  (none found)")
@@ -258,6 +285,64 @@ def _handle_info(args):
     print("EXAMPLE")
     print("-" * 60)
     print(f"  llm-bench run --models {model_ids} --clis {cli_ids} --tiers 1")
+
+
+def _handle_compile_skill(args):
+    try:
+        from llm_bench.compiler import compile_skill
+    except ImportError as e:
+        print(f'DSPy not installed. Run: pip install -e ".[compile]"')
+        print(f"  Import error: {e}")
+        sys.exit(1)
+
+    skills_dir = Path(args.skills_dir)
+    results_dir = Path(args.results_dir)
+    config_dir = Path(args.config_dir)
+
+    print("=" * 60)
+    print("LLM BENCH — SKILL COMPILER (DSPy)")
+    print("=" * 60)
+    print(f"  Skill:          {args.skill}")
+    print(f"  Target model:   {args.target_model}")
+    print(f"  Teacher model:  {args.teacher_model}")
+    print(f"  Task:           {args.task}")
+    print(f"  Output variant: {args.output_variant}")
+    print(f"  Metric:         {args.metric}")
+    print(f"  Iterations:     {args.iterations}")
+    print()
+
+    try:
+        result = compile_skill(
+            skill_domain=args.skill,
+            target_model=args.target_model,
+            teacher_model=args.teacher_model,
+            task_id=args.task,
+            skills_dir=skills_dir,
+            results_dir=results_dir,
+            config_dir=config_dir,
+            output_variant=args.output_variant,
+            metric_mode=args.metric,
+            num_iterations=args.iterations,
+            cli_name=args.cli,
+        )
+
+        print()
+        print("=" * 60)
+        print("COMPILATION RESULT")
+        print("=" * 60)
+        print(f"  Output:     {result.output_path}")
+        print(f"  Score:      {result.score:.2f}")
+        print(f"  Duration:   {result.duration_s:.1f}s")
+        print()
+        print(f"  Test it:    llm-bench run --models {args.target_model} --clis claude-code \\")
+        print(f"                --tasks {args.task.replace('tier3', 'tier4')} --skills-dir {args.skills_dir}")
+
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Compilation failed: {e}")
+        raise
 
 
 if __name__ == "__main__":

@@ -12,3 +12,4 @@ config/*.env
 temp/
 results/*.json
 .pytest_cache/
+.compile-cache/

@@ -557,6 +557,12 @@ function renderComparison() {
 }
 
 // === SKILL UPLIFT ===
+function parseSkill(s) {
+    if (!s) return { domain: null, variant: null, label: 'none' };
+    const parts = s.split(':');
+    return { domain: parts[0], variant: parts[1] || null, label: parts[1] || s };
+}
+
 function renderUpliftView() {
     const tier3=R.filter(r=>(r.tier||0)===3);
     const tier4=R.filter(r=>(r.tier||0)===4);
@@ -567,47 +573,101 @@ function renderUpliftView() {
         return;
     }
 
+    // Detect skill variants in tier4 results
+    const skillSpecs = [...new Set(tier4.map(r=>r.skill||'').filter(Boolean))].sort();
+    const hasVariants = skillSpecs.length > 1;
+
     let h = '<div class="card"><h2>Skill Uplift — Correctness Delta (Tier 4 - Tier 3)</h2>';
     h += '<canvas id="uplift-chart" style="max-height:300px"></canvas></div>';
 
-    // Table
-    h += '<div class="card"><h2>Skill Uplift Detail</h2>';
-    h += '<table><tr><th>Model</th><th>Tier 3 (no skill)</th><th>Tier 4 (with skill)</th><th>Uplift</th><th>Interpretation</th></tr>';
-    const t3s=[],t4s=[];
-    models.forEach(m => {
-        const r3=tier3.filter(r=>r.model===m);
-        const r4=tier4.filter(r=>r.model===m);
-        const v3=r3.length?r3.reduce((s,r)=>s+(r.scores.correctness||0),0)/r3.length:null;
-        const v4=r4.length?r4.reduce((s,r)=>s+(r.scores.correctness||0),0)/r4.length:null;
-        t3s.push(v3||0); t4s.push(v4||0);
-        if(v3===null&&v4===null)return;
-        const d=(v4||0)-(v3||0);
-        const cls=Math.abs(d)<0.01?'zero':d>0?'pos':'neg';
-        let interp='-';
-        if(v3!==null&&v4!==null){
-            if(d>0.3) interp='<span class="pass">Strong uplift — skill significantly helps</span>';
-            else if(d>0.1) interp='<span class="partial">Moderate uplift</span>';
-            else if(d>-0.05) interp='<span style="color:var(--muted)">Minimal effect</span>';
-            else interp='<span class="fail">Negative — skill may confuse model</span>';
-        }
-        h += '<tr><td><b>'+m+'</b></td>';
-        h += '<td class="mono '+(v3!=null?sc(v3):'')+'">'+(v3!=null?fmt(v3):'-')+'</td>';
-        h += '<td class="mono '+(v4!=null?sc(v4):'')+'">'+(v4!=null?fmt(v4):'-')+'</td>';
-        h += '<td class="mono delta '+cls+'">'+(d>0?'+':'')+fmt(d)+'</td>';
-        h += '<td>'+interp+'</td></tr>';
-    });
-    h += '</table></div>';
+    if (hasVariants) {
+        // === VARIANT COMPARISON MATRIX ===
+        const variantLabels = skillSpecs.map(s => parseSkill(s).label);
+        h += '<div class="card"><h2>Skill Variant Comparison</h2>';
+        h += '<table><tr><th>Model</th><th>Tier 3 (no skill)</th>';
+        variantLabels.forEach(v => { h += '<th>' + v + '</th>'; });
+        h += '</tr>';
 
-    document.getElementById('uplift-content').innerHTML = h;
+        const chartData = { t3: [], variants: {} };
+        skillSpecs.forEach(s => { chartData.variants[s] = []; });
 
-    new Chart(document.getElementById('uplift-chart'),{
-        type:'bar',
-        data:{labels:models,datasets:[
-            {label:'Tier 3 (no skill)',data:t3s,backgroundColor:C.red},
-            {label:'Tier 4 (with skill)',data:t4s,backgroundColor:C.green},
-        ]},
-        options:{responsive:true,scales:{y:{min:0,max:1,ticks:{color:'#7d8590'},grid:{color:'#30363d'}},x:{ticks:{color:'#7d8590'},grid:{color:'#30363d'}}},plugins:{legend:{labels:{color:'#e6edf3'}}}}
-    });
+        models.forEach(m => {
+            const r3 = tier3.filter(r => r.model === m);
+            const v3 = r3.length ? r3.reduce((s,r) => s + (r.scores.correctness||0), 0) / r3.length : null;
+            chartData.t3.push(v3 || 0);
+
+            let row = '<tr><td><b>' + m + '</b></td>';
+            row += '<td class="mono ' + (v3 != null ? sc(v3) : '') + '">' + (v3 != null ? fmt(v3) : '-') + '</td>';
+
+            skillSpecs.forEach(spec => {
+                const r4v = tier4.filter(r => r.model === m && r.skill === spec);
+                const v4v = r4v.length ? r4v.reduce((s,r) => s + (r.scores.correctness||0), 0) / r4v.length : null;
+                chartData.variants[spec].push(v4v || 0);
+                const d = v3 != null && v4v != null ? (v4v - v3) : null;
+                if (d !== null) {
+                    const cls = Math.abs(d) < 0.01 ? 'zero' : d > 0 ? 'pos' : 'neg';
+                    row += '<td class="mono delta ' + cls + '">' + (d > 0 ? '+' : '') + fmt(d) + '</td>';
+                } else {
+                    row += '<td class="mono" style="color:var(--muted)">-</td>';
+                }
+            });
+            h += row + '</tr>';
+        });
+        h += '</table></div>';
+
+        document.getElementById('uplift-content').innerHTML = h;
+
+        // Chart with variant datasets
+        const variantColors = [C.green, C.blue, '#f0883e', '#a371f7', '#3fb950'];
+        const datasets = [{ label: 'Tier 3 (no skill)', data: chartData.t3, backgroundColor: C.red }];
+        skillSpecs.forEach((spec, i) => {
+            datasets.push({ label: parseSkill(spec).label, data: chartData.variants[spec], backgroundColor: variantColors[i % variantColors.length] });
+        });
+        new Chart(document.getElementById('uplift-chart'), {
+            type: 'bar',
+            data: { labels: models, datasets },
+            options: { responsive: true, scales: { y: { min: 0, max: 1, ticks: { color: '#7d8590' }, grid: { color: '#30363d' } }, x: { ticks: { color: '#7d8590' }, grid: { color: '#30363d' } } }, plugins: { legend: { labels: { color: '#e6edf3' } } } }
+        });
+    } else {
+        // === SINGLE VARIANT (original view) ===
+        h += '<div class="card"><h2>Skill Uplift Detail</h2>';
+        h += '<table><tr><th>Model</th><th>Tier 3 (no skill)</th><th>Tier 4 (with skill)</th><th>Uplift</th><th>Interpretation</th></tr>';
+        const t3s=[],t4s=[];
+        models.forEach(m => {
+            const r3=tier3.filter(r=>r.model===m);
+            const r4=tier4.filter(r=>r.model===m);
+            const v3=r3.length?r3.reduce((s,r)=>s+(r.scores.correctness||0),0)/r3.length:null;
+            const v4=r4.length?r4.reduce((s,r)=>s+(r.scores.correctness||0),0)/r4.length:null;
+            t3s.push(v3||0); t4s.push(v4||0);
+            if(v3===null&&v4===null)return;
+            const d=(v4||0)-(v3||0);
+            const cls=Math.abs(d)<0.01?'zero':d>0?'pos':'neg';
+            let interp='-';
+            if(v3!==null&&v4!==null){
+                if(d>0.3) interp='<span class="pass">Strong uplift — skill significantly helps</span>';
+                else if(d>0.1) interp='<span class="partial">Moderate uplift</span>';
+                else if(d>-0.05) interp='<span style="color:var(--muted)">Minimal effect</span>';
+                else interp='<span class="fail">Negative — skill may confuse model</span>';
+            }
+            h += '<tr><td><b>'+m+'</b></td>';
+            h += '<td class="mono '+(v3!=null?sc(v3):'')+'">'+(v3!=null?fmt(v3):'-')+'</td>';
+            h += '<td class="mono '+(v4!=null?sc(v4):'')+'">'+(v4!=null?fmt(v4):'-')+'</td>';
+            h += '<td class="mono delta '+cls+'">'+(d>0?'+':'')+fmt(d)+'</td>';
+            h += '<td>'+interp+'</td></tr>';
+        });
+        h += '</table></div>';
+
+        document.getElementById('uplift-content').innerHTML = h;
+
+        new Chart(document.getElementById('uplift-chart'),{
+            type:'bar',
+            data:{labels:models,datasets:[
+                {label:'Tier 3 (no skill)',data:t3s,backgroundColor:C.red},
+                {label:'Tier 4 (with skill)',data:t4s,backgroundColor:C.green},
+            ]},
+            options:{responsive:true,scales:{y:{min:0,max:1,ticks:{color:'#7d8590'},grid:{color:'#30363d'}},x:{ticks:{color:'#7d8590'},grid:{color:'#30363d'}}},plugins:{legend:{labels:{color:'#e6edf3'}}}}
+        });
+    }
 }
 
 init();

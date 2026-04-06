@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
-from llm_bench.runner import run_single_task
+from llm_bench.runner import run_single_task, resolve_skill_path
 from llm_bench.models import TaskConfig, TokenUsage
 from llm_bench.adapters.base import CLIOutput
 
@@ -55,3 +55,59 @@ def test_run_single_task(tmp_path):
     assert result.scores.efficiency.tokens.input == 400
     assert result.prompt == "Write hello world"
     assert result.tier == 1
+
+
+# --- resolve_skill_path tests ---
+
+def _make_skill_dir(tmp_path, domain, variants_yaml=None, files=None):
+    """Helper to create a skill directory with optional VARIANTS.yaml and .md files."""
+    skill_dir = tmp_path / domain
+    skill_dir.mkdir(parents=True)
+    if variants_yaml:
+        (skill_dir / "VARIANTS.yaml").write_text(variants_yaml)
+    if files:
+        for name, content in files.items():
+            (skill_dir / name).write_text(content)
+    return tmp_path
+
+
+def test_resolve_skill_path_domain_with_variants_yaml(tmp_path):
+    """Domain-only spec resolves via VARIANTS.yaml default."""
+    skills_dir = _make_skill_dir(tmp_path, "usd-composition",
+        variants_yaml="default: reference\nvariants:\n  reference:\n    description: full\n",
+        files={"reference.md": "# Reference"})
+    result = resolve_skill_path(skills_dir, "usd-composition")
+    assert result is not None
+    assert result.name == "reference.md"
+
+
+def test_resolve_skill_path_explicit_variant(tmp_path):
+    """domain:variant resolves to {variant}.md."""
+    skills_dir = _make_skill_dir(tmp_path, "usd-composition",
+        files={"task-hints.md": "# Hints", "reference.md": "# Ref"})
+    result = resolve_skill_path(skills_dir, "usd-composition:task-hints")
+    assert result is not None
+    assert result.name == "task-hints.md"
+
+
+def test_resolve_skill_path_missing_variant(tmp_path):
+    """Missing variant returns None."""
+    skills_dir = _make_skill_dir(tmp_path, "usd-composition",
+        files={"reference.md": "# Ref"})
+    result = resolve_skill_path(skills_dir, "usd-composition:nonexistent")
+    assert result is None
+
+
+def test_resolve_skill_path_legacy_skill_md_fallback(tmp_path):
+    """Falls back to SKILL.md when no VARIANTS.yaml exists."""
+    skills_dir = _make_skill_dir(tmp_path, "old-skill",
+        files={"SKILL.md": "# Legacy"})
+    result = resolve_skill_path(skills_dir, "old-skill")
+    assert result is not None
+    assert result.name == "SKILL.md"
+
+
+def test_resolve_skill_path_missing_domain(tmp_path):
+    """Missing domain directory returns None."""
+    result = resolve_skill_path(tmp_path, "nonexistent-domain")
+    assert result is None

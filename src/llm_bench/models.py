@@ -49,6 +49,20 @@ class TaskConfig:
     scoring_flagged: list[str]
     task_dir: Path = field(repr=False)
 
+    @property
+    def skill_domain(self) -> Optional[str]:
+        """Extract domain from skill spec: 'usd-composition' from 'usd-composition:task-hints'."""
+        if not self.skill:
+            return None
+        return self.skill.split(":")[0]
+
+    @property
+    def skill_variant(self) -> Optional[str]:
+        """Extract variant from skill spec: 'task-hints' from 'usd-composition:task-hints'."""
+        if not self.skill or ":" not in self.skill:
+            return None
+        return self.skill.split(":", 1)[1]
+
     @classmethod
     def from_dir(cls, task_dir: Path) -> TaskConfig:
         yaml_path = task_dir / "task.yaml"

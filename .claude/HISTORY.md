@@ -52,3 +52,33 @@
 - Key insight: skills only help models "on the cusp" — too-weak models get confused by extra context
 - Implication: task-scoped skills safer than broad domain reference skills
 - **Status:** First skill uplift data collected, findings inform skill design approach
+
+## 2026-04-05 — Skill Variants + DSPy Compiler (Phases 1-3)
+- Implemented skill variant system: `domain:variant` format, VARIANTS.yaml, resolve_skill_path()
+- Created task-hints variant (40-line narrow skill vs 144-line reference)
+- Built DSPy skill compiler with proxy/live metrics, BootstrapFewShot optimizer
+- Added `compile-skill` subcommand to CLI
+- Dashboard updated with variant comparison matrix in uplift view
+- 69 tests passing
+- **Status:** Implementation complete, ready for variant benchmarking
+
+## 2026-04-06 — Skill Variant Experiment (Phase 4)
+- Ran DSPy compilation: glm-5 as teacher → compiled-glm45 variant (80 lines, proxy score 0.80)
+- Ran 12 benchmarks: 3 variants × 3 models × 2 CLIs on USD shot assembly
+- **Results:** All skills net-negative on avg for weak models (reference -0.20, task-hints -0.13, compiled -0.10)
+- **Highlight:** DSPy compiled skill got glm-4.5 Kilo from 0.1→0.8 (+0.7 uplift) — single biggest win
+- **Surprise:** Same skill+model performs oppositely on different CLIs (CLI is a confound)
+- **Confirmed:** glm-5 is immune to skill quality (always 1.0) — above capability threshold
+- **Insight:** Model-specific optimization helps the target but may hurt other models
+- **Status:** Variant experiment complete, 226 total results
+
+## 2026-04-06 — CLI Confound Investigation + Live DSPy Compilation
+- Investigated why same model+skill produces opposite results on CC vs Kilo
+- **Root causes found:** Kilo LSP false positives (Pyright vs pxr), CC proxy swallows telemetry, CC hooks bloat context
+- Fixed live metric bug: candidate skill wasn't being injected into run_single_task (added skill_path_override param)
+- Ran DSPy live-metric compilation (34 min, 6 iterations, glm-5 teacher → glm-4.5 target on Kilo)
+- Generated compiled-live-glm45 variant (59 lines, proxy score 1.00)
+- Benchmarked all 5 variants × 3 models × 2 CLIs = 18 new runs
+- **Key result:** DSPy-live variant recovered glm-4.5 on CC to 0.8 (from 0.2 with reference skill)
+- **Key insight:** No single skill variant works across CLIs — CLI environment is the dominant variable
+- **Status:** 238 total results, experiment complete
