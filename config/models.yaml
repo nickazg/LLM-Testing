@@ -14,6 +14,10 @@ models:
     name: "Anthropic Opus 4.6 (frontier)"
     provider: anthropic
     openrouter_id: "anthropic/claude-opus-4-6"
+    claude-code:
+      model_id: "claude-opus-4-6"  # native CC model name (uses subscription)
+    kilo:
+      provider: openrouter  # route through OpenRouter for Kilo
 
   # ── Budget / paid ─────────────────────────────────────────────
   qwen3-30b:

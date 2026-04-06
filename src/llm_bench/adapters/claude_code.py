@@ -137,6 +137,8 @@ class ClaudeCodeAdapter(CLIAdapter):
         # When env overrides model tiers, pass a valid tier name
         if env and any(k.startswith("ANTHROPIC_DEFAULT_") and k.endswith("_MODEL") for k in env):
             cmd = self.build_command(prompt, model_override="sonnet")
+        elif env and env.get("LLM_BENCH_CC_MODEL"):
+            cmd = self.build_command(prompt, model_override=env["LLM_BENCH_CC_MODEL"])
         else:
             cmd = self.build_command(prompt)
 

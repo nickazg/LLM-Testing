@@ -67,13 +67,12 @@ def resolve_model(
     cli_override = model_def.get(cli_name, None)
 
     if cli_name == "claude-code":
-        if cli_override:
-            # Direct API (e.g. GLM-5)
-            base_url = cli_override.get("base_url", "")
+        if cli_override and cli_override.get("base_url"):
+            # Direct API with custom base URL (e.g. GLM-5 via z.ai)
+            base_url = cli_override["base_url"]
             auth_env = cli_override.get("auth_env", "")
             model_override = cli_override.get("model_id", "")
-            if base_url:
-                env["ANTHROPIC_BASE_URL"] = base_url
+            env["ANTHROPIC_BASE_URL"] = base_url
             if auth_env and auth_env in keys:
                 env["ANTHROPIC_AUTH_TOKEN"] = keys[auth_env]
             if model_override:
@@ -89,16 +88,19 @@ def resolve_model(
             env["ANTHROPIC_DEFAULT_SONNET_MODEL"] = or_model
             env["ANTHROPIC_DEFAULT_OPUS_MODEL"] = or_model
         elif provider == "anthropic":
-            # Native Anthropic — no env overrides needed
-            pass
+            # Native Anthropic — use model_id override for CC model name
+            if cli_override and cli_override.get("model_id"):
+                env["LLM_BENCH_CC_MODEL"] = cli_override["model_id"]
 
     elif cli_name in ("open-code", "kilo"):
-        if provider == "openrouter" and openrouter_id:
+        # CLI override can change provider (e.g. opus routes through OpenRouter on Kilo)
+        cli_provider = cli_override.get("provider", provider) if cli_override else provider
+        if cli_provider == "openrouter" and openrouter_id:
             env["OPENROUTER_API_KEY"] = keys.get("OPENROUTER_API_KEY", "")
             env["LLM_BENCH_MODEL_ID"] = f"openrouter/{openrouter_id}"
-        elif provider == "anthropic":
+        elif cli_provider == "anthropic":
             env["ANTHROPIC_API_KEY"] = keys.get("ANTHROPIC_API_KEY", "")
-            env["LLM_BENCH_MODEL_ID"] = f"anthropic/{openrouter_id}"
+            env["LLM_BENCH_MODEL_ID"] = openrouter_id
 
     return ModelConfig(
         model_id=model_id,
