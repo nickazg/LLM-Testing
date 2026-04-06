@@ -1,0 +1,4 @@
+default: reference
+variants:
+  compiled-qwen3-30b:
+    description: DSPy-compiled for qwen3-30b (score=0.84)

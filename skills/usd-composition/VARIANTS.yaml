@@ -10,3 +10,5 @@ variants:
     description: DSPy-compiled for glm-4.5-air-free (score=0.80)
   compiled-live-glm45:
     description: DSPy-compiled for glm-4.5-air-free (score=1.00)
+  compiled-qwen3-30b:
+    description: DSPy-compiled for qwen3-30b (score=1.00)

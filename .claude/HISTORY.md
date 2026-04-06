@@ -82,3 +82,19 @@
 - **Key result:** DSPy-live variant recovered glm-4.5 on CC to 0.8 (from 0.2 with reference skill)
 - **Key insight:** No single skill variant works across CLIs — CLI environment is the dominant variable
 - **Status:** 238 total results, experiment complete
+
+## 2026-04-06 — Qwen3 Coder 30B Full Experiment
+- Ran 12 baseline benchmarks: qwen3-30b × [claude-code, kilo] × 6 USD/Houdini tasks
+- DSPy proxy-compiled usd-composition for qwen3-30b (76 lines, proxy=1.00) using glm-5 teacher
+- DSPy proxy-compiled houdini-solaris for qwen3-30b (74 lines, proxy=0.84) using glm-5 teacher
+- Created 2 new tier4 task variants for compiled-qwen3 skills
+- Ran 4 compiled variant benchmarks
+- **Headline: qwen3-30b scores 1.0 without skill but 0.0 with its own DSPy-compiled skill**
+- All 6 skill variants hurt qwen3-30b on CC (1.0→0.7/0.9/0.9/0.1/0.0 depending on variant)
+- Model-specific compilation was worst; cross-model glm45-compiled transferred better
+- Root cause: model hallucinated LockVariant() despite skill showing GetVariantEditContext()
+- Proxy metric scored 1.0 but doesn't predict behavioral compliance
+- Houdini Solaris: 0/6 regardless of skill — above difficulty ceiling for qwen3-30b
+- Kilo: 0.0 on all USD/Houdini tasks — CLI environment fully blocks qwen3-30b
+- **Insight: "skill harm zones" — models above capability threshold are hurt by skills**
+- **Status:** 259 total results, qwen3-30b experiment complete

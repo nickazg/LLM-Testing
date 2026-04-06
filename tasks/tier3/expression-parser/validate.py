@@ -19,7 +19,7 @@ tests_passed = 0
 total_tests = 20
 
 try:
-    import importlib
+    import importlib.util
     spec = importlib.util.spec_from_file_location("expr_parser", str(parser_py))
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)

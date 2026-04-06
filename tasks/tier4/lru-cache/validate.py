@@ -20,7 +20,7 @@ tests_passed = 0
 total_tests = 15
 
 try:
-    import importlib
+    import importlib.util
     spec = importlib.util.spec_from_file_location("lru_cache", str(cache_py))
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -112,8 +112,11 @@ try:
         tests_passed += 1
 
     # Test 14: Does NOT use OrderedDict
-    import inspect
-    source = inspect.getsource(mod.LRUCache)
+    try:
+        source = cache_py.read_text()
+    except Exception:
+        import inspect
+        source = inspect.getsource(mod.LRUCache)
     if "OrderedDict" not in source:
         tests_passed += 1
 
