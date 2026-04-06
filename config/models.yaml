@@ -40,25 +40,29 @@ models:
     name: "Qwen3 Coder 30B"
     openrouter_id: "qwen/qwen3-coder-30b-a3b-instruct"
 
-  qwen3-coder-next:
-    name: "Qwen3 Coder Next (80B MoE, 3B active)"
-    openrouter_id: "qwen/qwen3-coder-next"
+  # qwen3-coder-next:
+  #   name: "Qwen3 Coder Next (80B MoE, 3B active)"
+  #   openrouter_id: "qwen/qwen3-coder-next"
+  #   NOTE: Not in Kilo model registry — 0/33 Kilo. Works on CC only.
 
-  gemma-4-31b:
-    name: "Google Gemma 4 31B"
-    openrouter_id: "google/gemma-4-31b-it"
+  # gemma-4-31b:
+  #   name: "Google Gemma 4 31B"
+  #   openrouter_id: "google/gemma-4-31b-it"
+  #   NOTE: 0/33 CC in Phase 2. Works on Kilo only (7/33).
 
   gpt-oss-120b:
-    name: "GPT OSS 120B (free)"
-    openrouter_id: "openai/gpt-oss-120b:free"
+    name: "GPT OSS 120B"
+    openrouter_id: "openai/gpt-oss-120b"
+    disable_adaptive_thinking: true
 
   gpt-oss-20b:
-    name: "GPT OSS 20B (free)"
-    openrouter_id: "openai/gpt-oss-20b:free"
+    name: "GPT OSS 20B"
+    openrouter_id: "openai/gpt-oss-20b"
+    disable_adaptive_thinking: true
 
   # ── GLM (Z.ai direct on CC, OpenRouter on Kilo) ───────────────
-  # Note: Kilo CLI 7.x doesn't support z-ai as direct provider,
-  # GLM models only available via openrouter/z-ai/* on Kilo.
+  # Kilo CLI 7.x only supports kilo/ and openrouter/ prefixes.
+  # Z.ai direct not available — GLM routes via OpenRouter on Kilo.
   glm-5:
     name: "GLM-5"
     openrouter_id: "z-ai/glm-5"
@@ -68,18 +72,19 @@ models:
       model_id: "glm-5"
 
   glm-4.5-air-free:
-    name: "GLM 4.5 Air (free)"
+    name: "GLM 4.5 Air"
     openrouter_id: "z-ai/glm-4.5-air:free"
 
   glm-4.7-flash:
-    name: "GLM 4.7 Flash (ultra-cheap)"
+    name: "GLM 4.7 Flash"
     openrouter_id: "z-ai/glm-4.7-flash"
 
-  # ── Non-functional (excluded from Phase 2) ────────────────────
-  # minimax-m2.7:
-  #   name: "MinimaxM2.7"
-  #   openrouter_id: "minimax/minimax-m2.7"  # was minimax-m2-7 (wrong)
-  #   NOTE: 0/66 in Phase 2, confirmed non-functional
+  minimax-m2.7:
+    name: "MiniMax M2.7"
+    openrouter_id: "minimax/minimax-m2.7"  # was minimax-m2-7 (wrong ID in Phase 2)
+    disable_adaptive_thinking: true
+
+  # ── Non-functional (excluded) ─────────────────────────────────
 
   # qwen3-coder-free:
   #   openrouter_id: "qwen/qwen3-coder:free"

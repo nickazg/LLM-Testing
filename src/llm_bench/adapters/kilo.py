@@ -31,7 +31,10 @@ class KiloAdapter(CLIAdapter):
             "openrouter": {"env": ["OPENROUTER_API_KEY"]}
         },
         "z-ai": lambda env: {
-            "z-ai": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
+            "z-ai": {"options": {
+                "apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", ""),
+                "baseUrl": "https://api.z.ai/api/coding/paas/v4",
+            }}
         },
         "openai": lambda env: {
             "openai": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}

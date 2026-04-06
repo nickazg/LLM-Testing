@@ -66,6 +66,10 @@ def resolve_model(
     # Check for CLI-specific override
     cli_override = model_def.get(cli_name, None)
 
+    # Model-level flags
+    if model_def.get("disable_adaptive_thinking"):
+        env["CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING"] = "1"
+
     if cli_name == "claude-code":
         # Check CLI override provider first, fall back to model-level provider
         cc_provider = cli_override.get("provider", provider) if cli_override else provider
