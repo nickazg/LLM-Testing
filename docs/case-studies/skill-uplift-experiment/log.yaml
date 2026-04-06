@@ -1,0 +1,630 @@
+# Case Study: Skill Uplift in Budget LLMs
+# Started: 2026-04-03
+# Description: Measuring whether structured knowledge (skills) can close the gap between budget and frontier LLM coding performance
+entries:
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-03 — Framework Design
+# ══════════════════════════════════════════════════════════════
+
+- id: "001"
+  date: "2026-04-03"
+  category: method
+  title: "Framework design — 4-tier task system with paired skill uplift measurement"
+  body: >
+    Designed benchmarking framework with 4 task tiers. Tier 1-2 are baselines (no skills).
+    Tier 3 tasks require domain knowledge. Tier 4 tasks are IDENTICAL to tier 3 but with
+    a skill injected. The delta between tier 3 and tier 4 scores isolates skill uplift.
+    This paired design controls for task difficulty and model capability.
+  evidence:
+    - ".claude/HISTORY.md"
+  tags: [design, methodology]
+  session: "2026-04-03-design"
+  retrospective: true
+
+- id: "002"
+  date: "2026-04-03"
+  category: method
+  title: "Skill injection via .claude/skills/ — the only path all CLIs share"
+  body: >
+    Researched native skill mechanisms for Claude Code, Open Code, and Kilo CLI.
+    All three discover skills placed in .claude/skills/{name}/SKILL.md. This is
+    the injection point — skills are copied into the workspace before the CLI runs.
+    Claude Code also reads CLAUDE.md, Open Code and Kilo read AGENTS.md — adapters
+    write the correct context file per CLI.
+  evidence:
+    - "src/llm_bench/workspace.py"
+    - "src/llm_bench/adapters/"
+  tags: [design, skill-injection, cli-adapters]
+  session: "2026-04-03-design"
+  retrospective: true
+
+- id: "003"
+  date: "2026-04-03"
+  category: context
+  title: "Core research question defined"
+  body: >
+    Can structured knowledge (domain-specific skills) close the performance gap between
+    budget models (Qwen3 Coder 30B, Gemma 4 31B, GLM family) and frontier models
+    (Claude Opus 4.6)? Hypothesis: skills should help weaker models more, since
+    frontier models already have the knowledge internalized.
+  evidence: []
+  tags: [research-question, hypothesis]
+  session: "2026-04-03-design"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-03 — MVP Implementation
+# ══════════════════════════════════════════════════════════════
+
+- id: "004"
+  date: "2026-04-03"
+  category: context
+  title: "MVP framework implemented — Python package with 3 CLI adapters"
+  body: >
+    Built llm-bench Python package with src layout. 3 CLI adapters (Claude Code,
+    Open Code, Kilo), task loader, workspace manager, automated scorer, LLM judge
+    stub, result storage, and FastAPI dashboard with 4 views. 2 tier 1 tasks
+    (hello-world, fizzbuzz). 44 tests passing.
+  evidence:
+    - "src/llm_bench/"
+    - "tasks/tier1/"
+  tags: [implementation, mvp]
+  session: "2026-04-03-mvp"
+  retrospective: true
+
+- id: "005"
+  date: "2026-04-03"
+  category: result
+  title: "Early dev runs — qwen3-30b, qwen3-coder-next, gemma-4-31b"
+  body: >
+    32 early development runs testing the framework. Mix of models and CLIs
+    on tier 1 tasks. 7/32 passed — many failures were framework bugs
+    (adapter issues, env config) not model failures.
+  evidence:
+    - "results/tier1-*_2026-04-03*.json"
+  tags: [tier1, early-testing]
+  session: "2026-04-03-mvp"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-04 — First Real Benchmarks
+# ══════════════════════════════════════════════════════════════
+
+- id: "006"
+  date: "2026-04-04"
+  category: method
+  title: "Selected 5 free/cheap OpenRouter models for initial benchmark"
+  body: >
+    Researched OpenRouter free models. Many have limitations (no tool calling,
+    provider restrictions, max_tokens caps). Selected: qwen3-coder-free,
+    glm-4.5-air-free, glm-4.7-flash, qwen3-next-80b-free, glm-5.
+    Claude Code proxy supports limited providers (Qwen, Z-AI, Llama).
+  evidence:
+    - "config/models.yaml"
+  tags: [model-selection, openrouter]
+  session: "2026-04-04-first-benchmarks"
+  retrospective: true
+
+- id: "007"
+  date: "2026-04-04"
+  category: finding
+  title: "2 of 5 free models are non-functional (all timeout)"
+  body: >
+    qwen3-coder-free and qwen3-next-80b-free timed out on every single task
+    across both CLIs. Zero usable output. Only the 3 GLM models
+    (glm-4.5-air-free, glm-4.7-flash, glm-5) produced real data.
+  evidence:
+    - "results/tier1-*qwen3-coder-free*.json"
+    - "results/tier1-*qwen3-next-80b-free*.json"
+  tags: [model-viability, timeout, openrouter]
+  session: "2026-04-04-first-benchmarks"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-05 — Task Expansion + V1 Benchmark
+# ══════════════════════════════════════════════════════════════
+
+- id: "008"
+  date: "2026-04-05"
+  category: method
+  title: "Expanded to 16 tasks across all 4 tiers"
+  body: >
+    Implemented 14 new tasks. Tier 2 (6): csv-pipeline, cli-tool, log-processor,
+    makefile, usd-scene, houdini-sop. Tier 3 (6): lru-cache, expression-parser,
+    git-hook, service-generator, usd-shot-assembly, houdini-solaris.
+    Tier 4 (2): usd-shot-assembly + usd-composition skill, houdini-solaris +
+    houdini-solaris skill. Created mock hou module for Houdini tasks.
+  evidence:
+    - "tasks/"
+    - "skills/usd-composition/reference.md"
+    - "skills/houdini-solaris/SKILL.md"
+  tags: [tasks, skills, tier-expansion]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+- id: "009"
+  date: "2026-04-05"
+  category: result
+  title: "V1 Benchmark — 160 runs, 6.3 hours, 3 functional models"
+  body: >
+    Full benchmark: 5 models x 2 CLIs x 16 tasks = 160 runs. 2 models
+    non-functional (all timeout). 3 GLM models produced data.
+    Best model: glm-5 on Claude Code (12/16 pass, avg=0.76).
+    Hardest tasks: expression-parser, lru-cache, houdini-solaris (0/18 all models).
+  evidence:
+    - "results/*_2026-04-04*.json"
+    - "results/*_2026-04-05*.json"
+  tags: [v1-benchmark, full-run]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+- id: "010"
+  date: "2026-04-05"
+  category: finding
+  title: "Tier difficulty perfectly calibrated — 92%, 78%, 42%, 25%"
+  body: >
+    Pass rates by tier: T1=92%, T2=78%, T3=42%, T4=25%. The progressive
+    difficulty validates the tier system design. The drop from T3 to T4
+    is partly artificial since T4 has fewer tasks, but the domain-specific
+    tasks (T3/T4) are genuinely harder.
+  evidence:
+    - "results/"
+  tags: [tier-calibration, validation]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+- id: "011"
+  date: "2026-04-05"
+  category: surprise
+  title: "Broad USD skill DESTROYS glm-4.5 performance (0.8 → 0.2)"
+  body: >
+    glm-4.5-air-free scored 0.8 on tier3-usd-shot-assembly (no skill) but
+    dropped to 0.2 on tier4 (with usd-composition reference skill — 144 lines
+    of broad API reference). The skill actively harmed the model.
+    This directly contradicts our initial hypothesis that skills help weaker models.
+  evidence:
+    - "results/tier3-usd-shot-assembly_claude-code_glm-4.5-air-free*.json"
+    - "results/tier4-usd-shot-assembly_claude-code_glm-4.5-air-free*.json"
+  tags: [skill-uplift, glm-4.5, negative-uplift, key-finding]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+- id: "012"
+  date: "2026-04-05"
+  category: finding
+  title: "Root cause — API hallucination amplification from skill content"
+  body: >
+    When given the broad USD skill, weaker models treat the examples as
+    authoritative and hallucinate similar-sounding APIs (e.g. GetPrototypeStage,
+    .edit() instead of GetVariantEditContext). The skill provides enough context
+    to make the model confident in wrong approaches but not enough to prevent
+    hallucination. Authority bias + context saturation.
+  evidence:
+    - "results/tier4-usd-shot-assembly_claude-code_glm-4.5-air-free*.json"
+  tags: [hallucination, root-cause, authority-bias]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+- id: "013"
+  date: "2026-04-05"
+  category: hypothesis
+  title: "Capability threshold theory — skills only help models 'on the cusp'"
+  body: >
+    Skills only help models strong enough to synthesize from examples but not
+    strong enough to solve the task alone. Too-weak models get confused by
+    extra context (hallucination amplification). Too-strong models already
+    know the answer. The uplift sweet spot is a narrow capability band.
+  evidence:
+    - "results/tier4-*glm-5*.json"
+    - "results/tier4-*glm-4.5*.json"
+  tags: [capability-threshold, theory, key-finding]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+- id: "014"
+  date: "2026-04-05"
+  category: surprise
+  title: "glm-5 + houdini-solaris skill: 0.0 → 1.0 on Claude Code"
+  body: >
+    The one clear positive skill uplift in V1. glm-5 couldn't do the Houdini
+    Solaris task at all (0.0) but with the skill it scored 1.0 on Claude Code.
+    This model was exactly at the capability threshold — it needed the skill
+    to bridge the gap. Validates the threshold theory from the positive side.
+  evidence:
+    - "results/tier3-houdini-solaris_claude-code_glm-5*.json"
+    - "results/tier4-houdini-solaris_claude-code_glm-5*.json"
+  tags: [skill-uplift, positive-uplift, glm-5, houdini, capability-threshold]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-05 — Skill Variants + DSPy Compiler
+# ══════════════════════════════════════════════════════════════
+
+- id: "015"
+  date: "2026-04-05"
+  category: method
+  title: "Skill variant system — domain:variant format with VARIANTS.yaml"
+  body: >
+    Built variant system to test multiple skill formulations. Format:
+    'usd-composition:task-hints' resolves to skills/usd-composition/task-hints.md.
+    VARIANTS.yaml declares available variants and the default. Each tier 4 task
+    specifies which variant to use. This enables A/B testing of skill content.
+  evidence:
+    - "src/llm_bench/runner.py:28-55"
+    - "skills/usd-composition/VARIANTS.yaml"
+  tags: [skill-variants, methodology]
+  session: "2026-04-05-skill-variants"
+  retrospective: true
+
+- id: "016"
+  date: "2026-04-05"
+  category: method
+  title: "Created task-hints variant — manual narrow skill (40 lines vs 144)"
+  body: >
+    Hypothesis: the broad 144-line reference skill is too much for weak models.
+    Created a 40-line task-hints variant containing only the specific APIs
+    needed for the shot assembly task. Tests whether narrower skills reduce harm.
+  evidence:
+    - "skills/usd-composition/task-hints.md"
+  tags: [skill-variants, narrow-skills]
+  session: "2026-04-05-skill-variants"
+  retrospective: true
+
+- id: "017"
+  date: "2026-04-05"
+  category: method
+  title: "DSPy skill compiler — automated skill optimization via BootstrapFewShot"
+  body: >
+    Built DSPy integration to automatically optimize skills for target models.
+    Teacher model generates candidate skills, proxy metric scores structural
+    quality (markdown, code examples, conciseness, API pattern coverage),
+    BootstrapFewShot optimizer selects the best. Also supports live metric
+    mode that runs actual benchmarks in the optimization loop.
+  evidence:
+    - "src/llm_bench/compiler.py"
+    - "src/llm_bench/cli.py:290-346"
+  tags: [dspy, compiler, methodology]
+  session: "2026-04-05-skill-variants"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-06 — Skill Variant Experiment
+# ══════════════════════════════════════════════════════════════
+
+- id: "018"
+  date: "2026-04-06"
+  category: result
+  title: "DSPy proxy compilation — glm-5 teacher → glm-4.5 target"
+  body: >
+    Compiled usd-composition skill targeting glm-4.5-air-free using glm-5 as
+    teacher. Proxy metric. Output: compiled-glm45.md (80 lines, proxy score 0.80).
+    The compiled skill is more task-focused with concrete code patterns.
+  evidence:
+    - "skills/usd-composition/compiled-glm45.md"
+  tags: [dspy, compilation, glm-4.5]
+  session: "2026-04-06-variant-experiment"
+  retrospective: true
+
+- id: "019"
+  date: "2026-04-06"
+  category: result
+  title: "Variant experiment — 12 runs, all skill variants net-negative on average"
+  body: >
+    Tested reference, task-hints, and compiled-glm45 variants across 3 models
+    and 2 CLIs. Average uplift: reference -0.20, task-hints -0.13, compiled -0.10.
+    Narrower skills reduce harm but none achieve net-positive uplift on average.
+  evidence:
+    - "results/tier4-usd-shot-assembly*_2026-04-06*.json"
+  tags: [skill-variants, uplift-measurement]
+  session: "2026-04-06-variant-experiment"
+  retrospective: true
+
+- id: "020"
+  date: "2026-04-06"
+  category: surprise
+  title: "Same model+skill gives opposite results on different CLIs"
+  body: >
+    DSPy-compiled skill got glm-4.5 Kilo from 0.1→0.8 (+0.7 uplift) but
+    the same skill on Claude Code showed different behavior. Every variant
+    that helps one CLI hurts or is neutral on the other. The CLI environment
+    is a confounding variable we didn't anticipate.
+  evidence:
+    - "results/tier4-usd-shot-assembly-compiled_kilo_glm-4.5-air-free*.json"
+    - "results/tier4-usd-shot-assembly-compiled_claude-code_glm-4.5-air-free*.json"
+  tags: [cli-confound, surprise, key-finding]
+  session: "2026-04-06-variant-experiment"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-06 — CLI Confound Investigation
+# ══════════════════════════════════════════════════════════════
+
+- id: "021"
+  date: "2026-04-06"
+  category: finding
+  title: "CLI confound root causes — LSP, proxy telemetry, hook bloat"
+  body: >
+    Investigated why same model+skill gives opposite results on CC vs Kilo.
+    Three root causes: (1) Kilo LSP false positives — Pyright flags all pxr
+    API calls, forcing iteration that can help or hurt. (2) CC proxy swallows
+    telemetry — OpenRouter models show empty raw_output/tokens. (3) CC hooks
+    bloat context — superpowers SessionStart injects thousands of words,
+    consuming the model's context budget for the actual task.
+  evidence:
+    - ".claude/CURRENT-STATE.md"
+  tags: [cli-confound, root-cause, kilo-lsp, cc-hooks]
+  session: "2026-04-06-cli-confound"
+  retrospective: true
+
+- id: "022"
+  date: "2026-04-06"
+  category: finding
+  title: "Benchmark partially measures CLI tooling, not just model capability"
+  body: >
+    The CLI confound means our benchmark doesn't purely measure model+skill
+    performance. It measures the combined system of model + skill + CLI
+    environment. This is actually more realistic (production conditions vary)
+    but complicates the skill uplift isolation we designed for.
+  evidence: []
+  tags: [cli-confound, methodology-limitation, validity]
+  session: "2026-04-06-cli-confound"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-06 — DSPy Live Compilation + More Variants
+# ══════════════════════════════════════════════════════════════
+
+- id: "023"
+  date: "2026-04-06"
+  category: result
+  title: "DSPy live-metric compilation — 34 min, glm-5 teacher → glm-4.5 target on Kilo"
+  body: >
+    Live-metric compilation uses actual benchmark runs in the optimization loop.
+    34 minutes, 6 iterations. Output: compiled-live-glm45.md (59 lines, proxy
+    score 1.00). The live metric ensures the skill actually helps the target
+    model pass the task, not just looks structurally good.
+  evidence:
+    - "skills/usd-composition/compiled-live-glm45.md"
+  tags: [dspy, live-metric, compilation]
+  session: "2026-04-06-live-compilation"
+  retrospective: true
+
+- id: "024"
+  date: "2026-04-06"
+  category: result
+  title: "18 variant runs — 5 variants x 3 models x 2 CLIs (partial)"
+  body: >
+    Benchmarked all 5 USD skill variants (reference, task-hints, compiled-glm45,
+    compiled-live-glm45, no-skill baseline). DSPy-live variant recovered
+    glm-4.5 on CC to 0.8 (from 0.2 with reference skill). But no single
+    variant works across all CLIs.
+  evidence:
+    - "results/tier4-usd-shot-assembly*_2026-04-06*.json"
+  tags: [variant-benchmark, uplift-measurement]
+  session: "2026-04-06-live-compilation"
+  retrospective: true
+
+- id: "025"
+  date: "2026-04-06"
+  category: finding
+  title: "No single skill variant works across CLIs"
+  body: >
+    Every variant that helps one CLI hurts or is neutral on the other.
+    The CLI environment is the dominant variable, not the skill content.
+    This suggests skill optimization may need to be CLI-specific, not
+    just model-specific.
+  evidence:
+    - "results/tier4-usd-shot-assembly*_2026-04-06*.json"
+  tags: [cli-confound, skill-variants, key-finding]
+  session: "2026-04-06-live-compilation"
+  retrospective: true
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-06 — Qwen3 Coder 30B Experiment
+# ══════════════════════════════════════════════════════════════
+
+- id: "026"
+  date: "2026-04-06"
+  category: result
+  title: "Qwen3-30b baseline benchmarks — 12 runs on USD + Houdini tasks"
+  body: >
+    Ran qwen3-30b across tier 2-4 USD and Houdini tasks on both CLIs.
+    Results: tier2-houdini-sop CC=1.0/Kilo=0.0, tier2-usd-scene CC=0.0/Kilo=1.0,
+    tier3-houdini-solaris 0.0/0.0, tier4-houdini-solaris 0.0/0.0,
+    tier4-usd-hints CC=0.9/Kilo=0.0, tier4-usd-compiled-glm45 CC=0.9/Kilo=0.0.
+    4/12 passed.
+  evidence:
+    - "results/tier2-*qwen3-30b*_2026-04-06*.json"
+    - "results/tier3-*qwen3-30b*_2026-04-06*.json"
+    - "results/tier4-*qwen3-30b*_2026-04-06*.json"
+  tags: [qwen3-30b, baseline, benchmark]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "027"
+  date: "2026-04-06"
+  category: result
+  title: "DSPy proxy compilation targeting qwen3-30b — usd-composition and houdini-solaris"
+  body: >
+    Compiled two skill variants targeting qwen3-30b using glm-5 as teacher.
+    usd-composition: 76 lines, proxy score 1.00 (149s).
+    houdini-solaris: 74 lines, proxy score 0.84 (66s).
+    Both are task-focused with concrete code patterns.
+  evidence:
+    - "skills/usd-composition/compiled-qwen3-30b.md"
+    - "skills/houdini-solaris/compiled-qwen3-30b.md"
+  tags: [dspy, compilation, qwen3-30b]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "028"
+  date: "2026-04-06"
+  category: result
+  title: "Compiled variant benchmarks — 0/4 pass, qwen3-30b with its own compiled skills"
+  body: >
+    Ran qwen3-30b with its own DSPy-compiled skill variants on both CLIs.
+    All 4 runs failed (0.0). usd-compiled-qwen3 CC=0.0/Kilo=0.0,
+    houdini-compiled-qwen3 CC=0.0/Kilo=0.0. The model-specific compiled
+    skills performed worse than the cross-model glm45-compiled variants.
+  evidence:
+    - "results/tier4-usd-shot-assembly-compiled-qwen3_claude-code_qwen3-30b*.json"
+    - "results/tier4-usd-shot-assembly-compiled-qwen3_kilo_qwen3-30b*.json"
+    - "results/tier4-houdini-solaris-compiled-qwen3_claude-code_qwen3-30b*.json"
+    - "results/tier4-houdini-solaris-compiled-qwen3_kilo_qwen3-30b*.json"
+  tags: [qwen3-30b, dspy, compiled-variants, failure]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "029"
+  date: "2026-04-06"
+  category: surprise
+  title: "qwen3-30b scores 1.0 without skill but 0.0 with its own DSPy-compiled skill"
+  body: >
+    qwen3-30b scored 1.0 on tier3-usd-shot-assembly (no skill) on CC.
+    With its own DSPy-compiled skill (proxy score 1.00), it scored 0.0.
+    The skill actively destroyed performance. Every single skill variant
+    tested hurt this model on this task: reference 0.7, hints 0.9,
+    compiled-glm45 0.9, compiled-live-glm45 0.1, compiled-qwen3 0.0.
+    The model-specific compilation was the WORST performer.
+  evidence:
+    - "results/tier3-usd-shot-assembly_claude-code_qwen3-30b*.json"
+    - "results/tier4-usd-shot-assembly-compiled-qwen3_claude-code_qwen3-30b*.json"
+  tags: [qwen3-30b, skill-harm, capability-threshold, key-finding]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "030"
+  date: "2026-04-06"
+  category: finding
+  title: "Root cause — model hallucinated LockVariant() despite skill showing GetVariantEditContext()"
+  body: >
+    The compiled-qwen3 skill correctly demonstrates GetVariantEditContext().
+    The model generated code using LockVariant() — a non-existent API.
+    The model did not follow the skill's demonstrated pattern, instead
+    hallucinating a plausible-sounding alternative. The skill content was
+    correct but the model's own priors overrode it.
+  evidence:
+    - "skills/usd-composition/compiled-qwen3-30b.md"
+    - "results/tier4-usd-shot-assembly-compiled-qwen3_claude-code_qwen3-30b*.json"
+  tags: [hallucination, root-cause, api-hallucination]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "031"
+  date: "2026-04-06"
+  category: finding
+  title: "Skill detail paradox — more detailed skills cause more harm"
+  body: >
+    The glm45-compiled skill (vague, with '# configure mesh...' placeholders)
+    scored 0.9 with qwen3-30b. The qwen3-compiled skill (detailed, full
+    working code) scored 0.0. The vague skill let the model skip complex
+    variant authoring and pass. The detailed skill encouraged the model to
+    attempt complex operations it then hallucinated. More correct skill
+    content = worse outcome for models above the capability threshold.
+  evidence:
+    - "skills/usd-composition/compiled-glm45.md"
+    - "skills/usd-composition/compiled-qwen3-30b.md"
+  tags: [skill-detail-paradox, key-finding, capability-threshold]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "032"
+  date: "2026-04-06"
+  category: finding
+  title: "Cross-model transfer outperforms model-specific optimization"
+  body: >
+    The glm45-compiled variant (compiled for a different model) scored 0.9
+    with qwen3-30b. The qwen3-compiled variant (compiled specifically for
+    this model) scored 0.0. Cross-model transfer beat model-specific
+    optimization, possibly because the cross-model skill was vaguer and
+    less prescriptive, giving the model room to use its own approach.
+  evidence:
+    - "results/tier4-usd-shot-assembly-compiled_claude-code_qwen3-30b*.json"
+    - "results/tier4-usd-shot-assembly-compiled-qwen3_claude-code_qwen3-30b*.json"
+  tags: [cross-model-transfer, dspy, key-finding]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "033"
+  date: "2026-04-06"
+  category: finding
+  title: "DSPy proxy metric is not predictive of real performance"
+  body: >
+    The compiled-qwen3 skill scored proxy=1.00 (highest possible) but
+    real performance was 0.0 (lowest possible). The proxy metric optimizes
+    for structural quality (markdown, code examples, conciseness, API pattern
+    coverage) but cannot predict whether a model will actually follow the
+    skill's patterns. Behavioral compliance is orthogonal to structural quality.
+  evidence:
+    - "src/llm_bench/compiler.py:260-298"
+  tags: [dspy, proxy-metric, validity, key-finding]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "034"
+  date: "2026-04-06"
+  category: hypothesis
+  title: "Skill harm zones — below, at, and above capability threshold"
+  body: >
+    Refined capability threshold theory into three zones:
+    (1) BELOW threshold — model can't do task at all, skill adds noise,
+    hallucination from examples → NET HARM.
+    (2) AT threshold — model sometimes passes, narrow task-specific skills
+    can tip the balance → POTENTIAL UPLIFT (the sweet spot).
+    (3) ABOVE threshold — model reliably passes, skill competes with
+    model's correct priors → NET HARM.
+    The uplift sweet spot is narrow and model+task specific.
+  evidence:
+    - "results/"
+  tags: [capability-threshold, skill-harm-zones, theory, key-finding]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "035"
+  date: "2026-04-06"
+  category: finding
+  title: "Kilo is 0.0 on all USD/Houdini tasks for qwen3-30b"
+  body: >
+    qwen3-30b scored 0.0 on every single USD and Houdini task on Kilo,
+    regardless of skill variant. 11 runs, all failed. The CLI environment
+    (Pyright LSP, provider routing) completely blocks this model on
+    domain-specific tasks. The same model scores 1.0 on CC for some of
+    these tasks.
+  evidence:
+    - "results/tier*_kilo_qwen3-30b*_2026-04-06*.json"
+  tags: [kilo, qwen3-30b, cli-confound]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "036"
+  date: "2026-04-06"
+  category: finding
+  title: "Houdini Solaris above qwen3-30b difficulty ceiling — 0/6 regardless"
+  body: >
+    qwen3-30b scored 0.0 on all Houdini Solaris variants (tier3 no-skill,
+    tier4 reference skill, tier4 compiled-qwen3 skill) across both CLIs.
+    6 runs, all failed. This task is simply above qwen3-30b's capability
+    ceiling — no amount of skill optimization can bridge the gap.
+  evidence:
+    - "results/tier3-houdini-solaris_*_qwen3-30b*.json"
+    - "results/tier4-houdini-solaris*_*_qwen3-30b*.json"
+  tags: [houdini-solaris, qwen3-30b, difficulty-ceiling]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
+
+- id: "037"
+  date: "2026-04-06"
+  category: finding
+  title: "Run-to-run variance is high — task-hints scored both 0.0 and 0.9 on CC"
+  body: >
+    The task-hints variant with qwen3-30b on CC produced scores of 0.0
+    and 0.9 across two separate runs. This high variance means single-run
+    conclusions are unreliable. Statistical significance requires multiple
+    runs per configuration, which we haven't done systematically.
+  evidence:
+    - "results/tier4-usd-shot-assembly-hints_claude-code_qwen3-30b*.json"
+  tags: [variance, statistical-validity, methodology-limitation]
+  session: "2026-04-06-qwen3-experiment"
+  retrospective: true
