@@ -98,3 +98,20 @@
 - Kilo: 0.0 on all USD/Houdini tasks — CLI environment fully blocks qwen3-30b
 - **Insight: "skill harm zones" — models above capability threshold are hurt by skills**
 - **Status:** 259 total results, qwen3-30b experiment complete
+
+## 2026-04-06/07 — Phase 2: Clean Benchmark (478 runs)
+- Archived all 268 Phase 1 results to results/archive-v1/
+- DSPy proxy-compiled USD + Houdini skills for 5 new models (10 new variants)
+- Created 10 new tier4 task directories (33 total tasks)
+- Fixed Opus 4.6 routing (native CC model name + OpenRouter for Kilo)
+- Ran full benchmark: 7 budget models × 2 CLIs × 33 tasks + Opus ceiling CC-only
+- Built case study skill with structured YAML logging and report generation
+- **Headline: Skills help on CC (+0.147 mean) but hurt on Kilo (-0.068 mean)**
+- 266 paired comparisons: 18% positive, 67% neutral, 14% negative
+- Houdini Solaris skill: +1.0 for 3 models on CC, 0 on Kilo (most consistent uplift)
+- Expression parser: extreme ±1.0 swings depending on model+CLI
+- qwen3-coder-next: 21/33 CC, 0/33 Kilo; gemma-4-31b: 0/33 CC, 7/33 Kilo (reversed!)
+- minimax-m2.7 confirmed dead (0/66)
+- Run-to-run variance confirmed: qwen3-30b 1.0→0.0 on same task between phases
+- **Revised theory: CLI determines DIRECTION of skill effect, not just magnitude**
+- **Status:** 478 Phase 2 + 268 Phase 1 = 746 total results

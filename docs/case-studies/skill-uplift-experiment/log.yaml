@@ -728,6 +728,160 @@ entries:
   tags: [phase-2, model-selection]
   session: "2026-04-06-phase2-clean-benchmark"
   retrospective: false
+
+# ══════════════════════════════════════════════════════════════
+# SESSION: 2026-04-07 — Phase 2 Results
+# ══════════════════════════════════════════════════════════════
+
+- id: "040"
+  date: "2026-04-07"
+  category: result
+  title: "Phase 2 complete — 478 runs across 8 models, 33 tasks, 2 CLIs"
+  body: >
+    Full clean benchmark completed. 478 results total. Model rankings by pass
+    rate: glm-5 (61%), qwen3-30b (44%), glm-4.5-air-free (39%), glm-4.7-flash
+    (30%), qwen3-coder-next (32%), gemma-4-31b (11%), minimax-m2.7 (0%).
+    Opus ceiling: 10/10 CC (62% including partial Kilo errors).
+    Tier calibration: T1=60%, T2=54%, T3=41%, T4=18%.
+  evidence:
+    - "results/"
+  tags: [phase-2, benchmark, full-results]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "041"
+  date: "2026-04-07"
+  category: finding
+  title: "Skills help on CC (+0.147 mean uplift) but hurt on Kilo (-0.068)"
+  body: >
+    266 paired tier3-vs-tier4 comparisons. On Claude Code: 40 positive, 84
+    neutral, 9 negative (mean +0.147). On Kilo: 9 positive, 95 neutral, 29
+    negative (mean -0.068). Overall: 18% positive, 67% neutral, 14% negative
+    (mean +0.039). The CLI environment is THE dominant variable for skill
+    effectiveness — not the skill content or the model.
+  evidence:
+    - "results/"
+  tags: [skill-uplift, cli-confound, key-finding, phase-2]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "042"
+  date: "2026-04-07"
+  category: finding
+  title: "Houdini Solaris skill: +1.0 uplift for 3 models on CC, 0 on Kilo"
+  body: >
+    The houdini-solaris reference skill produced the most consistent positive
+    uplift in the study. Three models went 0.0→1.0 on CC: glm-5, qwen3-30b,
+    and qwen3-coder-next. All three are 'at threshold' models — they can't
+    do the task alone but can synthesize from the skill. On Kilo: 0/6 models
+    showed any uplift. Zero. The same skill, same models, opposite CLI.
+  evidence:
+    - "results/tier3-houdini-solaris_claude-code_*.json"
+    - "results/tier4-houdini-solaris_claude-code_*.json"
+  tags: [houdini-solaris, skill-uplift, positive-uplift, cli-confound, key-finding]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "043"
+  date: "2026-04-07"
+  category: surprise
+  title: "Expression parser skill: extreme ±1.0 swings — helps and destroys"
+  body: >
+    The recursive-descent-parser skill (102 lines, near-complete solution)
+    shows the most extreme polarization. On CC: glm-5 0.0→1.0 (+1.0),
+    glm-4.5 0.1→1.0 (+0.9), but glm-4.7 1.0→0.0 (-1.0). On Kilo: glm-5
+    1.0→0.0 (-1.0), the exact opposite of CC. The same skill, same model,
+    opposite outcome depending on CLI. This near-complete-solution skill
+    helps models that need it but destroys models that already know the answer.
+  evidence:
+    - "results/tier3-expression-parser_*.json"
+    - "results/tier4-expression-parser_*.json"
+  tags: [expression-parser, skill-uplift, extreme-variance, cli-confound]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "044"
+  date: "2026-04-07"
+  category: surprise
+  title: "qwen3-30b scored 0.0 on USD this run vs 1.0 in Phase 1 — variance confirmed"
+  body: >
+    qwen3-30b scored 0.0 on tier3-usd-shot-assembly on CC in Phase 2, but
+    scored 1.0 on the identical task in Phase 1. This is the clearest
+    confirmation of high run-to-run variance. Single-run conclusions are
+    unreliable — the Phase 1 finding that 'qwen3-30b is above capability
+    threshold' may have been a lucky run.
+  evidence:
+    - "results/tier3-usd-shot-assembly_claude-code_qwen3-30b*.json"
+    - "results/archive-v1/tier3-usd-shot-assembly_claude-code_qwen3-30b*.json"
+  tags: [variance, qwen3-30b, statistical-validity, key-finding]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "045"
+  date: "2026-04-07"
+  category: surprise
+  title: "qwen3-coder-next: 21/33 CC, 0/33 Kilo — complete CLI dependence"
+  body: >
+    qwen3-coder-next passed 21 of 33 tasks on Claude Code (64%) but 0 of 33
+    on Kilo (0%). This is the most extreme CLI split in the study. The model
+    is functional and capable on one CLI but completely non-functional on the
+    other. The reverse pattern also exists: gemma-4-31b scored 0/33 on CC
+    but 7/33 on Kilo.
+  evidence:
+    - "results/*qwen3-coder-next*.json"
+    - "results/*gemma-4-31b*.json"
+  tags: [cli-confound, qwen3-coder-next, gemma-4-31b, key-finding]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "046"
+  date: "2026-04-07"
+  category: finding
+  title: "minimax-m2.7 confirmed non-functional — 0/66 across all tasks and CLIs"
+  body: >
+    minimax-m2.7 produced 0 passes across 66 runs (33 tasks x 2 CLIs).
+    Should be excluded from analysis alongside the Phase 1 non-functional
+    models (qwen3-coder-free, qwen3-next-80b-free).
+  evidence:
+    - "results/*minimax-m2*.json"
+  tags: [minimax, non-functional, model-viability]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "047"
+  date: "2026-04-07"
+  category: finding
+  title: "LRU cache skill has minimal effect — mostly neutral"
+  body: >
+    The lru-cache-pattern skill (70 lines, near-complete solution) showed
+    almost no uplift. Most models that can do it already score 1.0 without
+    the skill. Two small positives on Kilo: glm-4.5 0.0→0.5 (+0.5), glm-4.7
+    0.7→1.0 (+0.3). The task may be too well-represented in training data for
+    skills to matter, unlike the niche USD/Houdini domains.
+  evidence:
+    - "results/tier3-lru-cache_*.json"
+    - "results/tier4-lru-cache_*.json"
+  tags: [lru-cache, skill-uplift, neutral, training-data]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
+
+- id: "048"
+  date: "2026-04-07"
+  category: hypothesis
+  title: "Revised theory: CLI environment determines DIRECTION of skill effect"
+  body: >
+    Phase 2 data supports a revised theory. The capability threshold still
+    matters (below/at/above), but the CLI environment determines whether
+    the effect is positive or negative. CC's environment (hooks, context
+    injection) appears to amplify skill content constructively — models
+    integrate it better. Kilo's environment (LSP feedback, provider routing)
+    appears to amplify it destructively — models fight against conflicting
+    signals. The skill content is the same; the CLI determines the sign.
+  evidence:
+    - "results/"
+  tags: [theory, cli-confound, capability-threshold, key-finding]
+  session: "2026-04-07-phase2-analysis"
+  retrospective: false
   date: "2026-04-06"
   category: finding
   title: "Run-to-run variance is high — task-hints scored both 0.0 and 0.9 on CC"

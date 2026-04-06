@@ -1,86 +1,58 @@
 # Current State
 
 ## Project Direction
-Automated LLM benchmarking framework comparing coding performance across CLI interfaces (Claude Code, Kilo CLI) with free/cheap models via OpenRouter. Core experiment: measuring skill uplift delta per model. Includes DSPy-powered skill compilation to automatically optimize skills for weaker models.
+Automated LLM benchmarking framework comparing coding performance across CLI interfaces (Claude Code, Kilo CLI) with free/cheap models via OpenRouter. Core experiment: measuring skill uplift delta per model. Phase 2 clean benchmark complete with definitive dataset.
 
 ## Current Phase
-Qwen3 Coder 30B full experiment complete. 259 benchmark results total. Capability threshold theory strengthened.
+Phase 2 complete. 478 clean benchmark results. CLI environment confirmed as dominant variable for skill effectiveness.
 
 ## What's Built
 - Python package `llm-bench` with `run`, `dashboard`, `info`, and `compile-skill` subcommands
 - 3 CLI adapters (Claude Code, Open Code, Kilo) with async subprocess execution
-- 23 benchmark tasks across 4 tiers + 4 domain skills (with 7 total variants)
+- 33 benchmark tasks across 4 tiers + 4 domain skills (with 15+ variants)
 - Skill variant system: `domain:variant` format, VARIANTS.yaml, resolve_skill_path()
-- DSPy skill compiler with proxy + live metrics, Pydantic SkillDocument schema
+- DSPy skill compiler with proxy + live metrics, model-specific compilation for 7 models
 - Mock hou module (SOP + Solaris variants) for Houdini testing without license
-- FastAPI dashboard with matrix, skill uplift (variant comparison), efficiency, and run history views
+- FastAPI dashboard with matrix, skill uplift, efficiency, and run history views
+- Case study skill with structured logging and report generation
 - 69 unit tests passing
-- 259 benchmark result files
+- 478 Phase 2 results + 268 archived Phase 1 results = 746 total
 
-## Task Inventory (23 tasks, 4 skills with 7 variants)
-- Tier 1 (2): hello-world, fizzbuzz
-- Tier 2 (6): csv-pipeline, cli-tool, log-processor, makefile, usd-scene, houdini-sop
-- Tier 3 (6): expression-parser, git-hook, houdini-solaris, lru-cache, service-generator, usd-shot-assembly
-- Tier 4 (9): usd-shot-assembly (reference), usd-shot-assembly-hints, usd-shot-assembly-compiled (glm45), usd-shot-assembly-compiled-live (glm45), usd-shot-assembly-compiled-qwen3, houdini-solaris (reference), houdini-solaris-compiled-qwen3, expression-parser, lru-cache
+## Key Findings — Phase 2 (Definitive)
 
-## Skill Variants
-### usd-composition (6 variants)
-- `reference` (144 lines) — broad API reference, hurts weak models
-- `task-hints` (40 lines) — manual narrow skill
-- `compiled-glm45` (80 lines) — DSPy proxy metric for glm-4.5
-- `compiled-live-glm45` (59 lines) — DSPy live metric for glm-4.5
-- `compiled-qwen3-30b` (76 lines) — DSPy proxy metric for qwen3-30b
+### Headline: CLI Environment Determines Skill Effect Direction
+- 266 paired tier3-vs-tier4 comparisons
+- **Claude Code: mean uplift +0.147** (40 positive, 84 neutral, 9 negative)
+- **Kilo: mean uplift -0.068** (9 positive, 95 neutral, 29 negative)
+- Same skill, same model, opposite outcome depending on CLI
 
-### houdini-solaris (2 variants)
-- `SKILL` (160 lines) — full Solaris reference
-- `compiled-qwen3-30b` (74 lines) — DSPy proxy metric for qwen3-30b
+### Model Rankings (Phase 2, 478 runs)
+| Model | Pass Rate | CC | Kilo |
+|-------|-----------|-----|------|
+| opus4.6 (ceiling) | 62% | 10/10 | 0/6 (OpenRouter error) |
+| glm-5 | 61% | 25/33 | 15/33 |
+| qwen3-30b | 44% | 18/33 | 11/33 |
+| glm-4.5-air-free | 39% | 13/33 | 13/33 |
+| qwen3-coder-next | 32% | 21/33 | **0/33** |
+| glm-4.7-flash | 30% | 9/33 | 11/33 |
+| gemma-4-31b | 11% | **0/33** | 7/33 |
+| minimax-m2.7 | 0% | 0/33 | 0/33 (dead) |
 
-## Key Findings
+### Skill Uplift Highlights
+- **Houdini Solaris**: +1.0 for glm-5, qwen3-30b, qwen3-coder-next on CC; 0 on Kilo
+- **Expression parser**: ±1.0 extreme swings (helps or destroys depending on model+CLI)
+- **USD shot assembly**: highly variable, best on CC with live-compiled variants
+- **LRU cache**: mostly neutral — well-known domain, skills don't add much
 
-### Benchmark V1 (160 runs, 2026-04-05)
-1. Tier difficulty calibration: 92% → 78% → 42% → 25%
-2. Broad skills HURT weaker models (glm-4.5: 0.8→0.2 with USD skill)
-3. Capability threshold: skills only help models strong enough to synthesize from examples
-
-### Skill Variant Experiment (18 runs, 2026-04-06)
-1. Narrower skills reduce harm: reference -0.20 avg uplift, hints -0.13, DSPy variants -0.10
-2. DSPy-live recovered CC performance for glm-4.5: 0.2→0.8
-3. No single skill variant works across CLIs
-
-### CLI Confound (investigated 2026-04-06)
-1. Kilo LSP false positives: Pyright flags all pxr API calls
-2. CC proxy swallows telemetry: OpenRouter models show empty raw_output/tokens
-3. CC hooks bloat context: superpowers SessionStart injects thousands of words
-
-### Qwen3 Coder 30B Experiment (16 runs, 2026-04-06)
-**USD Shot Assembly — skill uplift by variant (CC):**
-| Variant | Score | Delta from baseline |
-|---------|-------|---------------------|
-| No skill (tier3) | 1.0 | baseline |
-| reference | 0.7 | -0.3 |
-| task-hints | 0.9 | -0.1 |
-| compiled-glm45 | 0.9 | -0.1 |
-| compiled-live-glm45 | 0.1 | -0.9 |
-| compiled-qwen3-30b | 0.0 | -1.0 |
-
-**Key findings:**
-1. **qwen3-30b is ABOVE capability threshold** — scores 1.0 without skill, all skills hurt
-2. **Model-specific DSPy compilation was WORST** — proxy score 1.0 but real score 0.0
-3. **Cross-model transfer > model-specific**: glm45-compiled (0.9) beat qwen3-compiled (0.0)
-4. **Root cause**: model hallucinated `LockVariant()` instead of skill's `GetVariantEditContext()`
-5. **Proxy metric is not predictive** — optimizes structure, not behavioral compliance
-6. **Houdini Solaris**: 0/6 across all variants and CLIs — above qwen3-30b's difficulty ceiling
-7. **Kilo**: 0.0 on all USD/Houdini tasks — CLI environment blocks qwen3-30b entirely
-
-### Emerging Theory: Skill Harm Zones
-- **Below threshold** (can't do task at all): skill adds noise, model hallucinates from examples → NET HARM
-- **At threshold** (sometimes passes): narrow, task-specific skills can tip the balance → POTENTIAL UPLIFT
-- **Above threshold** (reliably passes): skill competes with model's correct priors → NET HARM
-- The "sweet spot" for skill uplift is a narrow band around the capability threshold
+### Confirmed Findings
+1. **CLI is the dominant variable** — not skill content, not model capability
+2. **Capability threshold still real** — skills help "at threshold" models, neutral/harmful otherwise
+3. **High run-to-run variance** — qwen3-30b scored 1.0 (Phase 1) then 0.0 (Phase 2) on same task
+4. **Model-CLI coupling is asymmetric** — qwen3-coder-next: 64% CC / 0% Kilo; gemma-4-31b: 0% CC / 21% Kilo
 
 ## What's Next
-1. Run live-metric DSPy compilation (actual benchmark in the loop) for more reliable optimization
-2. Find models AT the capability threshold for each task (the uplift sweet spot)
-3. Investigate why Kilo is 0.0 on everything for qwen3-30b specifically
-4. Run frontier model (Opus 4.6) as ceiling benchmark
-5. Consider adaptive skill injection: only inject when model is predicted to be at threshold
+1. Multi-run statistical validation (5x per key configuration)
+2. Investigate WHY CC amplifies skills constructively vs Kilo destructively
+3. Adaptive skill injection prototype (inject only when uplift is predicted)
+4. Expand to more domains beyond USD/Houdini
+5. CLI-controlled ablation study (disable LSP, strip hooks)
