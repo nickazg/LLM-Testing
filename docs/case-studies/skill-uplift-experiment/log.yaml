@@ -57,6 +57,61 @@ entries:
 # SESSION: 2026-04-03 — MVP Implementation
 # ══════════════════════════════════════════════════════════════
 
+- id: "003b"
+  date: "2026-04-03"
+  category: method
+  title: "Domain selection — USD and Houdini chosen for distance from training data"
+  body: >
+    Selected two VFX domains: Pixar USD (composition arcs, variant sets, references)
+    and Houdini Solaris (LOP scripting via hou.pwd().editableStage()). Both are niche
+    Python APIs with limited training data representation, maximizing potential for
+    skill uplift. The critical API is GetVariantEditContext() — models frequently
+    hallucinate alternatives like LockVariant(), .edit(), or GetPrototypeStage().
+  evidence:
+    - "tasks/tier3/usd-shot-assembly/task.yaml"
+    - "tasks/tier3/houdini-solaris/task.yaml"
+  tags: [design, domain-selection, usd, houdini]
+  session: "2026-04-03-design"
+  retrospective: true
+
+- id: "003c"
+  date: "2026-04-03"
+  category: method
+  title: "Validation approach — execution-based scoring with structural test suites"
+  body: >
+    Each task has a validate.py that executes generated code and inspects output.
+    USD validator loads .usda files with pxr library, runs 10 structural tests
+    (prim hierarchy, variant sets, mesh types, references, transforms). Houdini
+    tasks use a mock hou module providing a real Usd.Stage without Houdini license.
+    Score = tests_passed / total_tests, giving granular 0.0-1.0 partial credit.
+  evidence:
+    - "tasks/tier3/usd-shot-assembly/validate.py"
+    - "tasks/tier3/houdini-solaris/validate.py"
+  tags: [design, validation, scoring]
+  session: "2026-04-03-design"
+  retrospective: true
+
+- id: "003d"
+  date: "2026-04-05"
+  category: method
+  title: "Skill design spectrum — broad reference to narrow task-hints to DSPy-compiled"
+  body: >
+    Skills deliberately designed along a granularity spectrum. USD reference (144
+    lines) includes 7 sections covering patterns beyond what the task needs —
+    tests the 'give them the docs' approach. Task-hints (40 lines) contains only
+    4 task-relevant API patterns — tests minimum viable information. DSPy-compiled
+    variants are auto-optimized for specific target models. The recursive-descent-
+    parser (102 lines) and lru-cache-pattern (70 lines) skills are near-complete
+    solutions testing whether reference implementations help.
+  evidence:
+    - "skills/usd-composition/reference.md"
+    - "skills/usd-composition/task-hints.md"
+    - "skills/recursive-descent-parser/SKILL.md"
+    - "skills/lru-cache-pattern/SKILL.md"
+  tags: [design, skill-granularity, methodology]
+  session: "2026-04-05-v1-benchmark"
+  retrospective: true
+
 - id: "004"
   date: "2026-04-03"
   category: context

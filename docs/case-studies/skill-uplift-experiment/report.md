@@ -56,9 +56,128 @@ Tasks are organized into four tiers of increasing difficulty, with tiers 3 and 4
 
 The key design decision is that **tier 3 and tier 4 tasks are identical in requirements**. The only variable changed between a tier 3 task and its tier 4 counterpart is the presence of a skill document. This paired design isolates skill uplift: the delta between tier 3 and tier 4 scores for the same model on the same task represents the causal effect of the skill.
 
-### 2.3 Skill Injection Mechanism
+#### 2.2.1 Task Descriptions
 
-Skills are injected via the `.claude/skills/{name}/SKILL.md` path, which is the native skill discovery mechanism shared by all three supported CLIs. A **variant system** allows multiple formulations of the same skill to be tested: the format `domain:variant` resolves to `skills/{domain}/{variant}.md`, with `VARIANTS.yaml` declaring available variants and their metadata.
+Each task is a self-contained directory containing a `task.yaml` definition, a `template/` directory of starting files copied into the workspace, and a `validate.py` scoring script. The model receives the task prompt and must produce working code in an isolated temporary directory.
+
+**Tier 1 — Baseline Sanity Checks** test fundamental code generation capability:
+
+- **hello-world**: Create a Python file that prints "Hello, World!". The simplest possible code generation task, validating that the CLI-to-model pipeline produces executable output.
+- **fizzbuzz**: Print numbers 1-100 with FizzBuzz substitutions. Tests basic logic, loops, and conditionals.
+
+**Tier 2 — General Coding Competence** tests real-world programming patterns without domain-specific knowledge:
+
+- **csv-pipeline**: Read, transform, and aggregate CSV data using Python's standard library.
+- **cli-tool**: Build a `wc`-like word count tool with argparse flags (`--lines`, `--words`, `--chars`) and multi-file totals.
+- **log-processor**: Write a POSIX-compatible bash script that parses Apache access logs, extracting top IPs, status codes, and paths.
+- **makefile**: Create a multi-target Makefile for a C project with compilation, testing, and installation targets using automatic variables.
+- **usd-scene**: Build a simple USD scene with geometry, materials, and lighting using the Pixar `pxr` library. This tier 2 task tests basic USD API usage without composition complexity.
+- **houdini-sop**: Create a Houdini SOP network script that builds geometry and sets HDA parameters. Tested via a mock `hou` module that tracks API calls.
+
+**Tier 3 — Domain-Specific Tasks** require niche knowledge that budget models may lack. These form the control group for the skill uplift experiment:
+
+- **expression-parser**: Implement a mathematical expression parser with AST construction and evaluation. Requires understanding of recursive descent parsing, operator precedence, and tree evaluation. The validator tests 20 cases including edge cases (unary minus, nested parentheses, division by zero).
+- **lru-cache**: Implement an LRU cache with O(1) `get`/`put` operations using a dict + doubly-linked list (not OrderedDict). Must be thread-safe with `threading.Lock`. The validator tests 15 criteria including capacity eviction, thread safety, and implementation constraints.
+- **git-hook**: Write a bash pre-commit hook that validates staged files for size limits, debug print statements, trailing whitespace, and Python syntax errors.
+- **service-generator**: Generate valid systemd service unit files from command-line arguments with proper `[Unit]`, `[Service]`, and `[Install]` sections.
+- **usd-shot-assembly**: Build a multi-file USD shot assembly with cross-file references, variant sets (model variants and lighting variants), and transform operations. This is the primary skill uplift task --- it requires knowledge of USD composition arcs (`GetVariantEditContext`, sublayers, references) that budget models frequently hallucinate.
+- **houdini-solaris**: Implement a Houdini Solaris Python Script LOP that builds a complete scene: root hierarchy, ground plane mesh, hero body cube, distant and dome lighting, PBR materials with shader binding, and model kind assignment. Requires 10 specific USD operations through the `hou.pwd().editableStage()` pattern.
+
+**Tier 4 — Paired Skill Tasks** are clones of tier 3 tasks with a skill document injected. Each shares the identical prompt, template, and validator as its tier 3 counterpart. The only change is the `skill` field in `task.yaml`:
+
+- **usd-shot-assembly** (5 variants): Tests 5 different skill formulations for the same USD task — reference, task-hints, compiled-glm45, compiled-live-glm45, and compiled-qwen3-30b
+- **houdini-solaris** (2 variants): Tests reference and compiled-qwen3-30b skills
+- **expression-parser**: Tests the recursive-descent-parser skill
+- **lru-cache**: Tests the lru-cache-pattern skill
+
+#### 2.2.2 Example: What a Task Looks Like
+
+To illustrate the experimental setup concretely, here is the prompt for the core USD shot assembly task (used identically for tier 3 and all tier 4 variants):
+
+> *Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:*
+>
+> *1. assets.usda — contains: Default prim /Assets, /Assets/Chair with a child Mesh, and a variant set 'modelVariant' with variants 'simple' and 'detailed'*
+>
+> *2. shot.usda — contains: Default prim /Shot, sublayers assets.usda, /Shot/Set/ChairA and ChairB as references to /Assets/Chair with different transforms, and /Shot/Lighting with a 'lightingVariant' containing 'day' (DistantLight) and 'night' (DomeLight) variants*
+
+The model must produce a working Python script that, when executed, generates valid USD files. The validator then loads these files using the `pxr` library and runs 10 structural tests.
+
+### 2.3 Skill Design and Injection
+
+#### 2.3.1 Injection Mechanism
+
+Skills are injected via the `.claude/skills/{name}/SKILL.md` path, which is the native skill discovery mechanism shared by all three supported CLIs. The workspace manager copies the skill file into the temporary workspace before the CLI starts, so the model discovers it through its normal skill-reading behavior. A **variant system** allows multiple formulations of the same skill to be tested: the format `domain:variant` resolves to `skills/{domain}/{variant}.md`, with `VARIANTS.yaml` declaring available variants and their metadata.
+
+#### 2.3.2 Skill Design Philosophy
+
+Skills were designed along a spectrum from broad reference to narrow task-specific, deliberately testing the hypothesis that skill granularity affects uplift:
+
+**USD Composition Skills** (the primary experiment):
+
+- **reference** (144 lines) — A comprehensive API reference covering all USD composition patterns: sublayers, references, default prims, variant sets with `GetVariantEditContext()`, transforms, materials, lighting, and mesh definition. Designed to represent what a developer might paste from documentation. Includes 7 code sections covering patterns beyond what the task requires.
+
+  *Design rationale:* Tests whether broad knowledge helps — the "give them the docs" approach. Intentionally includes material binding and mesh patterns that the shot assembly task doesn't need, to test whether irrelevant context is harmful.
+
+- **task-hints** (40 lines) — A narrow, task-scoped skill containing only the APIs needed for the shot assembly task. Four code sections: stage/file setup, references, variant sets (with `GetVariantEditContext` highlighted as important), and lighting. No mesh definition, no materials, no transform details beyond `AddTranslateOp`.
+
+  *Design rationale:* Tests whether minimal, targeted information outperforms comprehensive coverage. Created after the V1 finding that broad skills harmed weaker models, as a manual attempt to reduce the "noise" that causes hallucination.
+
+- **compiled-glm45** (80 lines, DSPy proxy-compiled) — Automatically optimized by DSPy's BootstrapFewShot for glm-4.5-air-free using glm-5 as teacher. Contains the same patterns as task-hints but with slightly more detail and a full cube mesh example. Notably, the variant edit context section uses placeholder comments (`# configure mesh...`) rather than full code.
+
+- **compiled-live-glm45** (59 lines, DSPy live-compiled) — Optimized using actual benchmark runs in the loop (34 minutes, 6 iterations). The most concise compiled variant. The live metric ensures the skill actually helps the target model pass the task on Kilo.
+
+- **compiled-qwen3-30b** (76 lines, DSPy proxy-compiled) — Compiled specifically for qwen3-30b. Full working code examples inside variant contexts, including complete mesh point/face data. This is the most detailed compiled variant.
+
+  *Design rationale:* Tests whether model-specific DSPy optimization produces better skills than cross-model transfer. The higher level of detail proved counterproductive (see Section 5.2).
+
+**Houdini Solaris Skills:**
+
+- **SKILL (reference)** (160 lines) — Complete Solaris reference covering `editableStage()`, prim definition (Xform, Mesh), transforms, lighting (Distant, Dome), materials (UsdPreviewSurface), material binding, and model kind. Includes a full "Complete Solaris Script Pattern" section showing all patterns composed together.
+
+  *Design rationale:* Mirrors the USD reference approach for a second domain. Houdini Solaris is a more niche domain than USD, so models are expected to have weaker priors.
+
+- **compiled-qwen3-30b** (74 lines, DSPy proxy-compiled) — Numbered step-by-step matching the exact 10 requirements of the task. Each section contains the exact code pattern needed.
+
+**General Domain Skills** (for tier 4 expansion tasks):
+
+- **recursive-descent-parser** (102 lines) — Provides the EBNF grammar, ASTNode structure, complete parser implementation using the tokenizer + recursive descent pattern, and evaluator. This is essentially a near-complete solution — it tests whether giving the model a working reference implementation helps it produce correct code.
+
+- **lru-cache-pattern** (70 lines) — Provides the Node class, full LRUCache implementation with sentinel nodes, and key design points (no OrderedDict, sentinel head/tail, threading.Lock). Like the parser skill, this is close to a complete solution.
+
+#### 2.3.3 Example: Skill Content Comparison
+
+To illustrate how skill granularity works in practice, here is the critical "variant authoring" section from three USD skill variants:
+
+**reference** (broad, 144 lines) — 6 lines for variant sets:
+```python
+vset = prim.GetVariantSets().AddVariantSet("modelVariant")
+vset.AddVariant("simple")
+vset.SetVariantSelection("simple")
+with vset.GetVariantEditContext():
+    geo = stage.DefinePrim("/Assets/Chair/Geo", "Mesh")
+    # ... set mesh attributes
+```
+
+**task-hints** (narrow, 40 lines) — 5 lines, labeled IMPORTANT:
+```python
+vset = prim.GetVariantSets().AddVariantSet("myVariant")
+vset.AddVariant("optionA")
+vset.SetVariantSelection("optionA")
+with vset.GetVariantEditContext():
+    child = stage.DefinePrim("/Parent/Child", "Xform")
+```
+
+**compiled-qwen3-30b** (DSPy, 76 lines) — 18 lines with full mesh data inside variants:
+```python
+vset.SetVariantSelection("simple")
+with vset.GetVariantEditContext():
+    mesh = UsdGeom.Mesh.Define(stage, "/Assets/Chair/Geo")
+    mesh.CreatePointsAttr([(-1,-1,-1), (1,-1,-1), ...])
+    mesh.CreateFaceVertexCountsAttr([4, 4, 4, 4, 4, 4])
+    mesh.CreateFaceVertexIndicesAttr([0,1,2,3, 4,5,6,7, ...])
+```
+
+All three skills demonstrate the correct `GetVariantEditContext()` API. The difference is the level of surrounding detail, which proved to be the critical variable (Section 5.2).
 
 ### 2.4 DSPy Skill Compilation
 
@@ -69,9 +188,39 @@ To test automated skill optimization, we integrated DSPy's BootstrapFewShot opti
 
 The optimizer iterates, selecting the highest-scoring skill document.
 
-### 2.5 Scoring
+### 2.5 Scoring and Validation
 
-All scoring is automated via per-task `validate.py` scripts that assess functional correctness. Scores are continuous on a 0.0--1.0 scale, where 1.0 indicates full correctness and 0.0 indicates complete failure. Partial credit is awarded for partially correct implementations (e.g., correct structure but incorrect API usage). An LLM-as-judge component exists in the framework but was not used in these experiments; all reported scores are from deterministic automated validation.
+All scoring is automated via per-task `validate.py` scripts that assess functional correctness. Scores are continuous on a 0.0--1.0 scale, where 1.0 indicates full correctness and 0.0 indicates complete failure. An LLM-as-judge component exists in the framework but was not used in these experiments; all reported scores are from deterministic automated validation.
+
+#### 2.5.1 Validation Methodology
+
+Each validator follows a consistent pattern:
+
+1. **Completion check** — binary (0.0 or 1.0): does the expected output file exist?
+2. **Execution** — the generated code is actually run (via subprocess or in-process exec), not just statically analyzed
+3. **Test suite** — a set of structural and behavioral assertions against the execution output
+4. **Score computation** — `correctness = tests_passed / total_tests`
+
+For the core USD shot assembly task, the validator runs 10 tests:
+
+| # | Test | What It Checks |
+|---|------|---------------|
+| 1 | Default prim of assets.usda is `/Assets` | File structure |
+| 2 | `/Assets/Chair` prim exists | Prim hierarchy |
+| 3 | `modelVariant` set exists with `simple` and `detailed` | Variant mechanism |
+| 4 | `/Assets/Chair/Geo` is a `UsdGeom.Mesh` | Geometry creation |
+| 5 | Default prim of shot.usda is `/Shot` | Cross-file structure |
+| 6 | `/Shot/Set/ChairA` exists (reference works) | Composition arc |
+| 7 | `/Shot/Set/ChairB` exists (reference works) | Composition arc |
+| 8 | ChairA and ChairB have different transforms | Transform ops |
+| 9 | `lightingVariant` set has `day` and `night` | Variant mechanism |
+| 10 | Variant switching produces different light types | Variant content |
+
+A score of 0.9 means 9/10 tests passed --- for example, the variant sets exist but authoring content inside them failed. A score of 0.0 means the script either crashed, produced no files, or the files contained no valid USD structure.
+
+For the Houdini Solaris task, the validator uses a **mock `hou` module** that provides a real `Usd.Stage` via `hou.pwd().editableStage()`, allowing the generated script to execute without a Houdini license. The mock captures the stage, and the validator inspects it for 10 required elements (scene hierarchy, mesh geometry with correct point counts, lighting, materials with shader binding, and model kind).
+
+Pass threshold is `correctness >= 0.5` for tier 1 tasks and `correctness >= 0.7` for tier 3/4 tasks, reflecting the higher partial-credit granularity of domain tasks.
 
 ---
 
@@ -99,26 +248,56 @@ Two CLI environments were used:
 - **Claude Code** --- Anthropic's official CLI, using `.env` file swapping for model selection. Injects additional context via hooks (superpowers SessionStart).
 - **Kilo CLI** --- alternative CLI with Pyright LSP integration, provider-specific routing.
 
-### 3.3 Tasks
+### 3.3 Task Inventory
 
-The task set expanded from 2 (MVP) to 16 (V1 benchmark) to 23 (final) over the experimental period. Domain-specific tasks focused on two areas:
+The task set expanded from 2 (MVP) to 16 (V1 benchmark) to 23 (final) over the experimental period. The full inventory by tier:
 
-- **USD (Pixar Universal Scene Description)** --- shot assembly using composition arcs, variant sets, and reference layering
-- **Houdini Solaris** --- LOP network construction using the `hou` Python API (tested via a mock module)
+| Tier | Task | Domain | Key Challenge | Timeout |
+|------|------|--------|---------------|---------|
+| 1 | hello-world | General | Baseline code execution | 120s |
+| 1 | fizzbuzz | General | Basic logic | 120s |
+| 2 | csv-pipeline | Data | File I/O, aggregation | 120s |
+| 2 | cli-tool | CLI | argparse, multi-file handling | 120s |
+| 2 | log-processor | Bash | POSIX text processing | 180s |
+| 2 | makefile | Build | Automatic variables, phony targets | 180s |
+| 2 | usd-scene | VFX | Basic USD prim/material creation | 120s |
+| 2 | houdini-sop | VFX | Houdini SOP API (mock module) | 120s |
+| 3 | expression-parser | CS | Recursive descent, operator precedence | 300s |
+| 3 | lru-cache | CS | O(1) data structure, thread safety | 300s |
+| 3 | git-hook | DevOps | Bash, git internals | 300s |
+| 3 | service-generator | DevOps | systemd unit format | 300s |
+| 3 | usd-shot-assembly | VFX | USD composition arcs, variant sets | 300s |
+| 3 | houdini-solaris | VFX | Solaris LOPs, 10 USD operations | 300s |
+| 4 | usd-shot-assembly (x5) | VFX | = tier 3 + skill variant | 300s |
+| 4 | houdini-solaris (x2) | VFX | = tier 3 + skill variant | 300s |
+| 4 | expression-parser | CS | = tier 3 + parser skill | 300s |
+| 4 | lru-cache | CS | = tier 3 + cache skill | 300s |
+
+The two primary experimental domains were chosen for their distance from typical training data:
+
+- **USD (Pixar Universal Scene Description)** --- a niche Python API for 3D scene composition, used primarily in VFX pipelines. Models must understand composition arcs (sublayers, references), variant sets with the `GetVariantEditContext()` context manager, and transform operations. The specific challenge is `GetVariantEditContext()` --- models frequently hallucinate similar-sounding APIs (e.g., `LockVariant`, `.edit()`, `GetPrototypeStage`).
+- **Houdini Solaris** --- an even more niche domain (SideFX's Solaris LOP system for USD scene layout). Tested via a mock `hou` module that provides a real `Usd.Stage` without requiring a Houdini license. Requires knowledge of 10 specific operations spanning geometry, lighting, materials, and model classification.
 
 ### 3.4 Skill Variants
 
-Five USD composition skill variants and two Houdini Solaris variants were tested:
+Seven skill variants were tested across two domains, designed along a granularity spectrum (see Section 2.3.2 for design rationale):
 
-| Variant | Lines | Creation Method | Proxy Score |
-|---------|-------|-----------------|-------------|
-| `reference` | 144 | Manual (broad API reference) | N/A |
-| `task-hints` | 40 | Manual (task-scoped) | N/A |
-| `compiled-glm45` | 80 | DSPy proxy (teacher: glm-5) | 0.80 |
-| `compiled-live-glm45` | 59 | DSPy live (teacher: glm-5) | 1.00 |
-| `compiled-qwen3-30b` | 76 | DSPy proxy (teacher: glm-5) | 1.00 |
-| `houdini-solaris` (ref) | 160 | Manual (full Solaris reference) | N/A |
-| `houdini-compiled-qwen3` | 74 | DSPy proxy (teacher: glm-5) | 0.84 |
+| Variant | Lines | Method | Target | Proxy Score | Content Style |
+|---------|-------|--------|--------|-------------|---------------|
+| USD `reference` | 144 | Manual | General | N/A | Broad API docs, 7 sections, includes irrelevant patterns |
+| USD `task-hints` | 40 | Manual | General | N/A | 4 sections, only task-relevant APIs, "IMPORTANT" labels |
+| USD `compiled-glm45` | 80 | DSPy proxy | glm-4.5 | 0.80 | Moderate detail, placeholder comments in variant section |
+| USD `compiled-live-glm45` | 59 | DSPy live | glm-4.5 | 1.00 | Most concise, behaviorally validated on Kilo |
+| USD `compiled-qwen3-30b` | 76 | DSPy proxy | qwen3-30b | 1.00 | Full working code inside variants, highest detail |
+| Solaris `SKILL` | 160 | Manual | General | N/A | Full Solaris reference with complete script pattern |
+| Solaris `compiled-qwen3` | 74 | DSPy proxy | qwen3-30b | 0.84 | 9 numbered sections matching task requirements |
+
+Additionally, two general-domain skills were used for tier 4 expansion:
+
+| Skill | Lines | Content |
+|-------|-------|---------|
+| `recursive-descent-parser` | 102 | EBNF grammar, complete parser + evaluator implementation |
+| `lru-cache-pattern` | 70 | Node class, full LRUCache with sentinel nodes, key design points |
 
 ### 3.5 Experiment Timeline
 

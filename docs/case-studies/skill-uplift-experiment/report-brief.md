@@ -18,17 +18,49 @@
 
 ## Setup
 
-We built **llm-bench**, a Python benchmarking framework that measures LLM coding performance across CLI interfaces. The framework uses a 4-tier task system: Tier 1-2 are baseline coding tasks (no skills). Tier 3 tasks require domain knowledge. Tier 4 tasks are *identical* to Tier 3 but with a skill document injected into the workspace. The delta between Tier 3 and Tier 4 scores isolates skill uplift.
+We built **llm-bench**, a Python benchmarking framework that measures LLM coding performance across CLI interfaces. The framework uses a 4-tier task system where the delta between Tier 3 (no skill) and Tier 4 (with skill) isolates skill uplift.
 
-**Models tested (5):** glm-4.5-air-free, glm-4.7-flash, glm-5, qwen3-30b, and two Qwen models that timed out on every run (excluded from analysis).
+### What the Tasks Are
 
-**CLIs tested (2):** Claude Code (via proxy to OpenRouter) and Kilo CLI. Both discover skills placed in `.claude/skills/{name}/SKILL.md`.
+Each task gives a model a natural-language prompt and an isolated workspace. The model produces code, which is executed and scored by automated validators.
 
-**Tasks (23):** 2 Tier 1 (hello-world, fizzbuzz), 6 Tier 2 (csv-pipeline, cli-tool, etc.), 6 Tier 3 (USD shot assembly, Houdini Solaris, expression parser, etc.), 9 Tier 4 variants.
+**Tier 1 — Sanity checks (2 tasks):** hello-world, fizzbuzz. Can the model produce runnable code at all?
 
-**Skill variants (5 for USD composition):** broad reference (144 lines), manual task-hints (40 lines), DSPy proxy-compiled for glm-4.5 (80 lines), DSPy live-compiled for glm-4.5 (59 lines), DSPy proxy-compiled for qwen3-30b (76 lines).
+**Tier 2 — General coding (6 tasks):** CSV data pipeline, CLI word-count tool (argparse), bash log analyzer, C project Makefile, basic USD scene, and Houdini SOP network. Tests standard programming patterns — no domain expertise needed.
 
-**Scoring:** Automated validation scripts (validate.py per task) produce 0.0-1.0 scores. Tasks have deterministic pass/fail criteria — no subjective grading.
+**Tier 3 — Domain-specific, no skill (6 tasks):** The control group. Tasks that require niche knowledge:
+- **USD shot assembly** — build a multi-file scene with cross-file references, variant sets (model variants + lighting variants), and transforms using Pixar's `pxr` library. The critical API is `GetVariantEditContext()` — a context manager for authoring inside USD variants that models frequently hallucinate.
+- **Houdini Solaris** — build a complete scene (geometry, lighting, PBR materials, model kinds) through Houdini's `hou.pwd().editableStage()` pattern. Tested via mock `hou` module. Requires 10 specific USD operations.
+- **Expression parser** — recursive descent parser with AST construction and operator precedence.
+- **LRU cache** — O(1) dict + doubly-linked list implementation, thread-safe. Must NOT use OrderedDict.
+- **Git pre-commit hook** and **systemd service generator** — DevOps domain tasks.
+
+**Tier 4 — Identical to Tier 3, with a skill injected (9 tasks):** Same prompt, same validator. The only change is a skill document in the workspace. Multiple tier 4 variants exist for the USD task, each with a different skill formulation.
+
+### What the Skills Are
+
+Skills are markdown documents injected into `.claude/skills/` — the native skill path all CLIs discover. They range from broad references to narrow task-specific hints:
+
+| Skill | Lines | What It Contains | Design Intent |
+|-------|-------|-----------------|---------------|
+| USD `reference` | 144 | Full USD API reference (7 sections) including patterns the task doesn't need | "Give them the docs" approach |
+| USD `task-hints` | 40 | Only the 4 API patterns needed for this task, with `GetVariantEditContext` labeled IMPORTANT | Minimum viable information |
+| USD `compiled-glm45` | 80 | DSPy-optimized for glm-4.5, placeholder comments in complex sections | Automated optimization (proxy) |
+| USD `compiled-live-glm45` | 59 | DSPy-optimized with actual benchmark runs in loop | Automated optimization (live) |
+| USD `compiled-qwen3-30b` | 76 | DSPy-optimized for qwen3-30b, full working code | Model-specific targeting |
+| Solaris `SKILL` | 160 | Complete Solaris LOP reference with full example | Broad reference for niche domain |
+| `recursive-descent-parser` | 102 | Complete parser implementation with grammar | Near-complete solution |
+| `lru-cache-pattern` | 70 | Full LRUCache with sentinel nodes | Near-complete solution |
+
+The key experiment: all USD skills show the correct `GetVariantEditContext()` API. The variable is how much surrounding detail they include — which turned out to be the critical factor.
+
+### How Scoring Works
+
+Validators execute the generated code and run structural tests. The USD shot assembly validator loads the output `.usda` files with the `pxr` library and checks 10 things: default prims, prim hierarchy, variant set existence, mesh types, reference resolution, transform differences, and variant content switching. Score = tests_passed / 10. A score of 0.9 means one test failed (e.g., variant content missing). A score of 0.0 means total failure.
+
+**Models tested:** glm-4.5-air-free, glm-4.7-flash, glm-5, qwen3-30b (2 Qwen free models excluded — 100% timeout).
+
+**CLIs tested:** Claude Code (via proxy to OpenRouter) and Kilo CLI.
 
 ---
 

@@ -112,6 +112,16 @@ docs/case-studies/{study-name}/
 - `method` — methodology decision, tool choice, or experimental design change. Captures the "why" of how we work.
 - `context` — setup, configuration, environment info. Background needed to reproduce.
 
+## Report Content Requirements
+
+Reports MUST include substantial sections covering:
+
+1. **Task descriptions** — what each task asks the model to do, what domain knowledge it requires, an example prompt, and how scoring works (validator methodology). A reader who hasn't seen the codebase should understand exactly what "USD shot assembly" means.
+2. **Skill descriptions** — what each skill contains, why it was designed that way (broad reference vs narrow hints vs DSPy-compiled), and how the content differs between variants. Include code excerpts showing the key patterns.
+3. **Validator methodology** — how scoring works (execution-based, structural test suites, partial credit). Include the specific tests run for key tasks so readers understand what a score of 0.9 vs 0.0 means concretely.
+
+These sections belong in Methodology (paper) or Setup (brief). Pull content from `task.yaml` prompts, `validate.py` test suites, and skill `.md` files.
+
 ## Report Templates
 
 ### Academic Paper (`report paper`)
