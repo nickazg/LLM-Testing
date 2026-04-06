@@ -3,21 +3,37 @@
 #
 # Most models route through OpenRouter — just set openrouter_id.
 # For direct API access, add a cli-specific override block.
+# Frontier models have max_tasks to limit expensive runs.
 
 defaults:
   provider: openrouter
   claude_code_proxy: "http://127.0.0.1:3456"
 
 models:
-  # ── Frontier (expensive, reference only) ──────────────────────
+  # ── Frontier (expensive, ceiling reference only) ─────────────
+  # These run on a SINGLE demanding task only (max_tasks: 1)
   opus4.6:
     name: "Anthropic Opus 4.6 (frontier)"
     provider: anthropic
-    openrouter_id: "anthropic/claude-opus-4-6"
+    openrouter_id: "anthropic/claude-opus-4.6"
+    max_tasks: 1
+    frontier_task: "tier3-usd-shot-assembly"
     claude-code:
       model_id: "claude-opus-4-6"  # native CC model name (uses subscription)
     kilo:
-      provider: openrouter  # route through OpenRouter for Kilo
+      provider: openrouter
+
+  gpt-5.4:
+    name: "OpenAI GPT-5.4 (frontier)"
+    openrouter_id: "openai/gpt-5.4"
+    max_tasks: 1
+    frontier_task: "tier3-usd-shot-assembly"
+
+  gemini-3.1-pro:
+    name: "Google Gemini 3.1 Pro Preview (frontier)"
+    openrouter_id: "google/gemini-3.1-pro-preview"
+    max_tasks: 1
+    frontier_task: "tier3-usd-shot-assembly"
 
   # ── Budget / paid ─────────────────────────────────────────────
   qwen3-30b:
@@ -28,10 +44,21 @@ models:
     name: "Qwen3 Coder Next (80B MoE, 3B active)"
     openrouter_id: "qwen/qwen3-coder-next"
 
-  minimax-m2.7:
-    name: "MinimaxM2.7"
-    openrouter_id: "minimax/minimax-m2-7"
+  gemma-4-31b:
+    name: "Google Gemma 4 31B"
+    openrouter_id: "google/gemma-4-31b-it"
 
+  gpt-oss-120b:
+    name: "GPT OSS 120B (free)"
+    openrouter_id: "openai/gpt-oss-120b:free"
+
+  gpt-oss-20b:
+    name: "GPT OSS 20B (free)"
+    openrouter_id: "openai/gpt-oss-20b:free"
+
+  # ── GLM (Z.ai direct on CC, OpenRouter on Kilo) ───────────────
+  # Note: Kilo CLI 7.x doesn't support z-ai as direct provider,
+  # GLM models only available via openrouter/z-ai/* on Kilo.
   glm-5:
     name: "GLM-5"
     openrouter_id: "z-ai/glm-5"
@@ -39,15 +66,6 @@ models:
       base_url: "https://api.z.ai/api/anthropic"
       auth_env: "GLM_API_KEY"
       model_id: "glm-5"
-
-  gemma-4-31b:
-    name: "Google Gemma 4 31B"
-    openrouter_id: "google/gemma-4-31b-it"
-
-  # ── Free tier (zero cost) ─────────────────────────────────────
-  qwen3-coder-free:
-    name: "Qwen3 Coder (free)"
-    openrouter_id: "qwen/qwen3-coder:free"
 
   glm-4.5-air-free:
     name: "GLM 4.5 Air (free)"
@@ -57,6 +75,16 @@ models:
     name: "GLM 4.7 Flash (ultra-cheap)"
     openrouter_id: "z-ai/glm-4.7-flash"
 
-  qwen3-next-80b-free:
-    name: "Qwen3 Next 80B MoE (free)"
-    openrouter_id: "qwen/qwen3-next-80b-a3b-instruct:free"
+  # ── Non-functional (excluded from Phase 2) ────────────────────
+  # minimax-m2.7:
+  #   name: "MinimaxM2.7"
+  #   openrouter_id: "minimax/minimax-m2.7"  # was minimax-m2-7 (wrong)
+  #   NOTE: 0/66 in Phase 2, confirmed non-functional
+
+  # qwen3-coder-free:
+  #   openrouter_id: "qwen/qwen3-coder:free"
+  #   NOTE: 100% timeout in Phase 1
+
+  # qwen3-next-80b-free:
+  #   openrouter_id: "qwen/qwen3-next-80b-a3b-instruct:free"
+  #   NOTE: 100% timeout in Phase 1

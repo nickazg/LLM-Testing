@@ -25,14 +25,34 @@ class KiloAdapter(CLIAdapter):
         cmd.append(prompt)
         return cmd
 
+    # Provider config templates for kilo.json
+    _PROVIDER_CONFIGS = {
+        "openrouter": lambda env: {
+            "openrouter": {"env": ["OPENROUTER_API_KEY"]}
+        },
+        "z-ai": lambda env: {
+            "z-ai": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
+        },
+        "openai": lambda env: {
+            "openai": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
+        },
+        "google": lambda env: {
+            "google": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
+        },
+        "anthropic": lambda env: {
+            "anthropic": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
+        },
+    }
+
     def _write_kilo_config(self, cwd: Path, model_id: str):
+        env = self._get_env() or {}
+        provider_name = env.get("LLM_BENCH_KILO_PROVIDER", "openrouter")
+        provider_factory = self._PROVIDER_CONFIGS.get(
+            provider_name, self._PROVIDER_CONFIGS["openrouter"]
+        )
         config = {
             "model": model_id,
-            "provider": {
-                "openrouter": {
-                    "env": ["OPENROUTER_API_KEY"],
-                },
-            },
+            "provider": provider_factory(env),
         }
         (Path(cwd) / "kilo.json").write_text(json.dumps(config, indent=2))
 

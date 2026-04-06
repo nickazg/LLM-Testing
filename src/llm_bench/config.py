@@ -67,6 +67,9 @@ def resolve_model(
     cli_override = model_def.get(cli_name, None)
 
     if cli_name == "claude-code":
+        # Check CLI override provider first, fall back to model-level provider
+        cc_provider = cli_override.get("provider", provider) if cli_override else provider
+
         if cli_override and cli_override.get("base_url"):
             # Direct API with custom base URL (e.g. GLM-5 via z.ai)
             base_url = cli_override["base_url"]
@@ -79,7 +82,7 @@ def resolve_model(
                 env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = model_override
                 env["ANTHROPIC_DEFAULT_SONNET_MODEL"] = model_override
                 env["ANTHROPIC_DEFAULT_OPUS_MODEL"] = model_override
-        elif provider == "openrouter" and openrouter_id:
+        elif cc_provider == "openrouter" and openrouter_id:
             # OpenRouter via proxy
             env["ANTHROPIC_BASE_URL"] = proxy_url
             env["ANTHROPIC_AUTH_TOKEN"] = keys.get("OPENROUTER_API_KEY", "")
@@ -87,20 +90,27 @@ def resolve_model(
             env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = or_model
             env["ANTHROPIC_DEFAULT_SONNET_MODEL"] = or_model
             env["ANTHROPIC_DEFAULT_OPUS_MODEL"] = or_model
-        elif provider == "anthropic":
+        elif cc_provider == "anthropic":
             # Native Anthropic — use model_id override for CC model name
             if cli_override and cli_override.get("model_id"):
                 env["LLM_BENCH_CC_MODEL"] = cli_override["model_id"]
 
     elif cli_name in ("open-code", "kilo"):
-        # CLI override can change provider (e.g. opus routes through OpenRouter on Kilo)
+        # CLI override can change provider (e.g. GLM via z-ai direct on Kilo)
         cli_provider = cli_override.get("provider", provider) if cli_override else provider
+
         if cli_provider == "openrouter" and openrouter_id:
             env["OPENROUTER_API_KEY"] = keys.get("OPENROUTER_API_KEY", "")
             env["LLM_BENCH_MODEL_ID"] = f"openrouter/{openrouter_id}"
-        elif cli_provider == "anthropic":
-            env["ANTHROPIC_API_KEY"] = keys.get("ANTHROPIC_API_KEY", "")
-            env["LLM_BENCH_MODEL_ID"] = openrouter_id
+            env["LLM_BENCH_KILO_PROVIDER"] = "openrouter"
+        elif cli_provider in ("z-ai", "openai", "google", "anthropic"):
+            # Direct provider routing
+            model_id_kilo = cli_override.get("model_id", "") if cli_override else ""
+            auth_env_key = cli_override.get("auth_env", "") if cli_override else ""
+            if auth_env_key:
+                env["LLM_BENCH_PROVIDER_API_KEY"] = keys.get(auth_env_key, "")
+            env["LLM_BENCH_MODEL_ID"] = model_id_kilo
+            env["LLM_BENCH_KILO_PROVIDER"] = cli_provider
 
     return ModelConfig(
         model_id=model_id,

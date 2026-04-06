@@ -170,6 +170,29 @@ async def run_single_task(
         workspace.cleanup()
 
 
+def _resolve_frontier_tasks(
+    tasks: list[TaskConfig],
+    model: str,
+    config_dir: Path | None,
+) -> list[TaskConfig]:
+    """Filter tasks for frontier models that have max_tasks set."""
+    if not config_dir:
+        return tasks
+    config = yaml.safe_load((config_dir / "models.yaml").read_text()) or {}
+    model_def = config.get("models", {}).get(model, {})
+    max_tasks = model_def.get("max_tasks")
+    if not max_tasks:
+        return tasks
+    frontier_task = model_def.get("frontier_task", "")
+    if frontier_task:
+        filtered = [t for t in tasks if t.id == frontier_task]
+        if filtered:
+            return filtered
+    # Fallback: pick the hardest tier 3 task
+    tier3 = [t for t in tasks if t.tier == 3]
+    return tier3[:max_tasks] if tier3 else tasks[:max_tasks]
+
+
 async def run_matrix(
     tasks: list[TaskConfig],
     cli_names: list[str],
@@ -180,12 +203,20 @@ async def run_matrix(
     log: Callable[[str], None] = _default_log,
 ) -> list[RunResult]:
     results = []
-    total = len(tasks) * len(cli_names) * len(models)
+
+    # Pre-compute task lists per model (frontier models get filtered)
+    model_tasks = {}
+    for model in models:
+        model_tasks[model] = _resolve_frontier_tasks(tasks, model, config_dir)
+
+    total = sum(len(model_tasks[m]) * len(cli_names) for m in models)
     run_num = 0
 
     for task in tasks:
         for cli_name in cli_names:
             for model in models:
+                if task not in model_tasks[model]:
+                    continue
                 run_num += 1
                 log(f"\n[{run_num}/{total}] {task.id} | {cli_name} | {model}")
 
