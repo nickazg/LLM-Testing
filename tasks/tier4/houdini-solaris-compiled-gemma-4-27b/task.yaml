@@ -1,0 +1,58 @@
+id: tier4-houdini-solaris-compiled-gemma-4-27b
+name: Solaris Python Script LOP (compiled-gemma-4-27b)
+tier: 4
+prompt: 'Create a Python file called solaris_lop.py that implements Houdini Solaris
+  Python Script LOP code. This code runs inside Houdini''s Solaris context where hou.pwd().editableStage()
+  provides a USD stage to write to.
+
+
+  The script should:
+
+
+  1. Get the stage: stage = hou.pwd().editableStage()
+
+  2. Create a root Xform: /Scene (set as default prim)
+
+  3. Create /Scene/Ground — a UsdGeom.Mesh ground plane (quad: 4 points, 1 face)
+
+  4. Create /Scene/Hero — a UsdGeom.Xform with xformOp:translate at (0, 1, 0)
+
+  5. Create /Scene/Hero/Body — a UsdGeom.Mesh (simple cube: 8 points, 6 faces)
+
+  6. Create /Scene/Lighting/KeyLight — a UsdLux.DistantLight with intensity=50000
+  and xformOp:rotateXYZ at (-45, 30, 0)
+
+  7. Create /Scene/Lighting/FillLight — a UsdLux.DomeLight with intensity=500
+
+  8. Create /Scene/Materials/HeroMat — a UsdShade.Material with UsdPreviewSurface
+  shader (diffuseColor=(0.8, 0.2, 0.1), roughness=0.4, metallic=0.0)
+
+  9. Bind HeroMat to /Scene/Hero/Body using UsdShade.MaterialBindingAPI
+
+  10. Apply UsdGeom.ModelAPI kind ''component'' to /Scene/Hero
+
+
+  Use: from pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf, Kind
+
+  The hou module is provided — import it with ''import hou'''
+timeout: 300
+skill: houdini-solaris:compiled-gemma-4-27b
+difficulty: 3
+skill_type: novel
+skill_intensity: heavy
+skill_pair: houdini-solaris
+tags:
+- python
+- houdini
+- sidefx
+- solaris
+- usd
+- lops
+scoring:
+  automated:
+  - correctness
+  - completion
+  - efficiency
+  flagged:
+  - quality
+  - instruction_following

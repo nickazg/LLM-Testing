@@ -1,0 +1,12 @@
+default: reference
+variants:
+  compiled-gemma-4-31b:
+    description: DSPy-compiled for gemma-4-31b (score=0.60)
+  compiled-devstral:
+    description: DSPy-compiled for devstral (score=0.60)
+  compiled-glm-4.7-flash:
+    description: DSPy-compiled for glm-4.7-flash (score=0.60)
+  compiled-gemma-4-27b:
+    description: DSPy-compiled for gemma-4-27b (score=0.60)
+  compiled-qwen3-30b:
+    description: DSPy-compiled for qwen3-30b (score=0.60)

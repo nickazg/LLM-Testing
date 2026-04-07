@@ -1,0 +1,36 @@
+id: tier4-houdini-pdg-compiled-devstral
+name: PDG/TOPs Network Builder (compiled-devstral)
+tier: 4
+prompt: "Create a Python script called build_top_network.py for Houdini's PDG/TOPs\
+  \ context. The script should build a TOP network using Python:\n\n1. Get the /obj\
+  \ context and create a topnet node\n2. Inside the topnet, create these nodes:\n\
+  \   - A Python Processor node that generates work items from a list of 5 file paths\
+  \ (file1.exr through file5.exr), setting a \"filepath\" attribute on each work item\n\
+  \   - A Partition by Attribute node connected to the processor, partitioning by\
+  \ a \"batch\" attribute\n   - A Generic Generator or Python Script node that processes\
+  \ each work item (can just print the filepath attribute)\n   - A Wait for All node\
+  \ before the final output\n3. Connect the nodes in sequence: processor → partition\
+  \ → script → waitforall\n4. Set the display flag on the final node\n5. Layout the\
+  \ nodes using node.moveToGoodPosition() or layoutChildren()\n\nUse hou module (available\
+  \ in Houdini Python context). The script should work when executed inside Houdini."
+timeout: 300
+skill: houdini-pdg:compiled-devstral
+difficulty: 3
+skill_type: novel
+skill_intensity: heavy
+skill_pair: houdini-pdg
+tags:
+- python
+- houdini
+- sidefx
+- pdg
+- tops
+- pipeline
+scoring:
+  automated:
+  - correctness
+  - completion
+  - efficiency
+  flagged:
+  - quality
+  - instruction_following

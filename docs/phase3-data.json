@@ -1,0 +1,886 @@
+{
+  "models": {
+    "glm-4.7-flash": {
+      "total": 172,
+      "pass": 6,
+      "cc_pass": 3,
+      "cc_total": 144,
+      "kilo_pass": 3,
+      "kilo_total": 28,
+      "t1_pass": 2,
+      "t1_total": 8,
+      "t2_pass": 1,
+      "t2_total": 13,
+      "t3_pass": 3,
+      "t3_total": 30,
+      "t4_pass": 0,
+      "t4_total": 121
+    },
+    "gpt-oss-20b": {
+      "total": 172,
+      "pass": 4,
+      "cc_pass": 2,
+      "cc_total": 144,
+      "kilo_pass": 2,
+      "kilo_total": 28,
+      "t1_pass": 4,
+      "t1_total": 8,
+      "t2_pass": 0,
+      "t2_total": 13,
+      "t3_pass": 0,
+      "t3_total": 30,
+      "t4_pass": 0,
+      "t4_total": 121
+    },
+    "gpt-oss-120b": {
+      "total": 172,
+      "pass": 4,
+      "cc_pass": 2,
+      "cc_total": 144,
+      "kilo_pass": 2,
+      "kilo_total": 28,
+      "t1_pass": 3,
+      "t1_total": 8,
+      "t2_pass": 1,
+      "t2_total": 13,
+      "t3_pass": 0,
+      "t3_total": 30,
+      "t4_pass": 0,
+      "t4_total": 121
+    },
+    "minimax-m2.7": {
+      "total": 151,
+      "pass": 4,
+      "cc_pass": 2,
+      "cc_total": 143,
+      "kilo_pass": 2,
+      "kilo_total": 8,
+      "t1_pass": 4,
+      "t1_total": 8,
+      "t2_pass": 0,
+      "t2_total": 10,
+      "t3_pass": 0,
+      "t3_total": 15,
+      "t4_pass": 0,
+      "t4_total": 118
+    },
+    "gemma-4-27b": {
+      "total": 174,
+      "pass": 20,
+      "cc_pass": 10,
+      "cc_total": 144,
+      "kilo_pass": 10,
+      "kilo_total": 30,
+      "t1_pass": 8,
+      "t1_total": 8,
+      "t2_pass": 10,
+      "t2_total": 13,
+      "t3_pass": 2,
+      "t3_total": 30,
+      "t4_pass": 0,
+      "t4_total": 123
+    },
+    "glm-5": {
+      "total": 220,
+      "pass": 191,
+      "cc_pass": 89,
+      "cc_total": 99,
+      "kilo_pass": 102,
+      "kilo_total": 121,
+      "t1_pass": 8,
+      "t1_total": 8,
+      "t2_pass": 12,
+      "t2_total": 13,
+      "t3_pass": 27,
+      "t3_total": 30,
+      "t4_pass": 144,
+      "t4_total": 169
+    },
+    "qwen3-30b": {
+      "total": 171,
+      "pass": 114,
+      "cc_pass": 44,
+      "cc_total": 69,
+      "kilo_pass": 70,
+      "kilo_total": 102,
+      "t1_pass": 3,
+      "t1_total": 8,
+      "t2_pass": 11,
+      "t2_total": 13,
+      "t3_pass": 20,
+      "t3_total": 30,
+      "t4_pass": 80,
+      "t4_total": 120
+    },
+    "glm-4.5-air-free": {
+      "total": 115,
+      "pass": 83,
+      "cc_pass": 26,
+      "cc_total": 39,
+      "kilo_pass": 57,
+      "kilo_total": 76,
+      "t1_pass": 8,
+      "t1_total": 8,
+      "t2_pass": 9,
+      "t2_total": 13,
+      "t3_pass": 19,
+      "t3_total": 30,
+      "t4_pass": 47,
+      "t4_total": 64
+    },
+    "gemma-4-31b": {
+      "total": 66,
+      "pass": 15,
+      "cc_pass": 6,
+      "cc_total": 35,
+      "kilo_pass": 9,
+      "kilo_total": 31,
+      "t1_pass": 6,
+      "t1_total": 8,
+      "t2_pass": 3,
+      "t2_total": 13,
+      "t3_pass": 5,
+      "t3_total": 30,
+      "t4_pass": 1,
+      "t4_total": 15
+    },
+    "gemini-3.1-pro": {
+      "total": 2,
+      "pass": 2,
+      "cc_pass": 1,
+      "cc_total": 1,
+      "kilo_pass": 1,
+      "kilo_total": 1,
+      "t1_pass": 0,
+      "t1_total": 0,
+      "t2_pass": 0,
+      "t2_total": 0,
+      "t3_pass": 2,
+      "t3_total": 2,
+      "t4_pass": 0,
+      "t4_total": 0
+    },
+    "devstral": {
+      "total": 187,
+      "pass": 41,
+      "cc_pass": 19,
+      "cc_total": 144,
+      "kilo_pass": 22,
+      "kilo_total": 43,
+      "t1_pass": 8,
+      "t1_total": 8,
+      "t2_pass": 13,
+      "t2_total": 13,
+      "t3_pass": 20,
+      "t3_total": 30,
+      "t4_pass": 0,
+      "t4_total": 136
+    },
+    "gpt-5.4": {
+      "total": 2,
+      "pass": 1,
+      "cc_pass": 0,
+      "cc_total": 1,
+      "kilo_pass": 1,
+      "kilo_total": 1,
+      "t1_pass": 0,
+      "t1_total": 0,
+      "t2_pass": 0,
+      "t2_total": 0,
+      "t3_pass": 1,
+      "t3_total": 2,
+      "t4_pass": 0,
+      "t4_total": 0
+    },
+    "opus4.6": {
+      "total": 3,
+      "pass": 3,
+      "cc_pass": 2,
+      "cc_total": 2,
+      "kilo_pass": 1,
+      "kilo_total": 1,
+      "t1_pass": 0,
+      "t1_total": 0,
+      "t2_pass": 0,
+      "t2_total": 0,
+      "t3_pass": 3,
+      "t3_total": 3,
+      "t4_pass": 0,
+      "t4_total": 0
+    }
+  },
+  "skill_taxonomy": {
+    "novel/light": {
+      "glm-4.7-flash": {
+        "total": 12,
+        "pass": 0
+      },
+      "minimax-m2.7": {
+        "total": 12,
+        "pass": 0
+      },
+      "gpt-oss-20b": {
+        "total": 12,
+        "pass": 0
+      },
+      "gpt-oss-120b": {
+        "total": 12,
+        "pass": 0
+      },
+      "gemma-4-27b": {
+        "total": 12,
+        "pass": 0
+      },
+      "glm-5": {
+        "total": 14,
+        "pass": 12
+      },
+      "devstral": {
+        "total": 12,
+        "pass": 0
+      },
+      "qwen3-30b": {
+        "total": 8,
+        "pass": 6
+      },
+      "glm-4.5-air-free": {
+        "total": 4,
+        "pass": 3
+      }
+    },
+    "novel/heavy": {
+      "glm-4.7-flash": {
+        "total": 78,
+        "pass": 0
+      },
+      "gpt-oss-20b": {
+        "total": 78,
+        "pass": 0
+      },
+      "gemma-4-27b": {
+        "total": 78,
+        "pass": 0
+      },
+      "glm-5": {
+        "total": 99,
+        "pass": 81
+      },
+      "gpt-oss-120b": {
+        "total": 78,
+        "pass": 0
+      },
+      "glm-4.5-air-free": {
+        "total": 33,
+        "pass": 22
+      },
+      "devstral": {
+        "total": 82,
+        "pass": 0
+      },
+      "minimax-m2.7": {
+        "total": 78,
+        "pass": 0
+      },
+      "qwen3-30b": {
+        "total": 70,
+        "pass": 38
+      }
+    },
+    "none": {
+      "gpt-oss-20b": {
+        "total": 30,
+        "pass": 0
+      },
+      "glm-5": {
+        "total": 30,
+        "pass": 27
+      },
+      "minimax-m2.7": {
+        "total": 15,
+        "pass": 0
+      },
+      "glm-4.7-flash": {
+        "total": 30,
+        "pass": 3
+      },
+      "gemini-3.1-pro": {
+        "total": 2,
+        "pass": 2
+      },
+      "gpt-5.4": {
+        "total": 2,
+        "pass": 1
+      },
+      "qwen3-30b": {
+        "total": 30,
+        "pass": 20
+      },
+      "glm-4.5-air-free": {
+        "total": 30,
+        "pass": 19
+      },
+      "gpt-oss-120b": {
+        "total": 30,
+        "pass": 0
+      },
+      "devstral": {
+        "total": 30,
+        "pass": 20
+      },
+      "gemma-4-31b": {
+        "total": 30,
+        "pass": 5
+      },
+      "gemma-4-27b": {
+        "total": 30,
+        "pass": 2
+      },
+      "opus4.6": {
+        "total": 3,
+        "pass": 3
+      }
+    },
+    "context/heavy": {
+      "gpt-oss-120b": {
+        "total": 12,
+        "pass": 0
+      },
+      "glm-4.7-flash": {
+        "total": 12,
+        "pass": 0
+      },
+      "qwen3-30b": {
+        "total": 18,
+        "pass": 15
+      },
+      "glm-5": {
+        "total": 24,
+        "pass": 23
+      },
+      "glm-4.5-air-free": {
+        "total": 12,
+        "pass": 11
+      },
+      "gpt-oss-20b": {
+        "total": 12,
+        "pass": 0
+      },
+      "gemma-4-27b": {
+        "total": 12,
+        "pass": 0
+      },
+      "devstral": {
+        "total": 18,
+        "pass": 0
+      },
+      "minimax-m2.7": {
+        "total": 12,
+        "pass": 0
+      },
+      "gemma-4-31b": {
+        "total": 2,
+        "pass": 1
+      }
+    },
+    "workflow/light": {
+      "glm-4.7-flash": {
+        "total": 2,
+        "pass": 0
+      },
+      "gemma-4-31b": {
+        "total": 1,
+        "pass": 0
+      },
+      "gpt-oss-20b": {
+        "total": 2,
+        "pass": 0
+      },
+      "devstral": {
+        "total": 3,
+        "pass": 0
+      },
+      "minimax-m2.7": {
+        "total": 2,
+        "pass": 0
+      },
+      "gemma-4-27b": {
+        "total": 2,
+        "pass": 0
+      },
+      "glm-5": {
+        "total": 4,
+        "pass": 4
+      },
+      "qwen3-30b": {
+        "total": 3,
+        "pass": 3
+      },
+      "glm-4.5-air-free": {
+        "total": 2,
+        "pass": 2
+      },
+      "gpt-oss-120b": {
+        "total": 2,
+        "pass": 0
+      }
+    },
+    "workflow/heavy": {
+      "gemma-4-27b": {
+        "total": 17,
+        "pass": 0
+      },
+      "glm-5": {
+        "total": 24,
+        "pass": 21
+      },
+      "gpt-oss-20b": {
+        "total": 15,
+        "pass": 0
+      },
+      "devstral": {
+        "total": 18,
+        "pass": 0
+      },
+      "gpt-oss-120b": {
+        "total": 15,
+        "pass": 0
+      },
+      "glm-4.5-air-free": {
+        "total": 12,
+        "pass": 8
+      },
+      "qwen3-30b": {
+        "total": 18,
+        "pass": 16
+      },
+      "glm-4.7-flash": {
+        "total": 15,
+        "pass": 0
+      },
+      "gemma-4-31b": {
+        "total": 12,
+        "pass": 0
+      },
+      "minimax-m2.7": {
+        "total": 12,
+        "pass": 0
+      }
+    },
+    "context/light": {
+      "glm-4.7-flash": {
+        "total": 2,
+        "pass": 0
+      },
+      "gpt-oss-120b": {
+        "total": 2,
+        "pass": 0
+      },
+      "minimax-m2.7": {
+        "total": 2,
+        "pass": 0
+      },
+      "qwen3-30b": {
+        "total": 3,
+        "pass": 2
+      },
+      "glm-5": {
+        "total": 4,
+        "pass": 3
+      },
+      "gpt-oss-20b": {
+        "total": 2,
+        "pass": 0
+      },
+      "gemma-4-27b": {
+        "total": 2,
+        "pass": 0
+      },
+      "devstral": {
+        "total": 3,
+        "pass": 0
+      },
+      "glm-4.5-air-free": {
+        "total": 1,
+        "pass": 1
+      }
+    }
+  },
+  "uplift": {
+    "glm-5": {
+      "houdini-pdg": {
+        "novel/heavy": 0.99,
+        "compiled": 0.988,
+        "baseline": 1.0,
+        "novel/light": 1.0
+      },
+      "lru-cache": {
+        "baseline": 1.0,
+        "workflow/heavy": 1.0,
+        "compiled": 1.0,
+        "workflow/light": 1.0
+      },
+      "expression-parser": {
+        "workflow/heavy": 0.75,
+        "compiled": 0.8,
+        "baseline": 0.5,
+        "workflow/light": 0.925
+      },
+      "usd-stage-layers": {
+        "baseline": 1.0
+      },
+      "git-hook": {
+        "context/heavy": 1.0,
+        "context/light": 0.8,
+        "compiled": 1.0,
+        "baseline": 0.917
+      },
+      "houdini-solaris-light-linking": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "baseline": 1.0,
+        "novel/light": 1.0
+      },
+      "houdini-solaris-render": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "novel/light": 1.0,
+        "baseline": 1.0
+      },
+      "service-generator": {
+        "context/heavy": 0.925,
+        "compiled": 1.0,
+        "baseline": 1.0,
+        "context/light": 0.7
+      },
+      "usd-custom-schema": {
+        "novel/heavy": 0.864,
+        "compiled": 0.863,
+        "novel/light": 0.875,
+        "baseline": 0.875
+      },
+      "houdini-solaris": {
+        "novel/heavy": 0.182,
+        "compiled": 0.1,
+        "baseline": 0.0,
+        "novel/light": 0.0
+      },
+      "usd-procedural-animation": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "novel/light": 1.0,
+        "baseline": 0.938
+      },
+      "houdini-solaris-instancing": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "novel/light": 1.0,
+        "baseline": 1.0
+      },
+      "usd-render-settings": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "baseline": 0.875,
+        "novel/light": 1.0
+      },
+      "usd-shader-graph": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "baseline": 1.0,
+        "novel/light": 1.0
+      },
+      "usd-shot-assembly": {
+        "baseline": 1.0
+      }
+    },
+    "glm-4.5-air-free": {
+      "git-hook": {
+        "context/heavy": 0.778,
+        "compiled": 0.833,
+        "baseline": 0.833,
+        "context/light": 0.6
+      },
+      "houdini-solaris": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.0,
+        "novel/light": 0.0
+      },
+      "houdini-pdg": {
+        "novel/heavy": 0.896,
+        "compiled": 0.9,
+        "baseline": 1.0,
+        "novel/light": 1.0
+      },
+      "houdini-solaris-render": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "baseline": 1.0
+      },
+      "houdini-solaris-instancing": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "baseline": 0.5,
+        "novel/light": 1.0
+      },
+      "expression-parser": {
+        "workflow/heavy": 0.642,
+        "compiled": 0.67,
+        "baseline": 1.0,
+        "workflow/light": 0.875
+      },
+      "lru-cache": {
+        "baseline": 0.767
+      },
+      "houdini-solaris-light-linking": {
+        "baseline": 1.0,
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "novel/light": 1.0
+      },
+      "usd-procedural-animation": {
+        "baseline": 0.312
+      },
+      "usd-shot-assembly": {
+        "baseline": 0.0
+      },
+      "usd-custom-schema": {
+        "baseline": 0.125
+      },
+      "service-generator": {
+        "baseline": 0.875
+      },
+      "usd-stage-layers": {
+        "baseline": 0.562
+      },
+      "usd-render-settings": {
+        "baseline": 0.5
+      },
+      "usd-shader-graph": {
+        "baseline": 0.062
+      }
+    },
+    "qwen3-30b": {
+      "service-generator": {
+        "context/heavy": 1.0,
+        "compiled": 1.0,
+        "baseline": 0.938,
+        "context/light": 1.0
+      },
+      "usd-procedural-animation": {
+        "baseline": 0.375,
+        "novel/heavy": 0.25,
+        "compiled": 0.25
+      },
+      "git-hook": {
+        "context/heavy": 0.736,
+        "compiled": 0.683,
+        "baseline": 0.917,
+        "context/light": 0.7
+      },
+      "houdini-solaris": {
+        "novel/heavy": 0.045,
+        "compiled": 0.05,
+        "baseline": 0.0,
+        "novel/light": 0.0
+      },
+      "houdini-solaris-light-linking": {
+        "novel/heavy": 0.8,
+        "compiled": 0.778,
+        "baseline": 1.0,
+        "novel/light": 1.0
+      },
+      "expression-parser": {
+        "workflow/heavy": 0.833,
+        "compiled": 1.0,
+        "baseline": 0.475,
+        "workflow/light": 1.0
+      },
+      "houdini-solaris-instancing": {
+        "novel/heavy": 1.0,
+        "compiled": 1.0,
+        "novel/light": 1.0,
+        "baseline": 1.0
+      },
+      "houdini-pdg": {
+        "novel/heavy": 0.844,
+        "compiled": 0.825,
+        "baseline": 0.938,
+        "novel/light": 0.938
+      },
+      "usd-shot-assembly": {
+        "baseline": 0.0
+      },
+      "houdini-solaris-render": {
+        "novel/heavy": 0.667,
+        "compiled": 0.6,
+        "baseline": 1.0,
+        "novel/light": 1.0
+      },
+      "usd-stage-layers": {
+        "baseline": 0.812
+      },
+      "lru-cache": {
+        "workflow/heavy": 1.0,
+        "compiled": 1.0,
+        "workflow/light": 1.0,
+        "baseline": 1.0
+      },
+      "usd-shader-graph": {
+        "baseline": 0.375
+      },
+      "usd-custom-schema": {
+        "novel/heavy": 0.271,
+        "compiled": 0.3,
+        "novel/light": 0.125,
+        "baseline": 0.25
+      },
+      "usd-render-settings": {
+        "baseline": 0.688
+      }
+    },
+    "devstral": {
+      "houdini-pdg": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.875,
+        "novel/light": 0.0
+      },
+      "usd-procedural-animation": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.438,
+        "novel/light": 0.0
+      },
+      "expression-parser": {
+        "workflow/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.975,
+        "workflow/light": 0.0
+      },
+      "houdini-solaris-render": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "novel/light": 0.0,
+        "baseline": 1.0
+      },
+      "usd-shader-graph": {
+        "baseline": 0.5,
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "novel/light": 0.0
+      },
+      "usd-shot-assembly": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.05,
+        "novel/light": 0.0
+      },
+      "lru-cache": {
+        "workflow/light": 0.0,
+        "baseline": 0.733,
+        "workflow/heavy": 0.0,
+        "compiled": 0.0
+      },
+      "service-generator": {
+        "baseline": 0.5,
+        "context/heavy": 0.0,
+        "compiled": 0.0,
+        "context/light": 0.0
+      },
+      "houdini-solaris-instancing": {
+        "baseline": 1.0,
+        "novel/light": 0.0,
+        "novel/heavy": 0.0,
+        "compiled": 0.0
+      },
+      "git-hook": {
+        "context/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 1.0,
+        "context/light": 0.0
+      },
+      "usd-custom-schema": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.375,
+        "novel/light": 0.0
+      },
+      "usd-stage-layers": {
+        "baseline": 0.0,
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "novel/light": 0.0
+      },
+      "houdini-solaris-light-linking": {
+        "novel/light": 0.0,
+        "baseline": 1.0,
+        "novel/heavy": 0.0,
+        "compiled": 0.0
+      },
+      "houdini-solaris": {
+        "novel/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.5,
+        "novel/light": 0.0
+      },
+      "usd-render-settings": {
+        "baseline": 0.5,
+        "novel/light": 0.0,
+        "novel/heavy": 0.0,
+        "compiled": 0.0
+      }
+    },
+    "gemma-4-31b": {
+      "expression-parser": {
+        "workflow/light": 0.0,
+        "workflow/heavy": 0.0,
+        "compiled": 0.0,
+        "baseline": 0.0
+      },
+      "usd-custom-schema": {
+        "baseline": 0.0
+      },
+      "git-hook": {
+        "context/heavy": 0.333,
+        "compiled": 0.333,
+        "baseline": 0.333
+      },
+      "houdini-solaris-instancing": {
+        "baseline": 0.0
+      },
+      "houdini-solaris": {
+        "baseline": 0.0
+      },
+      "usd-render-settings": {
+        "baseline": 0.0
+      },
+      "usd-procedural-animation": {
+        "baseline": 0.062
+      },
+      "lru-cache": {
+        "baseline": 0.5
+      },
+      "houdini-solaris-light-linking": {
+        "baseline": 0.0
+      },
+      "usd-shot-assembly": {
+        "baseline": 0.0
+      },
+      "service-generator": {
+        "baseline": 0.438
+      },
+      "houdini-solaris-render": {
+        "baseline": 0.0
+      },
+      "usd-shader-graph": {
+        "baseline": 0.0
+      },
+      "houdini-pdg": {
+        "baseline": 1.0
+      },
+      "usd-stage-layers": {
+        "baseline": 0.0
+      }
+    }
+  }
+}

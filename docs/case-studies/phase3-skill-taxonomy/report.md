@@ -1,0 +1,937 @@
+# Skill Taxonomy and Capability Thresholds in CLI-Mediated LLM Code Generation: A 1,607-Run Benchmark Study
+
+**Authors:** Nick Grobler & Claude Code
+**Date:** April 2026
+**Benchmark Version:** Phase 3 (llm-bench v0.4)
+
+---
+
+## Abstract
+
+Large language models are increasingly used for code generation through CLI scaffolding tools such as Claude Code and Kilo, yet existing benchmarks evaluate models via direct prompting, ignoring the overhead and failure modes introduced by these intermediary tools. We present a 1,607-run benchmark across 13 models, 2 CLIs, and 68 task definitions that introduces a three-dimensional skill taxonomy (novel knowledge, workflow/process, domain context) with two intensity levels (heavy, light) to measure structured knowledge uplift. Our principal finding is that a capability threshold exists at approximately 65% baseline pass rate, below which skill injection provides zero or negative benefit -- most dramatically illustrated by Devstral's complete 0% pass rate across all 136 skill-augmented runs despite a 67% no-skill baseline. We further show that CLI choice is a confounding variable that shifts model rankings by up to 38 percentage points, and that DSPy-compiled skills improve precision for capable models but cannot rescue models below the threshold.
+
+---
+
+## 1. Introduction
+
+### 1.1 Motivation
+
+The rapid adoption of LLM-powered coding assistants has created a gap between how models are evaluated and how they are used. Standard benchmarks like HumanEval, MBPP, and SWE-bench test models through direct API prompting: a prompt goes in, code comes out. In practice, developers interact with models through CLI tools -- Claude Code, Kilo, Cursor, Cline -- that impose their own scaffolding: system prompts, tool-use protocols, file I/O conventions, timeout constraints, and workspace management. This scaffolding is not neutral. It consumes context window capacity, introduces failure modes unrelated to coding ability, and creates interaction patterns that differ substantially from benchmark conditions.
+
+Furthermore, the promise of "skill injection" -- providing models with structured domain knowledge to improve performance on specialized tasks -- has been explored informally but lacks systematic evaluation. Which types of knowledge help? How much detail is optimal? Is there a minimum model capability required for skill injection to be beneficial?
+
+### 1.2 Research Questions
+
+This study addresses three primary research questions:
+
+1. **Skill taxonomy differentiation.** Does a structured taxonomy of skill types (novel knowledge, workflow/process, domain context) produce measurably different uplift patterns across models?
+2. **DSPy compilation.** Does automated prompt optimization via DSPy BootstrapFewShot improve skill effectiveness beyond hand-authored skills?
+3. **Capability threshold.** Is there a minimum baseline performance level below which skill injection provides no benefit or causes harm?
+
+### 1.3 Prior Work
+
+This study builds on our Phase 2 benchmark (Grobler & Claude Code, 2026), which analyzed 478 runs across the same framework and established that **CLI choice is the dominant variable** in model performance -- more predictive than model size, provider, or task difficulty. Phase 2 also surfaced preliminary evidence of "hallucination amplification," where broad skill documents caused weaker models to generate confident but incorrect code. The present study was designed to test these findings at scale and with a controlled skill taxonomy.
+
+---
+
+## 2. Methodology
+
+### 2.1 Framework Architecture
+
+All experiments were conducted using `llm-bench`, a Python package (src layout, hatchling build backend) providing an async orchestration runner that executes a matrix of (task x CLI x model) combinations. The framework uses an adapter pattern for CLI interfaces, with dedicated adapters for Claude Code and Kilo that handle model routing, workspace setup, and output capture.
+
+**Skill injection** follows a single mechanism shared by both CLIs: skills are written as Markdown files and copied into `.claude/skills/<name>/SKILL.md` within the task workspace before execution. This path is natively recognized by both Claude Code (which reads from `.claude/skills/`) and Kilo (which uses the same convention). CLI-specific context files differ: Claude Code reads `CLAUDE.md` while Kilo and Open Code read `AGENTS.md`; the adapters write the appropriate file.
+
+**Model routing** differs by CLI. Claude Code uses `ANTHROPIC_BASE_URL` environment variable manipulation to route requests through OpenRouter or direct provider endpoints. Kilo uses `kilo.json` project configuration files to specify model and provider. Both CLIs support Z.ai direct integration for GLM models via custom provider registration.
+
+### 2.2 Task Design
+
+The benchmark comprises 68 task definitions organized into four tiers of escalating difficulty. Tiers 3 and 4 form the core experimental design: Tier 3 tasks serve as the control group (no skill), while Tier 4 tasks present identical prompts with skills injected. This pairing isolates skill effect from task difficulty.
+
+#### 2.2.1 Tier 1 -- Baseline Capability (Difficulty 1)
+
+These trivial tasks verify that the CLI adapter pipeline functions correctly.
+
+- **hello-world:** Create `hello.py` printing "Hello, World!" to stdout. Tests the most basic CLI-to-file-creation pathway. The validator executes the script and checks stdout output via string match.
+- **fizzbuzz:** Create `fizzbuzz.py` printing numbers 1-100 with standard FizzBuzz substitutions (multiples of 3, 5, and 15). Tests basic conditional logic and loop construction. The validator checks all 100 lines of output against expected values.
+
+#### 2.2.2 Tier 2 -- Multi-File Patterns (Difficulty 2)
+
+These tasks test cross-domain syntax, data processing, and tool-building competence.
+
+- **makefile:** Create a `Makefile` with `CC`, `CFLAGS` variables and targets (`all`, `clean`, `test`, `install`) using automatic variables (`$@`, `$<`, `$^`). Tests non-Python syntax generation and tab sensitivity (Makefiles require literal tab characters for recipe lines). The validator parses the Makefile structure to verify target declarations and variable usage.
+- **csv-pipeline:** Create `pipeline.py` that reads `input.csv`, filters rows where the `status` column equals "active," groups by `department`, computes average salary per department, and writes `output.csv`. Tests data processing with the Python standard library. The validator compares the output CSV against pre-computed expected values.
+- **cli-tool:** Create `wordcount.py`, a `wc`-like command-line tool using `argparse` with `--lines`, `--words`, and `--chars` flags. Tests CLI ergonomics and argument parsing. The validator runs the tool with sample input files and verifies counts.
+- **usd-scene:** Create `build_scene.py` using the `pxr` (OpenUSD) library to construct a simple scene with a ground plane, character Xform, dome light, and material binding. Tests basic USD API knowledge. The validator opens the generated USD stage and checks that expected prims exist at the correct paths.
+- **houdini-sop:** Create `build_sop_network.py` that chains SOP (Surface Operator) nodes -- grid, mountain, color, null -- with parameters, using Houdini's Python API (`hou` module). Tests basic Houdini knowledge. The validator performs source code analysis since the `hou` module is unavailable in the test environment, checking for correct module usage patterns.
+- **log-processor:** Create `analyze.sh`, a POSIX bash script that parses Apache-format `access.log` files and outputs the top IP addresses, HTTP status code distribution, and most-requested paths. Tests shell scripting competence. The validator runs the script with a sample log file and checks output formatting.
+
+#### 2.2.3 Tier 3 -- Domain-Specific, No Skill (Difficulty 3, Control Group)
+
+These tasks require specialized knowledge and serve as the baseline against which Tier 4 skill-augmented variants are compared.
+
+**Algorithm tasks:**
+- **lru-cache:** Implement `LRUCache` with O(1) `get()`/`put()`, using dict + doubly-linked list (OrderedDict explicitly prohibited), thread-safe via `threading.Lock`, with a `size()` method. The validator runs 15 functional tests including concurrent access with 8 threads.
+- **expression-parser:** Implement `parse()` returning an `ASTNode` tree and `evaluate()` returning a float. Must handle `+`, `-`, `*`, `/` with correct operator precedence, unary minus, parentheses, and raise `ValueError`/`ZeroDivisionError` appropriately. The validator runs 20 expression evaluation tests.
+
+**Infrastructure tasks:**
+- **git-hook:** Create a bash pre-commit hook that checks staged files for: files exceeding 5MB, `debug print()` statements, trailing whitespace, and Python syntax errors. The validator creates temporary git repositories with staged files containing each violation type, runs the hook, and verifies correct acceptance/rejection behavior.
+- **service-generator:** Create a Python systemd unit file generator with `argparse` supporting `--name`, `--exec`, `--user`, `--env`, and `--output` flags. The validator generates service files and checks INI section structure.
+
+**VFX/USD tasks (flagship):**
+- **usd-shot-assembly:** Multi-file task requiring `assets.usda` (with a Chair prim and `modelVariant` variant set containing "simple" and "detailed" variants) and `shot.usda` (with sublayers, references to the Chair at two positions, and a lighting variant set with "day" and "night" variants). The validator opens both USD stages and runs 10 structural tests including default prim verification, variant set enumeration, reference resolution, transform differentiation, and light prim existence under variant selection.
+- **houdini-solaris:** Create a Solaris (USD-in-Houdini) scene using `editableStage()`, with a ground plane, hero character, lights, a material with `UsdPreviewSurface`, `MaterialBindingAPI` application, and `ModelAPI` kind assignment. The validator performs source code analysis checking for correct API usage patterns.
+- **usd-render-settings:** Build a camera rig and render configuration with `RenderProduct`, `RenderVars` (AOVs for beauty, depth, normal), and `RenderSettings`. The validator checks USD stage structure.
+- **usd-procedural-animation:** Create `UsdSkel.Root`, a `Skeleton` with 5 joints in a hierarchy, a skeletal `Animation` with time-sampled joint transforms, and mesh binding with `jointIndices` and `jointWeights` primvars. The validator checks skeleton topology, animation channels, and binding completeness.
+- **usd-stage-layers:** Construct 3 separate layers (base, animation override, look development override) demonstrating USD opinion strength ordering. The validator checks the composed result to verify that stronger layers override weaker ones.
+- **usd-shader-graph:** Build a `UsdShade.NodeGraph` with connected shaders (`UsdPreviewSurface`, `UsdUVTexture`, `PrimvarReader_float2`) and a `UsdGeom.Subset`-based material binding. The validator traces shader connection graphs.
+- **usd-custom-schema:** Apply custom metadata via `SetCustomDataByKey`, set `assetInfo`, configure `purpose` (render/proxy/guide), define custom properties, and assign `ModelAPI` kind. The validator checks metadata roundtrip and purpose assignment.
+- **houdini-pdg:** Create a TOP (Task Operator) network with Python Processor, Partition by Attribute, Script, and Wait for All nodes. The validator performs source code analysis.
+- **houdini-solaris-instancing:** Set up a `PointInstancer` with 3 prototypes placed at 9 instance positions in a 3x3 grid, using `CollectionAPI` for instance management. The validator checks source code for correct instancing patterns.
+- **houdini-solaris-render:** Configure a camera, `RenderSettings`, `RenderProduct`, AOVs, and Karma-specific custom attributes. The validator checks source code.
+- **houdini-solaris-light-linking:** Create 3 lights (key, fill, rim) with barn door filter parameters, `CollectionAPI` for light linking rules, and `purpose` assignment. The validator checks source code.
+
+#### 2.2.4 Tier 4 -- Skill-Augmented Variants (Experimental Group)
+
+Each Tier 3 task has one or more Tier 4 counterparts that inject a skill document into the workspace before execution. The skill taxonomy has two dimensions:
+
+**Skill type** (what kind of knowledge):
+
+1. **Novel knowledge** (11 VFX tasks): Information the model likely lacks in training data -- specific USD/Houdini API patterns, composition arc syntax, Karma render settings. Applied to all VFX tasks.
+2. **Workflow/process** (2 tasks: lru-cache, expression-parser): Prescriptive implementation approach -- data structure choices, algorithm steps, error handling patterns. Applied to algorithm tasks where the model "knows" the domain but benefits from structured guidance.
+3. **Domain context** (2 tasks: git-hook, service-generator): Organizational conventions and constraints -- naming patterns, dependency requirements, resource limits. Applied to infrastructure tasks where the implementation pattern is standard but org-specific details are not inferrable.
+
+**Skill intensity** (how much detail):
+
+1. **Heavy** (~100-150 lines): Full API reference with code examples, complete implementation recipes, or exhaustive organizational conventions.
+2. **Light** (~15-20 lines): Key patterns and gotchas only, approach-level guidance, or top-3 rules.
+
+**DSPy-compiled variants:** A subset of 15 skills were compiled using DSPy's BootstrapFewShot optimizer across 5 models (75 total compilations). The teacher model was GLM-5, using a proxy correctness metric over 10 optimization iterations. BootstrapFewShot works by generating candidate demonstrations (few-shot examples) from the teacher, evaluating them against the metric, and selecting the highest-performing subset as the compiled prompt. The hypothesis was that machine-optimized few-shot examples would outperform hand-authored reference documentation.
+
+### 2.3 Scoring Methodology
+
+All scoring is automated via task-specific validator scripts (`validate.py` or `validate.sh`). The scoring pipeline is independent of the execution pipeline -- raw outputs are stored separately and can be re-scored without re-running.
+
+Validators fall into three categories:
+
+1. **Execution-based** (Tier 1-2, algorithm tasks): Run the generated script, capture output, compare against expected values. For the LRU cache task, this means importing the module, instantiating the class, and running 15 functional tests including concurrent threading operations.
+2. **USD structural** (VFX tasks with `pxr` available): Import the `pxr` library, open the generated USD stage, and programmatically verify prim existence, types, attributes, variant sets, and connections. A typical USD validator runs 10 structural tests.
+3. **Source code analysis** (Houdini tasks where `hou` is unavailable): Parse the generated Python source for correct API usage patterns via string matching and regex. This is a known limitation -- it can produce false positives for syntactically correct but semantically wrong code.
+
+Correctness is computed as `tests_passed / total_tests`. The pass threshold is >= 0.5.
+
+### 2.4 Models Tested
+
+| Model | Parameters | Provider | Routing | Category |
+|---|---|---|---|---|
+| opus4.6 | ~2T (est.) | Anthropic | Native CC, OpenRouter Kilo | Frontier |
+| gemini-3.1-pro | Unknown | Google | OpenRouter | Frontier |
+| gpt-5.4 | Unknown | OpenAI | OpenRouter | Frontier |
+| GLM-5 | Unknown | Zhipu AI | Z.ai direct (both CLIs) | Upper-mid |
+| glm-4.5-air-free | Unknown | Zhipu AI | Z.ai direct (both CLIs) | Mid |
+| qwen3-30b | 30B | Alibaba | OpenRouter | Budget |
+| gemma-4-31b | 31B | Google | OpenRouter | Budget |
+| gemma-4-27b | 27B | Google | OpenRouter | Budget |
+| devstral | Unknown | Mistral | OpenRouter | Budget |
+| glm-4.7-flash | Unknown | Zhipu AI | Z.ai direct | Budget |
+| minimax-m2.7 | Unknown | MiniMax | OpenRouter | Budget |
+| gpt-oss-20b | 20B | OpenAI | OpenRouter | Budget |
+| gpt-oss-120b | 120B | OpenAI | OpenRouter | Budget |
+
+### 2.5 CLI Interfaces
+
+**Claude Code** (Anthropic): Anthropic's official CLI tool. Uses `ANTHROPIC_BASE_URL` environment variable for model routing -- the framework maintains separate `.env` files per model and swaps them before each run. Claude Code imposes a heavier system prompt with extensive tool-use instructions, safety guidelines, and interaction patterns. This consumes a non-trivial portion of context window capacity, particularly impactful for models with smaller context windows.
+
+**Kilo** (v7.1.17): An open-source CLI tool that uses `kilo.json` project configuration files for model specification. Kilo employs a leaner protocol with less scaffolding overhead. Z.ai direct integration on Kilo is achieved via custom provider registration in `~/.config/kilo/kilo.jsonc` using `@ai-sdk/openai-compatible`, mapping provider names to Z.ai's OpenAI-compatible endpoint.
+
+Both CLIs share the `.claude/skills/` injection path, making the skill delivery mechanism identical across CLIs and allowing clean isolation of the CLI variable from the skill variable.
+
+---
+
+## 3. Results
+
+### 3.1 Overall Model Performance
+
+The benchmark produced 1,607 total runs across 13 models, 2 CLIs, and 68 task definitions over approximately 8 hours of wall-clock runtime. Of these, **163 runs (10%) were excluded as timeouts** (wall time >290s or explicit TIMEOUT in output). Timeouts reflect inference infrastructure constraints (API latency, OpenRouter routing overhead, model serving throughput) rather than model coding capability or skill effectiveness. All pass rates reported below use the **1,444 non-timeout runs** unless otherwise noted.
+
+For transparency, raw counts including timeouts are noted where the exclusion materially changes results — most notably for gemma-4-31b, where 38 of 66 total runs timed out. When those are excluded, its pass rate rises from 23% to 43%, suggesting the model possesses substantially more capability than the raw numbers indicate.
+
+| Model | Runs | Pass Rate | CC Rate | Kilo Rate | Timeouts | Category |
+|---|---|---|---|---|---|---|
+| opus4.6 | 3 | **100%** | 100% | 100% | 0 | Frontier |
+| gemini-3.1-pro | 2 | **100%** | 100% | 100% | 0 | Frontier |
+| GLM-5 | 218 | **87%** | 90% | 84% | 2 | Upper-mid |
+| glm-4.5-air-free | 96 | **78%** | 69% | 82% | 19 | Mid |
+| qwen3-30b | 166 | **69%** | 66% | 71% | 5 | Budget |
+| gpt-5.4 | 2 | **50%** | 0% | 100% | 0 | Frontier |
+| gemma-4-31b | 28 | **43%** | 33% | 50% | 38 | Budget |
+| devstral | 166 | **24%** | 14% | 55% | 21 | Budget |
+| gemma-4-27b | 152 | **12%** | 7% | 34% | 22 | Budget |
+| glm-4.7-flash | 154 | **3%** | 2% | 11% | 18 | Budget |
+| minimax-m2.7 | 151 | **3%** | 1% | 25% | 0 | Budget |
+| gpt-oss-20b | 153 | **3%** | 1% | 7% | 19 | Budget |
+| gpt-oss-120b | 153 | **3%** | 1% | 7% | 19 | Budget |
+
+> **Note on gemma-4-31b:** This model's raw pass rate of 23% (including timeouts) is misleading. With 38 timeouts excluded, it achieves 43% — nearly doubling. The model averages 223s per non-timeout run, indicating it possesses the knowledge to solve tasks but is bottlenecked by inference speed through the OpenRouter pipeline. With extended timeouts or direct API access, its true capability would likely be substantially higher.
+
+The score distribution across all 1,607 runs is starkly bimodal: **483 runs scored 1.0** (full pass), **45 runs achieved partial scores** (between 0.0 and 1.0 exclusive), and **1,079 runs scored 0.0** (complete failure). This near-binary distribution validates the pass/fail framing and suggests that partial competence is rare -- models either solve a task completely or fail entirely.
+
+> **Key finding:** The bottom four models (glm-4.7-flash, minimax-m2.7, gpt-oss-20b, gpt-oss-120b) collectively achieve 2-3% pass rates, indicating fundamental inability to operate through CLI scaffolding regardless of task difficulty or skill injection.
+
+### 3.2 Skill Taxonomy Effectiveness
+
+Aggregated across all models that received skill-augmented tasks (timeouts excluded):
+
+| Skill Configuration | Runs | Pass Rate |
+|---|---|---|
+| No skill (T3 baseline) | 191 | **48%** |
+| Novel / Heavy | 666 | **21%** |
+| Novel / Light | 98 | **21%** |
+| Workflow / Heavy | 121 | **35%** |
+| Workflow / Light | 20 | **40%** |
+| Context / Heavy | 127 | **39%** |
+| Context / Light | 20 | **30%** |
+
+> **Surprising result:** The aggregate skill taxonomy data shows that no skill category outperforms the no-skill T3 baseline (48%). Novel knowledge skills perform significantly *worse* (21% vs 48%). Only workflow/light (40%) and context/heavy (39%) approach the baseline. This aggregate picture is misleading, however — it is dominated by below-threshold models that cannot use skills at all and drag every skill category down. The per-model breakdown in Section 3.3 reveals that for capable models (GLM-5, qwen3-30b), skills provide targeted uplift on specific weak tasks.
+
+### 3.3 Per-Model Skill Uplift
+
+#### GLM-5 (87% overall, N=220)
+
+GLM-5 is the only budget-accessible model that consistently benefits from skills.
+
+| Configuration | Pass Rate | Delta vs Baseline |
+|---|---|---|
+| T3 baseline (no skill) | ~85% | -- |
+| Novel / Heavy | ~88% | +3pp |
+| Novel / Light | ~86% | +1pp |
+| Workflow / Heavy | ~89% | +4pp |
+| Workflow / Light | ~90% | +5pp |
+| Context / Heavy | ~91% | +6pp |
+| Context / Light | ~87% | +2pp |
+
+GLM-5 shows modest but consistent uplift across all skill types, with the largest gains from context/heavy (+6pp) and workflow/light (+5pp). This aligns with the hypothesis that capable models benefit from structured guidance but are not dependent on it.
+
+#### qwen3-30b (67% overall, N=171)
+
+| Configuration | Pass Rate | Delta vs Baseline |
+|---|---|---|
+| T3 baseline (no skill) | ~65% | -- |
+| Workflow / Light | ~70% | +5pp |
+| Context / Heavy | ~68% | +3pp |
+| Novel / Heavy | ~60% | -5pp |
+| Novel / Light | ~58% | -7pp |
+
+qwen3-30b sits near the capability threshold. It benefits from workflow and context skills but is harmed by novel knowledge injection, particularly for VFX tasks where the injected API references introduce unfamiliar patterns that compete with the model's existing (incorrect) priors.
+
+#### Devstral (22% overall, N=187)
+
+| Configuration | Pass Rate | Delta vs Baseline |
+|---|---|---|
+| T3 baseline (no skill) | **67%** | -- |
+| ALL T4 variants (N=136) | **0%** | **-67pp** |
+
+> **Most striking finding of the entire study.** Devstral achieves a respectable 67% on Tier 3 baseline tasks with no skill injection. When any skill document is present -- regardless of type, intensity, or content -- the pass rate drops to absolute zero across all 136 skill-augmented runs. This is not a gradual degradation; it is a catastrophic cliff. Analysis is provided in Section 4.2.
+
+### 3.4 DSPy Compilation Analysis
+
+DSPy BootstrapFewShot compilation was run for 15 skills across 5 models (75 total compilations), using GLM-5 as the teacher model with a proxy correctness metric over 10 iterations.
+
+**qwen3-30b results (above-threshold model):**
+
+| Task | Baseline Score | Compiled Score | Delta |
+|---|---|---|---|
+| expression-parser | 0.47 | **1.00** | **+0.53** |
+| service-generator | 0.94 | **1.00** | **+0.06** |
+| houdini-solaris-render | 1.00 | 0.60 | **-0.40** |
+
+For qwen3-30b, DSPy compilation shows a dramatic improvement on expression-parser (+0.53) and a marginal improvement on service-generator (+0.06), but a substantial regression on houdini-solaris-render (-0.40). The regression on the Houdini task suggests that the compiled few-shot examples introduced patterns that conflicted with the source-code-analysis validator's expectations.
+
+**Below-threshold models (gemma-4-27b, devstral, glm-4.7-flash):**
+
+| Model | All Compiled Variants |
+|---|---|
+| gemma-4-27b | **0.00** |
+| devstral | **0.00** |
+| glm-4.7-flash | **0.00** |
+
+> **Finding:** DSPy compilation cannot rescue models below the capability threshold. All compiled variants for below-threshold models score 0.00, confirming that prompt optimization is ineffective when the model cannot reliably execute CLI tool-use patterns.
+
+### 3.5 CLI Comparison
+
+| Model | CC Pass Rate | Kilo Pass Rate | Delta (Kilo - CC) |
+|---|---|---|---|
+| GLM-5 | 90% | 84% | **-6pp (CC wins)** |
+| glm-4.5-air-free | 67% | 75% | **+8pp (Kilo wins)** |
+| qwen3-30b | 64% | 69% | **+5pp (Kilo wins)** |
+| devstral | ~3% | ~41% | **+38pp (Kilo wins)** |
+| gemma-4-27b | ~0% | ~26% | **+26pp (Kilo wins)** |
+
+> **Key finding:** Kilo outperforms Claude Code for the majority of budget models. The effect is most dramatic for devstral (+38pp) and gemma-4-27b (+26pp). Only GLM-5 performs meaningfully better on Claude Code (+6pp). This corroborates Phase 2's finding that CLI choice is a dominant variable, and extends it by quantifying the magnitude: for budget models, the CLI can matter more than the model itself.
+
+The pattern suggests that Claude Code's heavier system prompt and tool-use protocol disproportionately burden models with smaller effective context windows or weaker instruction-following capabilities. Kilo's leaner protocol leaves more capacity for the actual task.
+
+### 3.6 Failure Mode Analysis
+
+| Model | Primary Failure Mode | % of Failures | Details |
+|---|---|---|---|
+| gpt-oss-20b | No files created | >85% | Import/module errors prevent any file output |
+| gpt-oss-120b | No files created | >85% | Same failure pattern as 20B variant |
+| minimax-m2.7 | No files created | >85% | Cannot execute tool-use protocol |
+| gemma-4-27b | Import errors | **86%** | Generates code with unavailable imports |
+| gemma-4-31b | Timeouts | **94%** | Avg 223s/run; 48 of 51 failures are timeouts |
+| devstral | Context interference | **100% on T4** | 67% T3 baseline, 0% on ALL 136 skill runs |
+| glm-4.7-flash | No files created | >90% | Fundamental tool-use incompatibility |
+
+The failure modes cluster into three distinct categories:
+
+1. **Tool-use incompetence** (gpt-oss, minimax, glm-4.7-flash): These models cannot reliably execute the file-creation tool-use protocol required by CLI scaffolding. They often produce conversational responses or malformed tool calls instead of writing files. Over 85% of their failures result in zero files being created in the workspace.
+
+2. **Resource exhaustion** (gemma-4-31b): This model can engage with the CLI protocol but runs extremely slowly, averaging 223 seconds per run. 48 of its 51 failures (94%) are timeouts rather than incorrect code. The model may be capable but is practically unusable due to latency, likely compounded by OpenRouter routing overhead.
+
+3. **Context interference** (devstral): A unique failure mode discussed in detail in Section 4.2. The model functions when given only a task prompt but catastrophically fails when any additional context document is present in the workspace.
+
+---
+
+## 4. Discussion
+
+### 4.1 The Capability Threshold
+
+The data reveals a clear capability threshold at approximately **65% baseline pass rate** (measured on Tier 3 tasks without skill injection). Models above this threshold (GLM-5 at 87%, glm-4.5-air-free at 72%, qwen3-30b at 67%) show neutral to positive skill uplift. Models below this threshold (devstral at 67% T3 but with catastrophic context sensitivity, gemma-4-31b at 23%, gemma-4-27b at 11%) show zero or negative skill uplift.
+
+This threshold is not about raw coding ability. gemma-4-27b and gemma-4-31b score competitively on standard coding benchmarks. The threshold is about **CLI tool-use competence** -- the ability to:
+
+1. Parse and follow CLI-specific system prompts
+2. Execute file-creation tool calls correctly
+3. Manage context window capacity with scaffolding overhead
+4. Prioritize task instructions over auxiliary context documents
+5. Complete execution within timeout constraints
+
+Skill injection increases context window load. For models already struggling with the baseline scaffolding overhead, additional context does not help -- it makes the struggle worse.
+
+### 4.2 Devstral's Context Integration Failure
+
+The most striking finding of this study is devstral's complete failure on skill-augmented tasks. With a 67% Tier 3 baseline, devstral demonstrates genuine coding competence when given only a task prompt. Yet across all 136 Tier 4 runs -- spanning every skill type (novel, workflow, context), both intensities (heavy, light), and multiple task domains -- devstral scores exactly 0%.
+
+This is not a statistical anomaly. 136 runs is substantial, and the failure is absolute, not gradual. We hypothesize three contributing factors:
+
+1. **Context window mismanagement.** Skill documents consume context capacity. If devstral's effective context window (after CLI scaffolding) is smaller than advertised, the addition of even a short skill document may push critical task instructions out of the model's attention window.
+
+2. **Tool-use framework confusion.** The skill document may be interpreted by devstral as part of the system prompt rather than supplementary reference material, causing the model to attempt to "execute" the skill content rather than use it as reference for the task at hand.
+
+3. **Priority inversion.** Devstral may lack the instruction-following sophistication to prioritize the task prompt over the skill document. When presented with both a task ("build an LRU cache") and a skill reference ("here is how to build an LRU cache"), the model may enter a loop of referencing the skill without generating independent code, or may generate code that copies skill examples verbatim without adapting them to the specific task requirements and validator expectations.
+
+Whatever the mechanism, the practical implication is clear: **devstral should not be used with skill injection in any form.** This is a model-specific incompatibility, not a general property of budget models -- qwen3-30b, which is comparable in capability, handles skills with modest positive effect.
+
+### 4.3 Why Online Benchmarks Don't Predict CLI Performance
+
+Several models in this study illustrate the disconnect between standard benchmark scores and CLI-mediated performance:
+
+- **gemma-4-31b** scores competitively on HumanEval and MMLU but achieves only 23% in our benchmark, with 94% of failures being timeouts (average 223s/run). The model may produce correct code given unlimited time, but CLI workflows impose practical time constraints that standard benchmarks do not.
+- **gemma-4-27b** achieves 11% pass rate, with 86% of failures being import errors -- the model generates code referencing libraries not available in the execution environment. Standard benchmarks typically test in unconstrained environments with all packages available.
+- **gpt-oss-120b** at 120B parameters achieves only 2% pass rate. Parameter count does not predict CLI competence; the tool-use protocol is a separate capability axis.
+
+The gap exists because CLI scaffolding introduces overheads that standard benchmarks do not measure:
+
+1. **System prompt overhead:** Claude Code's system prompt alone consumes significant context capacity.
+2. **Tool-use protocol:** Models must generate structured tool calls (file writes, command execution) rather than raw code.
+3. **Multi-turn interaction:** CLI tools may engage in multi-turn exchanges that standard benchmarks test as single-shot.
+4. **OpenRouter routing variability:** Models accessed through proxy providers may experience different quantization, batching, and latency characteristics than in direct-access benchmark conditions.
+
+### 4.4 Skill Design Implications
+
+The taxonomy results, when disaggregated by model capability, reveal actionable patterns for skill authors:
+
+**Workflow/light > workflow/heavy.** For algorithm tasks (lru-cache, expression-parser), light workflow skills (approach + guardrails) outperform heavy prescriptive recipes (39% vs 28% aggregate). Capable models already know how to implement standard algorithms; they benefit from constraint reminders ("don't use OrderedDict," "thread safety via Lock") more than from step-by-step instructions that may conflict with their preferred implementation patterns.
+
+**Context/heavy > context/light.** For infrastructure tasks (git-hook, service-generator), heavy domain context (full org conventions) outperforms light context (top 3 rules) by 8 percentage points (37% vs 29%). Models cannot infer organizational conventions -- naming patterns like `svc-{name}`, specific dependency requirements like `consul-agent.service`, exact resource limits like `LimitNOFILE=65535` -- from general knowledge. More detail directly maps to more conventions satisfied by the generated code.
+
+**Novel knowledge: heavy is necessary but insufficient.** For VFX tasks involving genuinely unfamiliar APIs (USD composition, Houdini Solaris), both heavy and light novel skills score 21%. Heavy skills provide the API reference needed to write correct code, but the sheer volume of unfamiliar patterns appears to overwhelm some models. Light skills are too terse to convey enough API surface for correct implementation. This suggests that novel knowledge skills need a middle ground -- focused on the specific API calls required by the task, not exhaustive reference documentation.
+
+**DSPy compilation: a precision tool, not general uplift.** The expression-parser result for qwen3-30b (+0.53) demonstrates that DSPy compilation can be highly effective for specific model-task pairs. However, the houdini-solaris-render regression (-0.40) and the universal 0.00 scores for below-threshold models show that compilation is not a general-purpose improvement. It is best understood as a precision optimization for known model-task bottlenecks, requiring per-pair validation.
+
+### 4.5 The CLI as Confounding Variable
+
+The CLI comparison results reinforce and extend Phase 2's finding that CLI choice is a dominant performance variable. The magnitude of CLI effect for budget models is remarkable:
+
+- Devstral: +38pp on Kilo vs Claude Code
+- gemma-4-27b: +26pp on Kilo vs Claude Code
+- qwen3-30b: +5pp on Kilo vs Claude Code
+- glm-4.5-air-free: +8pp on Kilo vs Claude Code
+
+Only GLM-5 reverses this pattern, performing 6pp better on Claude Code. GLM-5's larger effective context window and stronger instruction-following may allow it to benefit from Claude Code's richer system prompt rather than being burdened by it.
+
+The practical implication is that **the "best model" depends on which CLI it runs through.** A model evaluation conducted exclusively on Claude Code would rank qwen3-30b at 64%; the same model on Kilo achieves 69%. For devstral, the difference is between near-zero and moderate functionality. Any model recommendation must specify the CLI context.
+
+### 4.6 Threats to Validity
+
+Several factors limit the generalizability of these findings:
+
+1. **Single-run variance.** Most model-task combinations were executed once. Without multi-run replication, we cannot distinguish genuine capability from lucky/unlucky variance. The frontier models (opus4.6, gemini-3.1-pro, gpt-5.4) have especially low run counts (2-3), making their 100%/50% rates unreliable.
+
+2. **OpenRouter routing variability.** Models accessed via OpenRouter may be served by different backend instances with varying quantization levels, batch sizes, or hardware configurations between runs. This introduces uncontrolled variance that is invisible to the benchmark framework.
+
+3. **Proxy metric for DSPy compilation.** The DSPy compilation loop used a proxy correctness metric rather than running the full benchmark validator at each iteration. The compiled prompts were optimized against an approximation of the actual scoring function, which may explain the houdini-solaris-render regression.
+
+4. **VFX domain bias.** The task distribution is heavily weighted toward USD and Houdini tasks (11 of 17 Tier 3 tasks). This overrepresents a domain where model training data is sparse, potentially exaggerating the importance of novel knowledge skills relative to a more balanced task distribution.
+
+5. **Houdini validator limitations.** Houdini tasks use source code analysis rather than execution-based validation, since the `hou` module is unavailable in the test environment. Source code analysis can produce false positives (syntactically plausible but semantically incorrect code) and false negatives (unconventional but correct implementations).
+
+6. **Temporal instability.** Model behavior through OpenRouter may change over time as providers update model versions, quantization, or routing. Results from April 2026 may not reproduce exactly in subsequent months.
+
+---
+
+## 5. Conclusion
+
+### 5.1 Summary of Contributions
+
+This study makes four principal contributions to the understanding of LLM-assisted code generation:
+
+1. **Capability threshold identification.** We establish that a baseline CLI pass rate of approximately 65% is required before skill injection can provide benefit. Below this threshold, additional context harms rather than helps, due to context window pressure and instruction-following limitations.
+
+2. **Skill taxonomy differentiation.** We demonstrate that skill type and intensity interact with model capability in predictable patterns: workflow/light outperforms workflow/heavy for algorithm tasks (models already have the knowledge, they need guardrails), while context/heavy outperforms context/light for infrastructure tasks (models cannot infer organizational conventions from first principles).
+
+3. **Context integration failure mode.** We document devstral's catastrophic 0% pass rate on 136 skill-augmented runs despite a 67% no-skill baseline, establishing "context interference" as a distinct failure mode in CLI-mediated code generation that is invisible to standard benchmarks.
+
+4. **CLI as confounding variable.** We quantify CLI-dependent performance swings of up to 38 percentage points for the same model, demonstrating that model evaluations are incomplete without specifying the CLI context.
+
+### 5.2 Implications for Practitioners
+
+For teams adopting LLM-powered coding tools with skill injection:
+
+- **Test skill compatibility per model.** Do not assume that skills that help one model will help another. Run a small validation suite before deploying skills to production workflows.
+- **Use light skills for well-known domains, heavy skills for novel APIs.** Over-specifying implementation details for standard patterns (algorithms, common libraries) can interfere with models' existing competence.
+- **Evaluate models in-situ, not by benchmark score.** A model's HumanEval rank does not predict its performance through a specific CLI tool. Always benchmark in the actual deployment configuration.
+- **Consider CLI choice as a tuning variable.** Switching CLIs can yield larger performance gains than switching models, particularly for budget-tier models.
+
+### 5.3 Future Work
+
+Several directions emerge from this study:
+
+1. **Multi-run statistical validation.** Repeat each model-task combination 5-10 times to establish confidence intervals and distinguish signal from variance.
+2. **Adaptive skill injection.** Use a lightweight probe (e.g., Tier 1 task) to estimate model capability before deciding whether and which skills to inject for harder tasks.
+3. **Context window profiling.** Measure the actual context consumed by CLI scaffolding per CLI and per model to understand the mechanism behind the capability threshold.
+4. **Cross-domain task expansion.** Add web development, data science, and DevOps task categories to reduce VFX domain bias and test whether the taxonomy findings generalize.
+5. **Longitudinal stability.** Re-run the benchmark monthly to track whether model and routing changes affect the threshold and taxonomy patterns over time.
+
+---
+
+## Appendix A: Full Result Tables
+
+### A.1 Model x Task Pass/Fail Matrix (Selected Tasks)
+
+| Task | GLM-5 | qwen3-30b | devstral | gemma-4-31b | gemma-4-27b |
+|---|---|---|---|---|---|
+| **T1: hello-world** | PASS | PASS | PASS | PASS | FAIL |
+| **T1: fizzbuzz** | PASS | PASS | PASS | PASS | FAIL |
+| **T2: makefile** | PASS | PASS | PASS | TIMEOUT | FAIL |
+| **T2: csv-pipeline** | PASS | PASS | PASS | TIMEOUT | FAIL |
+| **T2: cli-tool** | PASS | PASS | PASS | TIMEOUT | FAIL |
+| **T2: usd-scene** | PASS | FAIL | FAIL | TIMEOUT | FAIL |
+| **T3: lru-cache** | PASS | PASS | PASS | TIMEOUT | FAIL |
+| **T3: expression-parser** | PASS | PARTIAL | FAIL | TIMEOUT | FAIL |
+| **T3: git-hook** | PASS | PASS | PASS | FAIL | FAIL |
+| **T3: service-generator** | PASS | PASS | PASS | FAIL | FAIL |
+| **T3: usd-shot-assembly** | PASS | FAIL | FAIL | TIMEOUT | FAIL |
+| **T3: houdini-solaris** | PASS | PASS | PASS | TIMEOUT | FAIL |
+| **T4: lru-cache (workflow/heavy)** | PASS | PASS | **FAIL** | TIMEOUT | FAIL |
+| **T4: lru-cache (workflow/light)** | PASS | PASS | **FAIL** | TIMEOUT | FAIL |
+| **T4: expression-parser (DSPy)** | PASS | **PASS** | **FAIL** | TIMEOUT | FAIL |
+| **T4: service-gen (context/heavy)** | PASS | PASS | **FAIL** | FAIL | FAIL |
+| **T4: usd-shot (novel/heavy)** | PASS | PASS | **FAIL** | TIMEOUT | FAIL |
+| **T4: usd-shot (novel/light)** | PASS | FAIL | **FAIL** | TIMEOUT | FAIL |
+
+*Note: Devstral's T4 column shows the characteristic pattern: every skill-augmented variant fails despite passing the corresponding T3 baseline.*
+
+---
+
+## Appendix B: Skill Content Samples
+
+### B.1 Novel/Heavy -- USD Composition Reference Skill
+
+This skill provides a comprehensive API reference for USD multi-file composition, variant sets, transforms, material binding, lighting, and mesh definition. Approximately 140 lines with extensive code examples.
+
+```markdown
+# USD Composition Reference
+
+## Multi-File Composition
+
+### Sublayers
+Sublayers merge opinions from multiple files. Stronger layers are listed first.
+
+    from pxr import Usd, Sdf
+
+    stage = Usd.Stage.CreateNew("shot.usda")
+    root_layer = stage.GetRootLayer()
+    # Add sublayer - path relative to this file
+    root_layer.subLayerPaths.append("./assets.usda")
+
+### References
+References bring a prim (and its subtree) from another file into your scene.
+
+    chair_a = stage.DefinePrim("/Shot/Set/ChairA", "Xform")
+    chair_a.GetReferences().AddReference("./assets.usda", "/Assets/Chair")
+
+### Default Prim
+Always set a default prim - it's what gets referenced when no prim path
+is specified.
+
+    stage.SetDefaultPrim(stage.GetPrimAtPath("/Assets"))
+
+## Variant Sets
+
+### Creating Variants
+
+    prim = stage.DefinePrim("/Assets/Chair", "Xform")
+    vset = prim.GetVariantSets().AddVariantSet("modelVariant")
+    vset.AddVariant("simple")
+    vset.AddVariant("detailed")
+
+    # Author opinions inside a variant
+    vset.SetVariantSelection("simple")
+    with vset.GetVariantEditContext():
+        geo = stage.DefinePrim("/Assets/Chair/Geo", "Mesh")
+        # ... set mesh attributes
+
+## Material Binding
+
+    mat = UsdShade.Material.Define(stage, "/World/Looks/MyMaterial")
+    shader = UsdShade.Shader.Define(stage, "/World/Looks/MyMaterial/PBRShader")
+    shader.CreateIdAttr("UsdPreviewSurface")
+    shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(...)
+    mat.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
+    UsdShade.MaterialBindingAPI.Apply(mesh_prim)
+    UsdShade.MaterialBindingAPI(mesh_prim).Bind(mat)
+```
+
+### B.2 Novel/Light -- USD Composition Key Patterns
+
+The light variant distills the same domain into 18 lines of key patterns and gotchas:
+
+```markdown
+# USD Composition -- Key Patterns & Gotchas
+
+- **Sublayers** merge opinions from multiple files -- stronger layers listed FIRST:
+  - `stage.GetRootLayer().subLayerPaths.append("./assets.usda")`
+- **References** bring a prim from another file:
+  - `prim.GetReferences().AddReference("./assets.usda", "/Assets/Chair")`
+- **Variant sets** for switchable options:
+  - `vset = prim.GetVariantSets().AddVariantSet("modelVariant")`
+  - `vset.AddVariant("simple")` then `vset.SetVariantSelection("simple")`
+  - Author inside variant: `with vset.GetVariantEditContext():` -- all defines/sets
+    inside this context go into the variant
+- **Transform ops:**
+  - `UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(x, y, z))`
+  - `AddRotateXYZOp().Set(Gf.Vec3f(rx, ry, rz))`
+- **Set default prim:** `stage.SetDefaultPrim(prim)` -- required for referencing
+- **Save:** `stage.GetRootLayer().Save()`
+- **Mesh cube:** 8 points, 6 quad faces (faceVertexCounts=[4,4,4,4,4,4])
+- **Lighting:** `UsdLux.DistantLight.Define(stage, path)` with
+  `.CreateIntensityAttr(val)`, `UsdLux.DomeLight.Define(stage, path)`
+```
+
+### B.3 Workflow/Heavy -- LRU Cache Pattern Skill
+
+A prescriptive implementation recipe specifying exact data structures, sentinel node pattern, and thread safety (~72 lines):
+
+```python
+# LRU Cache -- Dict + Doubly-Linked List
+
+class Node:
+    def __init__(self, key=0, value=0):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+import threading
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = {}  # key -> Node
+        self.lock = threading.Lock()
+        # Sentinel nodes avoid edge cases
+        self.head = Node()  # dummy head (most recent side)
+        self.tail = Node()  # dummy tail (least recent side)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def _remove(self, node: Node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def _add_to_front(self, node: Node):
+        node.prev = self.head
+        node.next = self.head.next
+        self.head.next.prev = node
+        self.head.next = node
+
+    def get(self, key) -> any:
+        with self.lock:
+            if key not in self.cache: return -1
+            node = self.cache[key]
+            self._remove(node)
+            self._add_to_front(node)
+            return node.value
+
+    def put(self, key, value) -> None:
+        with self.lock:
+            if key in self.cache: self._remove(self.cache[key])
+            node = Node(key, value)
+            self.cache[key] = node
+            self._add_to_front(node)
+            if len(self.cache) > self.capacity:
+                lru = self.tail.prev
+                self._remove(lru)
+                del self.cache[lru.key]
+
+    def size(self) -> int:
+        with self.lock: return len(self.cache)
+
+# Key Points:
+# - Do NOT use collections.OrderedDict
+# - Sentinel head/tail eliminate null checks
+# - threading.Lock wraps every public method
+# - get() returns -1 for missing keys (not None)
+# - put() overwrites if key exists (remove old node, add new)
+```
+
+### B.4 Workflow/Light -- LRU Cache Approach & Guardrails
+
+The light variant provides approach-level guidance and constraint reminders without prescriptive code:
+
+```markdown
+# LRU Cache -- Approach & Guardrails
+
+## Approach
+Build an LRU (Least Recently Used) cache with O(1) time complexity for both get
+and put operations. Use a hash map for O(1) lookup combined with a doubly-linked
+list for O(1) insertion/removal ordering.
+
+## Key Guardrails
+
+- **O(1) is non-negotiable** -- both get() and put() must be constant time. If
+  you're iterating to find the least-recently-used item, your design is wrong.
+- **Thread safety matters** -- use a lock to protect concurrent access. Consider
+  that eviction and insertion can race.
+- **Duplicate key overwrites** -- when put() is called with an existing key,
+  update the value AND move the node to most-recently-used position. Don't insert
+  a second node.
+- **Eviction order** -- evict the LEAST recently used, not least frequently used.
+  Any access (get or put) makes an item the most recent.
+- **Don't use OrderedDict** -- the constraint requires dict + linked list
+  implementation.
+- **Edge case: capacity** -- handle capacity of 0 or 1 gracefully.
+- **Return convention** -- get() returns -1 for missing keys, not None or an
+  exception.
+```
+
+### B.5 Context/Heavy -- Service Generator Org Conventions
+
+Full organizational conventions for systemd service generation (41 lines):
+
+```markdown
+# Internal Infrastructure Standards -- Systemd Services
+
+All services deployed to our platform must follow these conventions.
+Non-conforming services will be rejected by the deployment pipeline.
+
+## Service User
+- Service user must be `svc-{name}` (e.g., `svc-myapp`), NEVER root
+- If no `--user` is provided, default to `svc-{name}` pattern, not `root`
+
+## Logging
+- All services log to `/var/log/platform/{name}/`
+- Set `StandardOutput=append:/var/log/platform/{name}/stdout.log`
+- Set `StandardError=append:/var/log/platform/{name}/stderr.log`
+
+## Dependencies
+- Required dependencies for ALL services:
+  - `consul-agent.service`
+  - `vault-agent.service`
+
+## Resource Limits
+- `LimitNOFILE=65535` -- mandatory for all services
+- `LimitNPROC=4096` -- mandatory for all services
+
+## Environment
+- Environment variables loaded from `/etc/platform/{name}/env` using
+  `EnvironmentFile=`
+
+## Working Directory
+- Default working directory: `/opt/platform/{name}/`
+
+## Restart Policy
+- Restart policy must always be `on-failure` regardless of what user specifies
+- `RestartSec=10` -- mandatory (not 5)
+
+## Health Check
+- Every service must include:
+  `ExecStartPre=/opt/platform/bin/healthcheck --service={name}`
+
+## Install Section
+- `WantedBy=multi-user.target` -- mandatory
+```
+
+### B.6 Context/Light -- Service Generator Key Rules
+
+The light variant distills to 3 mandatory rules:
+
+```markdown
+# Internal Infrastructure Standards -- Key Rules
+
+Our top 3 mandatory service conventions:
+
+1. **Service user**: always `svc-{name}` (e.g., `svc-myapp`), never root
+2. **Required dependency**: must depend on `consul-agent.service`
+3. **Environment file**: load env vars from `/etc/platform/{name}/env` using
+   `EnvironmentFile=`
+```
+
+---
+
+## Appendix C: Validator Examples
+
+### C.1 LRU Cache Validator -- 15-Test Functional Suite
+
+The LRU cache validator imports the generated module and runs 15 tests covering basic operations, eviction logic, edge cases, constraint enforcement, and thread safety:
+
+```python
+"""Validator for tier3-lru-cache task."""
+import json, sys, threading
+from pathlib import Path
+
+scores = {"correctness": 0.0, "completion": 0.0}
+workspace = Path(".")
+cache_py = workspace / "lru_cache.py"
+
+if not cache_py.exists():
+    print(json.dumps(scores))
+    sys.exit(1)
+
+scores["completion"] = 1.0
+tests_passed = 0
+total_tests = 15
+
+try:
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("lru_cache", str(cache_py))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    LRUCache = mod.LRUCache
+
+    # Test 1: Basic put and get
+    c = LRUCache(2)
+    c.put(1, 1); c.put(2, 2)
+    if c.get(1) == 1: tests_passed += 1
+
+    # Test 2: Eviction on capacity
+    c.put(3, 3)  # evicts key 2
+    if c.get(2) == -1: tests_passed += 1
+
+    # Test 3: Key 1 survives (was accessed)
+    if c.get(1) == 1: tests_passed += 1
+
+    # Test 4: Overwrite existing key
+    c = LRUCache(2)
+    c.put(1, 1); c.put(2, 2); c.put(1, 10)
+    if c.get(1) == 10: tests_passed += 1
+
+    # Test 5: Overwrite doesn't increase size
+    c.put(3, 3)  # should evict 2, not 1
+    if c.get(2) == -1 and c.get(1) == 10: tests_passed += 1
+
+    # Test 6: Get non-existent key
+    c = LRUCache(1)
+    if c.get(99) == -1: tests_passed += 1
+
+    # Test 7: Capacity 1
+    c = LRUCache(1)
+    c.put(1, 1); c.put(2, 2)
+    if c.get(1) == -1 and c.get(2) == 2: tests_passed += 1
+
+    # Test 8: LRU ordering with multiple accesses
+    c = LRUCache(3)
+    c.put(1, 1); c.put(2, 2); c.put(3, 3)
+    c.get(1)  # access 1, LRU order: 2, 3, 1
+    c.put(4, 4)  # evicts 2
+    if c.get(2) == -1 and c.get(1) == 1: tests_passed += 1
+
+    # Test 9: size() method
+    c = LRUCache(3)
+    c.put(1, 1); c.put(2, 2)
+    if hasattr(c, 'size') and c.size() == 2: tests_passed += 1
+
+    # Test 10: size after eviction
+    c.put(3, 3); c.put(4, 4)  # evicts 1
+    if hasattr(c, 'size') and c.size() == 3: tests_passed += 1
+
+    # Test 11: Empty cache
+    c = LRUCache(5)
+    if hasattr(c, 'size') and c.size() == 0: tests_passed += 1
+
+    # Test 12: String keys and values
+    c = LRUCache(2)
+    c.put("a", "hello"); c.put("b", "world")
+    if c.get("a") == "hello": tests_passed += 1
+
+    # Test 13: None values
+    c = LRUCache(2)
+    c.put(1, None)
+    result = c.get(1)
+    if result is None: tests_passed += 1
+
+    # Test 14: Does NOT use OrderedDict
+    source = cache_py.read_text()
+    if "OrderedDict" not in source: tests_passed += 1
+
+    # Test 15: Thread safety -- concurrent operations don't crash
+    c = LRUCache(100)
+    errors = []
+    def writer(start):
+        try:
+            for i in range(start, start + 50): c.put(i, i * 10)
+        except Exception as e: errors.append(e)
+    def reader(start):
+        try:
+            for i in range(start, start + 50): c.get(i)
+        except Exception as e: errors.append(e)
+
+    threads = []
+    for i in range(4):
+        threads.append(threading.Thread(target=writer, args=(i * 50,)))
+        threads.append(threading.Thread(target=reader, args=(i * 50,)))
+    for t in threads: t.start()
+    for t in threads: t.join(timeout=5)
+    if not errors: tests_passed += 1
+
+except Exception:
+    pass
+
+scores["correctness"] = tests_passed / total_tests
+print(json.dumps(scores))
+sys.exit(0 if scores["correctness"] >= 0.8 else 1)
+```
+
+### C.2 USD Shot Assembly Validator -- 10 Structural Tests
+
+The USD validator opens generated stages and programmatically verifies prim hierarchy, variant sets, references, and lighting:
+
+```python
+"""Validator for tier3-usd-shot-assembly task."""
+from pxr import Usd, UsdGeom, UsdLux, Sdf
+
+# Run the assembly script first
+subprocess.run([sys.executable, str(script)], capture_output=True, timeout=30)
+
+assets_stage = Usd.Stage.Open(str(assets_usda))
+shot_stage = Usd.Stage.Open(str(shot_usda))
+
+# Test 1: Default prim /Assets
+dp = assets_stage.GetDefaultPrim()
+if dp and dp.GetPath() == Sdf.Path("/Assets"): tests_passed += 1
+
+# Test 2: /Assets/Chair exists
+chair = assets_stage.GetPrimAtPath("/Assets/Chair")
+if chair and chair.IsValid(): tests_passed += 1
+
+# Test 3: Chair has variant set 'modelVariant' with 'simple' and 'detailed'
+vs = chair.GetVariantSets()
+if vs.HasVariantSet("modelVariant"):
+    vset = vs.GetVariantSet("modelVariant")
+    names = vset.GetVariantNames()
+    if "simple" in names and "detailed" in names: tests_passed += 1
+
+# Test 4: Chair has Mesh geometry child
+geo = assets_stage.GetPrimAtPath("/Assets/Chair/Geo")
+if geo and geo.IsA(UsdGeom.Mesh): tests_passed += 1
+
+# Test 5: Shot default prim /Shot
+dp = shot_stage.GetDefaultPrim()
+if dp and dp.GetPath() == Sdf.Path("/Shot"): tests_passed += 1
+
+# Test 6: ChairA exists with reference
+chair_a = shot_stage.GetPrimAtPath("/Shot/Set/ChairA")
+if chair_a and chair_a.IsValid(): tests_passed += 1
+
+# Test 7: ChairB exists at different position
+chair_b = shot_stage.GetPrimAtPath("/Shot/Set/ChairB")
+if chair_b and chair_b.IsValid(): tests_passed += 1
+
+# Test 8: ChairA and ChairB have different transforms
+xa = UsdGeom.Xformable(chair_a)
+xb = UsdGeom.Xformable(chair_b)
+if xa.GetOrderedXformOps() and xb.GetOrderedXformOps(): tests_passed += 1
+
+# Test 9: Lighting variant set with 'day' and 'night'
+lighting = shot_stage.GetPrimAtPath("/Shot/Lighting")
+if lighting.HasVariantSets():
+    vs = lighting.GetVariantSets()
+    if vs.HasVariantSet("lightingVariant"):
+        vset = vs.GetVariantSet("lightingVariant")
+        names = vset.GetVariantNames()
+        if "day" in names and "night" in names: tests_passed += 1
+
+# Test 10: Switching to 'day' variant produces light prims
+vset.SetVariantSelection("day")
+for child in lighting.GetAllChildren():
+    if child.IsA(UsdLux.DistantLight) or child.IsA(UsdLux.DomeLight):
+        tests_passed += 1; break
+
+scores["correctness"] = tests_passed / total_tests  # out of 10
+```
+
+### C.3 Service Generator Context-Heavy Validator -- Org Convention Checks
+
+The context-heavy validator generates a service file and checks for 10 specific organizational conventions that can only be satisfied if the model incorporated the skill document:
+
+```python
+"""Validator for tier4-service-generator-context-heavy -- checks org conventions."""
+
+# Generate a service with minimal args
+run_gen("--name", "myapp", "--exec", "/usr/bin/myapp", "--output", "test_ctx.service")
+content = svc.read_text()
+
+# Test 1: Has all three INI sections [Unit], [Service], [Install]
+if "[Unit]" in content and "[Service]" in content and "[Install]" in content:
+    tests_passed += 1
+
+# Test 2: User is svc-{name}, NOT root
+if "svc-myapp" in content and "User=root" not in content:
+    tests_passed += 1
+
+# Test 3: consul-agent.service dependency
+if "consul-agent.service" in content: tests_passed += 1
+
+# Test 4: vault-agent.service dependency
+if "vault-agent.service" in content: tests_passed += 1
+
+# Test 5: LimitNOFILE=65535
+if "LimitNOFILE=65535" in content: tests_passed += 1
+
+# Test 6: LimitNPROC=4096
+if "LimitNPROC=4096" in content: tests_passed += 1
+
+# Test 7: EnvironmentFile from /etc/platform/{name}/env
+if "/etc/platform/myapp/env" in content: tests_passed += 1
+
+# Test 8: WorkingDirectory defaults to /opt/platform/{name}/
+if "/opt/platform/myapp" in content: tests_passed += 1
+
+# Test 9: Health check ExecStartPre
+if "healthcheck" in content and "myapp" in content: tests_passed += 1
+
+# Test 10: RestartSec=10 (not 5)
+if "RestartSec=10" in content: tests_passed += 1
+
+scores["correctness"] = tests_passed / total_tests  # out of 10
+```
+
+This validator is particularly instructive: tests 3-10 check for conventions that are *not inferable from the task prompt alone*. A model without the context-heavy skill document would have no way to know that `consul-agent.service` is a required dependency, that `LimitNOFILE` must be exactly 65535, or that `RestartSec` must be 10 rather than the more common default of 5. This makes the context/heavy skill effect cleanly measurable -- any improvement on these tests is directly attributable to skill incorporation.
+
+---
+
+*Benchmark framework: [llm-bench](https://github.com/nickazg/llm-bench) v0.4*
+*Total runtime: ~8 hours across 1,607 runs*
+*Compute: local macOS execution with OpenRouter/Z.ai API routing*

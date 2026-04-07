@@ -1,0 +1,178 @@
+# Case Study: Skill Taxonomy & Uplift Measurement in LLM CLI Coding Benchmarks
+# Started: 2026-04-07
+# Description: Three-category skill taxonomy (novel/workflow/context) with DSPy compilation, testing 13 models across 68 tasks
+entries:
+  - id: "001"
+    date: "2026-04-07"
+    category: context
+    title: "Benchmark framework and experimental design"
+    body: "llm-bench framework: Python harness running tasks through CLI interfaces (Claude Code, Kilo). Tasks organized in 4 tiers of increasing difficulty. Skills injected via .claude/skills/ directory. Scoring via automated validators (execute script, check output). 13 models tested: 3 frontier (opus4.6, gpt-5.4, gemini-3.1-pro), 10 budget. 2 CLIs. 68 task definitions."
+    evidence:
+      - "src/llm_bench/runner.py"
+      - "src/llm_bench/scoring.py"
+      - "config/models.yaml"
+    tags: [setup, framework]
+    session: "2026-04-07-taxonomy-expansion"
+    retrospective: true
+
+  - id: "002"
+    date: "2026-04-07"
+    category: method
+    title: "Three-category skill taxonomy introduced"
+    body: "Skills classified by intent into: Novel Knowledge (API info models lack), Workflow/Process (structured guidance on known tech), Domain Context (org-specific conventions). Each category has heavy (full reference) and light (key patterns only) intensity variants. New task.yaml fields: skill_type, skill_intensity, skill_pair, difficulty."
+    evidence:
+      - "src/llm_bench/models.py:40-54"
+      - "skills/lru-cache-workflow-light/SKILL.md"
+      - "skills/git-hook-context-heavy/SKILL.md"
+      - "skills/usd-render-settings/SKILL.md"
+    tags: [taxonomy, skill-design]
+    session: "2026-04-07-taxonomy-expansion"
+    retrospective: true
+
+  - id: "003"
+    date: "2026-04-07"
+    category: method
+    title: "9 new VFX baseline tasks covering distinct subsystems"
+    body: "Added tasks testing: USD Render (UsdRender API), USD Animation (UsdSkel), USD Layers (Sdf.Layer opinions), USD Shaders (NodeGraph connectivity), USD Custom Schema (metadata/purpose), Houdini PDG (work items), Houdini Solaris Instancing (PointInstancer), Houdini Solaris Render (Karma settings), Houdini Solaris Light Linking (collections/filters). Each has a tier3 baseline and tier4 novel-heavy + novel-light variants."
+    evidence:
+      - "tasks/tier3/usd-render-settings/task.yaml"
+      - "tasks/tier3/usd-procedural-animation/task.yaml"
+      - "tasks/tier3/houdini-pdg/task.yaml"
+    tags: [tasks, vfx, usd, houdini]
+    session: "2026-04-07-taxonomy-expansion"
+    retrospective: true
+
+  - id: "004"
+    date: "2026-04-07"
+    category: method
+    title: "DSPy compilation: 75 model-specific skill variants"
+    body: "Used DSPy BootstrapFewShot with GLM-5 as teacher model to compile 15 heavy skills for 5 target models (qwen3-30b, gemma-4-31b, gemma-4-27b, devstral, glm-4.7-flash). Proxy metric used (heuristic scoring of skill structure/conciseness). 10 iterations per compilation. All 75 compilations succeeded."
+    evidence:
+      - "src/llm_bench/compiler.py"
+      - ".claude/benchmark-checkpoint.json"
+      - "scripts/full_benchmark.py"
+    tags: [dspy, compilation, method]
+    session: "2026-04-07-taxonomy-expansion"
+    retrospective: true
+
+  - id: "005"
+    date: "2026-04-08"
+    category: result
+    title: "Full benchmark: 1,607 runs completed"
+    body: "1,607 runs across 13 models, 2 CLIs, 68+ tasks (including compiled variants). Overall 30% pass rate. Top performers: GLM-5 (87%), glm-4.5-air-free (72%), qwen3-30b (67%). Bottom cluster (<5%): glm-4.7-flash, minimax-m2.7, gpt-oss-20b, gpt-oss-120b."
+    evidence:
+      - "results/"
+    tags: [benchmark, results]
+    session: "2026-04-08-benchmark-run"
+    retrospective: true
+
+  - id: "006"
+    date: "2026-04-08"
+    category: finding
+    title: "GLM-5 dominates at 87% — clear budget champion"
+    body: "GLM-5 passed 191/220 runs (87%). Strongest on tier3 domain tasks (90%) and maintained performance with skills (85% on tier4). Only model to pass houdini-solaris flagship task. Uses Z.ai coding API directly on both CC and Kilo."
+    evidence:
+      - "results/"
+    tags: [glm-5, model-ranking]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "007"
+    date: "2026-04-08"
+    category: surprise
+    title: "Devstral catastrophic skill interference: 67% baseline → 0% with ANY skill"
+    body: "Devstral scored 67% on tier3 (no skill) — respectable performance from training data alone. But ALL 136 tier4 runs (with skills) scored 0%. Every skill type (novel, workflow, context), every intensity (heavy, light), every compiled variant — all 0%. The model reads the skill document but then fails to produce any output files. This is a fundamental context integration failure."
+    evidence:
+      - "results/"
+    tags: [devstral, skill-interference, surprise]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "008"
+    date: "2026-04-08"
+    category: finding
+    title: "Skills don't help on aggregate — only above capability threshold"
+    body: "No-skill baseline: 35% pass. Novel/heavy: 21%. Workflow/light: 39%. Context/heavy: 37%. Aggregate numbers are misleading because weak models (which make up bulk of runs) are hurt by skills. For GLM-5 specifically: skills improve expression-parser (+0.43), usd-render (+0.12), but hurt service-generator (-0.08 to -0.30)."
+    evidence:
+      - "results/"
+    tags: [skill-uplift, capability-threshold]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "009"
+    date: "2026-04-08"
+    category: finding
+    title: "Light workflow > heavy workflow; heavy context > light context"
+    body: "Workflow/light (39%) outperforms workflow/heavy (28%). Models already know algorithms; concise guardrails beat prescriptive recipes that conflict with internal knowledge. Context/heavy (37%) outperforms context/light (29%). For org conventions, more detail = better compliance. Novel: heavy wins on genuinely unknown APIs, light wins when model has partial knowledge."
+    evidence:
+      - "results/"
+    tags: [intensity, skill-design]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "010"
+    date: "2026-04-08"
+    category: finding
+    title: "DSPy compilation is a precision tool, not general uplift"
+    body: "For qwen3-30b: compilation improved expression-parser (+0.53) but degraded houdini-solaris-render (-0.40). For gemma-4-27b, devstral, glm-4.7-flash: zero effect on all tasks. Compilation only helps models already above capability threshold, and even then only on specific weak spots."
+    evidence:
+      - "results/"
+    tags: [dspy, compilation]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "011"
+    date: "2026-04-08"
+    category: surprise
+    title: "Gemma underperforms dramatically vs online benchmarks"
+    body: "gemma-4-31b: 23% (48/51 failures are timeouts — avg 223s/run). gemma-4-27b: 11% (86% of failures are import errors). Online benchmarks test models directly; our benchmark tests through CLI+OpenRouter pipeline where latency, context overhead, and tool-use framework competence matter. The benchmark measures 'can this model do real work through a CLI tool?' — not 'can this model answer coding questions?'"
+    evidence:
+      - "results/"
+    tags: [gemma, benchmark-validity]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "012"
+    date: "2026-04-08"
+    category: finding
+    title: "Kilo outperforms Claude Code for most budget models"
+    body: "Devstral: +38pp on Kilo. gemma-4-27b: +26pp. minimax: +24pp. CC's heavier system prompt and tool definitions consume more context budget, hurting models with small effective context windows. Exception: GLM-5 performs better on CC (+6%) — powerful enough to benefit from richer tool descriptions."
+    evidence:
+      - "results/"
+    tags: [cli-comparison, kilo, claude-code]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "013"
+    date: "2026-04-08"
+    category: finding
+    title: "Scores are binary — 1.0 or 0.0, almost no partial credit"
+    body: "Out of 1,607 runs: 483 scored 1.0, 1,079 scored 0.0, only 45 had partial scores. Models either fully understand a task or fail completely. Implications: skills don't need to improve partial understanding — they need to push models past a binary comprehension threshold."
+    evidence:
+      - "results/"
+    tags: [score-distribution, methodology]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "014"
+    date: "2026-04-08"
+    category: finding
+    title: "Import errors dominate weak model failures"
+    body: "gemma-4-27b: 133/154 failures (86%) are import errors. gpt-oss-120b: 142/168 (85%). gpt-oss-20b: 141/168 (84%). These models generate code referencing nonexistent modules or fail to use CLI file-writing tools. This is a CLI integration failure, not a coding capability failure. gemma-4-31b is different — 88% of failures are NO_OUTPUT (timeouts)."
+    evidence:
+      - "results/"
+    tags: [failure-analysis, import-errors]
+    session: "2026-04-08-analysis"
+    retrospective: true
+
+  - id: "015"
+    date: "2026-04-08"
+    category: hypothesis
+    title: "Capability threshold theory validated with new taxonomy"
+    body: "Skills only help models above ~65% baseline pass rate. Below that threshold, skills are neutral (models can't use them) or harmful (extra context confuses them). The threshold appears to be about CLI tool-use competence, not raw coding ability. Models that can't reliably create files can't benefit from skill content regardless of quality."
+    evidence:
+      - "results/"
+      - "docs/phase3-benchmark-report.md"
+    tags: [capability-threshold, hypothesis]
+    session: "2026-04-08-analysis"
+    retrospective: true

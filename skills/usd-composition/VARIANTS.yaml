@@ -22,3 +22,7 @@ variants:
     description: DSPy-compiled for qwen3-coder-next (score=1.00)
   compiled-minimax-m2.7:
     description: DSPy-compiled for minimax-m2.7 (score=1.00)
+  compiled-devstral:
+    description: DSPy-compiled for devstral (score=1.00)
+  compiled-gemma-4-27b:
+    description: DSPy-compiled for gemma-4-27b (score=1.00)

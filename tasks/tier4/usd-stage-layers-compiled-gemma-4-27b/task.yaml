@@ -1,0 +1,36 @@
+id: tier4-usd-stage-layers-compiled-gemma-4-27b
+name: Layer Opinion System (compiled-gemma-4-27b)
+tier: 4
+prompt: "Create a Python script called layer_opinions.py that uses the pxr library\
+  \ to demonstrate USD's layer opinion system. The script must create THREE .usda\
+  \ files and a composed result:\n\n1. base_layer.usda — contains:\n   - Default prim\
+  \ /Scene\n   - /Scene/Character — an Xform with xformOp:translate at (0, 0, 0)\n\
+  \   - /Scene/Character/Body — a Mesh (simple cube)\n\n2. anim_layer.usda — a STRONGER\
+  \ layer that overrides:\n   - /Scene/Character xformOp:translate with time-sampled\
+  \ values: frame 1 at (0,0,0), frame 24 at (5,0,0)\n\n3. look_layer.usda — the STRONGEST\
+  \ layer that adds:\n   - /Scene/Character/Body gets a Material binding to /Scene/Looks/HeroMat\n\
+  \   - /Scene/Looks/HeroMat — a UsdShade.Material with a UsdPreviewSurface shader,\
+  \ diffuseColor (0.9, 0.1, 0.1)\n\n4. The script should print the composed translate\
+  \ value at frame 12 to stdout as verification\n\nLayer stack order (strongest to\
+  \ weakest): look_layer.usda, anim_layer.usda, base_layer.usda\n\nUse: from pxr import\
+  \ Usd, UsdGeom, UsdShade, Sdf, Gf"
+timeout: 300
+skill: usd-stage-layers:compiled-gemma-4-27b
+difficulty: 3
+skill_type: novel
+skill_intensity: heavy
+skill_pair: usd-stage-layers
+tags:
+- python
+- usd
+- pixar
+- layers
+- composition
+scoring:
+  automated:
+  - correctness
+  - completion
+  - efficiency
+  flagged:
+  - quality
+  - instruction_following

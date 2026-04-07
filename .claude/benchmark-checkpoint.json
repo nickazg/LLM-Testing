@@ -1,0 +1,684 @@
+{
+  "compiled": {
+    "usd-composition:qwen3-30b": {
+      "skill": "usd-composition",
+      "model": "qwen3-30b",
+      "status": "skipped",
+      "message": "Already exists: /Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-composition/compiled-qwen3-30b.md"
+    },
+    "houdini-solaris:gemma-4-31b": {
+      "skill": "houdini-solaris",
+      "model": "gemma-4-31b",
+      "status": "skipped",
+      "message": "Already exists: /Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris/compiled-gemma-4-31b.md"
+    },
+    "houdini-solaris:qwen3-30b": {
+      "skill": "houdini-solaris",
+      "model": "qwen3-30b",
+      "status": "skipped",
+      "message": "Already exists: /Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris/compiled-qwen3-30b.md"
+    },
+    "usd-composition:gemma-4-31b": {
+      "skill": "usd-composition",
+      "model": "gemma-4-31b",
+      "status": "skipped",
+      "message": "Already exists: /Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-composition/compiled-gemma-4-31b.md"
+    },
+    "usd-composition:glm-4.7-flash": {
+      "skill": "usd-composition",
+      "model": "glm-4.7-flash",
+      "status": "skipped",
+      "message": "Already exists: /Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-composition/compiled-glm-4.7-flash.md"
+    },
+    "usd-composition:devstral": {
+      "skill": "usd-composition",
+      "model": "devstral",
+      "status": "success",
+      "score": 1.0,
+      "duration_s": 31.4,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-composition/compiled-devstral.md"
+    },
+    "houdini-solaris:glm-4.7-flash": {
+      "skill": "houdini-solaris",
+      "model": "glm-4.7-flash",
+      "status": "skipped",
+      "message": "Already exists: /Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris/compiled-glm-4.7-flash.md"
+    },
+    "houdini-solaris:devstral": {
+      "skill": "houdini-solaris",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 41.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris/compiled-devstral.md"
+    },
+    "houdini-solaris:gemma-4-27b": {
+      "skill": "houdini-solaris",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 45.9,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris/compiled-gemma-4-27b.md"
+    },
+    "usd-composition:gemma-4-27b": {
+      "skill": "usd-composition",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 1.0,
+      "duration_s": 80.4,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-composition/compiled-gemma-4-27b.md"
+    },
+    "usd-render-settings:devstral": {
+      "skill": "usd-render-settings",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 33.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-render-settings/compiled-devstral.md"
+    },
+    "usd-render-settings:gemma-4-31b": {
+      "skill": "usd-render-settings",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 83.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-render-settings/compiled-gemma-4-31b.md"
+    },
+    "usd-render-settings:glm-4.7-flash": {
+      "skill": "usd-render-settings",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 29.6,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-render-settings/compiled-glm-4.7-flash.md"
+    },
+    "usd-render-settings:gemma-4-27b": {
+      "skill": "usd-render-settings",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 98.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-render-settings/compiled-gemma-4-27b.md"
+    },
+    "usd-render-settings:qwen3-30b": {
+      "skill": "usd-render-settings",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 121.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-render-settings/compiled-qwen3-30b.md"
+    },
+    "usd-procedural-animation:gemma-4-27b": {
+      "skill": "usd-procedural-animation",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.5,
+      "duration_s": 79.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-procedural-animation/compiled-gemma-4-27b.md"
+    },
+    "usd-procedural-animation:glm-4.7-flash": {
+      "skill": "usd-procedural-animation",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.5,
+      "duration_s": 1.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-procedural-animation/compiled-glm-4.7-flash.md"
+    },
+    "usd-procedural-animation:gemma-4-31b": {
+      "skill": "usd-procedural-animation",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 85.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-procedural-animation/compiled-gemma-4-31b.md"
+    },
+    "usd-procedural-animation:qwen3-30b": {
+      "skill": "usd-procedural-animation",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 106.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-procedural-animation/compiled-qwen3-30b.md"
+    },
+    "usd-procedural-animation:devstral": {
+      "skill": "usd-procedural-animation",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 79.4,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-procedural-animation/compiled-devstral.md"
+    },
+    "usd-stage-layers:gemma-4-27b": {
+      "skill": "usd-stage-layers",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.96,
+      "duration_s": 71.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-stage-layers/compiled-gemma-4-27b.md"
+    },
+    "usd-stage-layers:devstral": {
+      "skill": "usd-stage-layers",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 81.9,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-stage-layers/compiled-devstral.md"
+    },
+    "usd-stage-layers:gemma-4-31b": {
+      "skill": "usd-stage-layers",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.96,
+      "duration_s": 92.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-stage-layers/compiled-gemma-4-31b.md"
+    },
+    "usd-stage-layers:glm-4.7-flash": {
+      "skill": "usd-stage-layers",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 58.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-stage-layers/compiled-glm-4.7-flash.md"
+    },
+    "usd-shader-graph:gemma-4-31b": {
+      "skill": "usd-shader-graph",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 63.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-shader-graph/compiled-gemma-4-31b.md"
+    },
+    "usd-shader-graph:gemma-4-27b": {
+      "skill": "usd-shader-graph",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 32.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-shader-graph/compiled-gemma-4-27b.md"
+    },
+    "usd-shader-graph:glm-4.7-flash": {
+      "skill": "usd-shader-graph",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 1.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-shader-graph/compiled-glm-4.7-flash.md"
+    },
+    "usd-shader-graph:devstral": {
+      "skill": "usd-shader-graph",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 39.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-shader-graph/compiled-devstral.md"
+    },
+    "usd-shader-graph:qwen3-30b": {
+      "skill": "usd-shader-graph",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 124.4,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-shader-graph/compiled-qwen3-30b.md"
+    },
+    "usd-stage-layers:qwen3-30b": {
+      "skill": "usd-stage-layers",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 237.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-stage-layers/compiled-qwen3-30b.md"
+    },
+    "usd-custom-schema:gemma-4-27b": {
+      "skill": "usd-custom-schema",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 64.6,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-custom-schema/compiled-gemma-4-27b.md"
+    },
+    "usd-custom-schema:devstral": {
+      "skill": "usd-custom-schema",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 42.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-custom-schema/compiled-devstral.md"
+    },
+    "usd-custom-schema:gemma-4-31b": {
+      "skill": "usd-custom-schema",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 95.2,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-custom-schema/compiled-gemma-4-31b.md"
+    },
+    "usd-custom-schema:glm-4.7-flash": {
+      "skill": "usd-custom-schema",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 26.1,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-custom-schema/compiled-glm-4.7-flash.md"
+    },
+    "usd-custom-schema:qwen3-30b": {
+      "skill": "usd-custom-schema",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 160.4,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/usd-custom-schema/compiled-qwen3-30b.md"
+    },
+    "houdini-pdg:qwen3-30b": {
+      "skill": "houdini-pdg",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 71.2,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-pdg/compiled-qwen3-30b.md"
+    },
+    "houdini-pdg:gemma-4-31b": {
+      "skill": "houdini-pdg",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 65.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-pdg/compiled-gemma-4-31b.md"
+    },
+    "houdini-pdg:gemma-4-27b": {
+      "skill": "houdini-pdg",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 58.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-pdg/compiled-gemma-4-27b.md"
+    },
+    "houdini-pdg:devstral": {
+      "skill": "houdini-pdg",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 35.2,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-pdg/compiled-devstral.md"
+    },
+    "houdini-pdg:glm-4.7-flash": {
+      "skill": "houdini-pdg",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 32.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-pdg/compiled-glm-4.7-flash.md"
+    },
+    "houdini-solaris-instancing:qwen3-30b": {
+      "skill": "houdini-solaris-instancing",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 62.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-instancing/compiled-qwen3-30b.md"
+    },
+    "houdini-solaris-instancing:gemma-4-31b": {
+      "skill": "houdini-solaris-instancing",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 73.2,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-instancing/compiled-gemma-4-31b.md"
+    },
+    "houdini-solaris-instancing:devstral": {
+      "skill": "houdini-solaris-instancing",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 59.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-instancing/compiled-devstral.md"
+    },
+    "houdini-solaris-instancing:glm-4.7-flash": {
+      "skill": "houdini-solaris-instancing",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 33.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-instancing/compiled-glm-4.7-flash.md"
+    },
+    "houdini-solaris-instancing:gemma-4-27b": {
+      "skill": "houdini-solaris-instancing",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 95.3,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-instancing/compiled-gemma-4-27b.md"
+    },
+    "houdini-solaris-render:devstral": {
+      "skill": "houdini-solaris-render",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 49.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-render/compiled-devstral.md"
+    },
+    "houdini-solaris-render:qwen3-30b": {
+      "skill": "houdini-solaris-render",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.68,
+      "duration_s": 83.1,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-render/compiled-qwen3-30b.md"
+    },
+    "houdini-solaris-render:gemma-4-27b": {
+      "skill": "houdini-solaris-render",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 70.5,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-render/compiled-gemma-4-27b.md"
+    },
+    "houdini-solaris-render:gemma-4-31b": {
+      "skill": "houdini-solaris-render",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.92,
+      "duration_s": 110.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-render/compiled-gemma-4-31b.md"
+    },
+    "houdini-solaris-render:glm-4.7-flash": {
+      "skill": "houdini-solaris-render",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.88,
+      "duration_s": 57.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-render/compiled-glm-4.7-flash.md"
+    },
+    "houdini-solaris-light-linking:gemma-4-27b": {
+      "skill": "houdini-solaris-light-linking",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 29.4,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-light-linking/compiled-gemma-4-27b.md"
+    },
+    "houdini-solaris-light-linking:qwen3-30b": {
+      "skill": "houdini-solaris-light-linking",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 64.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-light-linking/compiled-qwen3-30b.md"
+    },
+    "houdini-solaris-light-linking:glm-4.7-flash": {
+      "skill": "houdini-solaris-light-linking",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 1.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-light-linking/compiled-glm-4.7-flash.md"
+    },
+    "houdini-solaris-light-linking:devstral": {
+      "skill": "houdini-solaris-light-linking",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.84,
+      "duration_s": 30.2,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-light-linking/compiled-devstral.md"
+    },
+    "houdini-solaris-light-linking:gemma-4-31b": {
+      "skill": "houdini-solaris-light-linking",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 111.6,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/houdini-solaris-light-linking/compiled-gemma-4-31b.md"
+    },
+    "lru-cache-pattern:gemma-4-31b": {
+      "skill": "lru-cache-pattern",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 111.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/lru-cache-pattern/compiled-gemma-4-31b.md"
+    },
+    "lru-cache-pattern:gemma-4-27b": {
+      "skill": "lru-cache-pattern",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.5,
+      "duration_s": 126.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/lru-cache-pattern/compiled-gemma-4-27b.md"
+    },
+    "lru-cache-pattern:devstral": {
+      "skill": "lru-cache-pattern",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 89.5,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/lru-cache-pattern/compiled-devstral.md"
+    },
+    "lru-cache-pattern:glm-4.7-flash": {
+      "skill": "lru-cache-pattern",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 33.9,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/lru-cache-pattern/compiled-glm-4.7-flash.md"
+    },
+    "lru-cache-pattern:qwen3-30b": {
+      "skill": "lru-cache-pattern",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.8,
+      "duration_s": 210.6,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/lru-cache-pattern/compiled-qwen3-30b.md"
+    },
+    "recursive-descent-parser:gemma-4-31b": {
+      "skill": "recursive-descent-parser",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 120.5,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/recursive-descent-parser/compiled-gemma-4-31b.md"
+    },
+    "recursive-descent-parser:glm-4.7-flash": {
+      "skill": "recursive-descent-parser",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 1.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/recursive-descent-parser/compiled-glm-4.7-flash.md"
+    },
+    "recursive-descent-parser:devstral": {
+      "skill": "recursive-descent-parser",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 129.6,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/recursive-descent-parser/compiled-devstral.md"
+    },
+    "git-hook-context-heavy:qwen3-30b": {
+      "skill": "git-hook-context-heavy",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 90.9,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/git-hook-context-heavy/compiled-qwen3-30b.md"
+    },
+    "git-hook-context-heavy:gemma-4-27b": {
+      "skill": "git-hook-context-heavy",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 1.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/git-hook-context-heavy/compiled-gemma-4-27b.md"
+    },
+    "git-hook-context-heavy:devstral": {
+      "skill": "git-hook-context-heavy",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 1.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/git-hook-context-heavy/compiled-devstral.md"
+    },
+    "git-hook-context-heavy:glm-4.7-flash": {
+      "skill": "git-hook-context-heavy",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 1.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/git-hook-context-heavy/compiled-glm-4.7-flash.md"
+    },
+    "git-hook-context-heavy:gemma-4-31b": {
+      "skill": "git-hook-context-heavy",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 22.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/git-hook-context-heavy/compiled-gemma-4-31b.md"
+    },
+    "recursive-descent-parser:qwen3-30b": {
+      "skill": "recursive-descent-parser",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 254.8,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/recursive-descent-parser/compiled-qwen3-30b.md"
+    },
+    "service-generator-context-heavy:gemma-4-31b": {
+      "skill": "service-generator-context-heavy",
+      "model": "gemma-4-31b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 80.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/service-generator-context-heavy/compiled-gemma-4-31b.md"
+    },
+    "service-generator-context-heavy:devstral": {
+      "skill": "service-generator-context-heavy",
+      "model": "devstral",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 2.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/service-generator-context-heavy/compiled-devstral.md"
+    },
+    "service-generator-context-heavy:glm-4.7-flash": {
+      "skill": "service-generator-context-heavy",
+      "model": "glm-4.7-flash",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 1.7,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/service-generator-context-heavy/compiled-glm-4.7-flash.md"
+    },
+    "service-generator-context-heavy:gemma-4-27b": {
+      "skill": "service-generator-context-heavy",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 50.6,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/service-generator-context-heavy/compiled-gemma-4-27b.md"
+    },
+    "service-generator-context-heavy:qwen3-30b": {
+      "skill": "service-generator-context-heavy",
+      "model": "qwen3-30b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 101.0,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/service-generator-context-heavy/compiled-qwen3-30b.md"
+    },
+    "recursive-descent-parser:gemma-4-27b": {
+      "skill": "recursive-descent-parser",
+      "model": "gemma-4-27b",
+      "status": "success",
+      "score": 0.6,
+      "duration_s": 2.2,
+      "output": "/Users/nickgrobler/Projects/Development/LLM-Testing/skills/recursive-descent-parser/compiled-gemma-4-27b.md"
+    }
+  },
+  "tasks_created": [
+    "task:usd-shot-assembly-compiled-qwen3-30b",
+    "task:usd-shot-assembly-compiled-gemma-4-31b",
+    "task:usd-shot-assembly-compiled-gemma-4-27b",
+    "task:usd-shot-assembly-compiled-devstral",
+    "task:usd-shot-assembly-compiled-glm-4.7-flash",
+    "task:houdini-solaris-compiled-qwen3-30b",
+    "task:houdini-solaris-compiled-gemma-4-31b",
+    "task:houdini-solaris-compiled-gemma-4-27b",
+    "task:houdini-solaris-compiled-devstral",
+    "task:houdini-solaris-compiled-glm-4.7-flash",
+    "task:usd-render-settings-compiled-qwen3-30b",
+    "task:usd-render-settings-compiled-gemma-4-31b",
+    "task:usd-render-settings-compiled-gemma-4-27b",
+    "task:usd-render-settings-compiled-devstral",
+    "task:usd-render-settings-compiled-glm-4.7-flash",
+    "task:usd-procedural-animation-compiled-qwen3-30b",
+    "task:usd-procedural-animation-compiled-gemma-4-31b",
+    "task:usd-procedural-animation-compiled-gemma-4-27b",
+    "task:usd-procedural-animation-compiled-devstral",
+    "task:usd-procedural-animation-compiled-glm-4.7-flash",
+    "task:usd-stage-layers-compiled-qwen3-30b",
+    "task:usd-stage-layers-compiled-gemma-4-31b",
+    "task:usd-stage-layers-compiled-gemma-4-27b",
+    "task:usd-stage-layers-compiled-devstral",
+    "task:usd-stage-layers-compiled-glm-4.7-flash",
+    "task:usd-shader-graph-compiled-qwen3-30b",
+    "task:usd-shader-graph-compiled-gemma-4-31b",
+    "task:usd-shader-graph-compiled-gemma-4-27b",
+    "task:usd-shader-graph-compiled-devstral",
+    "task:usd-shader-graph-compiled-glm-4.7-flash",
+    "task:usd-custom-schema-compiled-qwen3-30b",
+    "task:usd-custom-schema-compiled-gemma-4-31b",
+    "task:usd-custom-schema-compiled-gemma-4-27b",
+    "task:usd-custom-schema-compiled-devstral",
+    "task:usd-custom-schema-compiled-glm-4.7-flash",
+    "task:houdini-pdg-compiled-qwen3-30b",
+    "task:houdini-pdg-compiled-gemma-4-31b",
+    "task:houdini-pdg-compiled-gemma-4-27b",
+    "task:houdini-pdg-compiled-devstral",
+    "task:houdini-pdg-compiled-glm-4.7-flash",
+    "task:houdini-solaris-instancing-compiled-qwen3-30b",
+    "task:houdini-solaris-instancing-compiled-gemma-4-31b",
+    "task:houdini-solaris-instancing-compiled-gemma-4-27b",
+    "task:houdini-solaris-instancing-compiled-devstral",
+    "task:houdini-solaris-instancing-compiled-glm-4.7-flash",
+    "task:houdini-solaris-render-compiled-qwen3-30b",
+    "task:houdini-solaris-render-compiled-gemma-4-31b",
+    "task:houdini-solaris-render-compiled-gemma-4-27b",
+    "task:houdini-solaris-render-compiled-devstral",
+    "task:houdini-solaris-render-compiled-glm-4.7-flash",
+    "task:houdini-solaris-light-linking-compiled-qwen3-30b",
+    "task:houdini-solaris-light-linking-compiled-gemma-4-31b",
+    "task:houdini-solaris-light-linking-compiled-gemma-4-27b",
+    "task:houdini-solaris-light-linking-compiled-devstral",
+    "task:houdini-solaris-light-linking-compiled-glm-4.7-flash",
+    "task:lru-cache-compiled-qwen3-30b",
+    "task:lru-cache-compiled-gemma-4-31b",
+    "task:lru-cache-compiled-gemma-4-27b",
+    "task:lru-cache-compiled-devstral",
+    "task:lru-cache-compiled-glm-4.7-flash",
+    "task:expression-parser-compiled-qwen3-30b",
+    "task:expression-parser-compiled-gemma-4-31b",
+    "task:expression-parser-compiled-devstral",
+    "task:expression-parser-compiled-glm-4.7-flash",
+    "task:git-hook-compiled-qwen3-30b",
+    "task:git-hook-compiled-gemma-4-31b",
+    "task:git-hook-compiled-gemma-4-27b",
+    "task:git-hook-compiled-devstral",
+    "task:git-hook-compiled-glm-4.7-flash",
+    "task:service-generator-compiled-qwen3-30b",
+    "task:service-generator-compiled-gemma-4-31b",
+    "task:service-generator-compiled-gemma-4-27b",
+    "task:service-generator-compiled-devstral",
+    "task:service-generator-compiled-glm-4.7-flash",
+    "task:expression-parser-compiled-gemma-4-27b"
+  ],
+  "run_complete": false,
+  "run_combos_done": [
+    "devstral:claude-code",
+    "gemma-4-27b:claude-code",
+    "gpt-oss-120b:claude-code",
+    "gpt-oss-20b:claude-code",
+    "glm-4.7-flash:claude-code",
+    "minimax-m2.7:claude-code",
+    "opus4.6:claude-code",
+    "opus4.6:kilo",
+    "gpt-5.4:claude-code",
+    "gpt-5.4:kilo",
+    "gemini-3.1-pro:claude-code",
+    "gemini-3.1-pro:kilo"
+  ]
+}

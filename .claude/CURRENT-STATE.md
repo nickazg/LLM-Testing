@@ -1,46 +1,49 @@
 # Current State
 
 ## Project Direction
-Automated LLM benchmarking framework comparing coding performance across CLI interfaces (Claude Code, Kilo CLI) with free/cheap models via OpenRouter. Core experiment: measuring skill uplift delta per model, now with a three-category skill taxonomy to isolate different types of uplift.
+Automated LLM benchmarking framework measuring coding performance across CLI interfaces (Claude Code, Kilo), with a three-category skill taxonomy to isolate different types of skill uplift. Core experiment: does structured knowledge close the gap between budget and frontier models?
 
 ## Current Phase
-Skill taxonomy expansion complete. 68 tasks across 3 skill categories (novel/workflow/context) x 2 intensities (heavy/light). Ready for benchmark runs with new matrix.
+Phase 3 benchmark complete. 1,607 results across 13 models, 2 CLIs, 68 tasks. Full analysis report written.
 
 ## What's Built
-- Python package `llm-bench` with `run`, `dashboard`, `info`, and `compile-skill` subcommands
+- Python package `llm-bench` with `run`, `dashboard`, `info`, `compile-skill` subcommands
 - 3 CLI adapters (Claude Code, Open Code, Kilo) with async subprocess execution
-- **68 benchmark tasks** across 4 tiers (was 33):
-  - 23 baselines (T1-T3): 2 trivial, 6 multi-file, 15 domain-specific
-  - 45 skill variants (T4): classified by type and intensity
-- **Skill taxonomy** with 3 categories:
-  - **Novel Knowledge** — genuinely new info (VFX APIs: USD, Houdini Solaris, PDG)
-  - **Workflow/Process** — structured guidance on known tech (LRU cache, expression parser)
-  - **Domain Context** — org-specific conventions on known tech (git hooks, systemd services)
-- Each category has **heavy** (full reference/recipe) and **light** (guardrails/key patterns) intensity variants
-- New task.yaml fields: `difficulty`, `skill_type`, `skill_intensity`, `skill_pair`
-- CLI filtering: `--skill-types novel,workflow` and `--difficulties 1,2,3`
-- Dashboard: skill type/intensity filters, uplift-by-type breakdown table
-- 26 skills total (was 4): 18 novel (heavy+light for 9 VFX tasks), 4 workflow, 4 context
-- DSPy skill compiler with proxy + live metrics (15+ compiled variants carry over)
+- **68 benchmark tasks** across 4 tiers
+- **Three-category skill taxonomy**: Novel Knowledge, Workflow/Process, Domain Context
+- **Heavy/light intensity** variants per skill type
+- **75 DSPy-compiled skill variants** (15 skills × 5 target models)
+- Parallel benchmark orchestrator (`scripts/full_benchmark.py`) with checkpointing
+- Z.ai direct on both CC and Kilo (via custom provider in ~/.config/kilo/kilo.jsonc)
+- FastAPI dashboard with skill type/intensity filters and uplift-by-type breakdown
 - 75 unit tests passing
-- 478 Phase 2 results + 268 archived Phase 1 results = 746 total
 
-## Skill Taxonomy
-| Category | What it measures | Tasks |
-|----------|-----------------|-------|
-| Novel Knowledge | Can the model learn from genuinely new API info? | 11 VFX tasks (USD render/skel/layers/shaders/metadata, Houdini solaris/PDG/instancing/render/lighting) |
-| Workflow/Process | Does structured guidance improve execution of known tasks? | 2 tasks (LRU cache, expression parser) |
-| Domain Context | Can the model apply org-specific rules it couldn't know? | 2 tasks (git hooks, systemd services) |
+## Phase 3 Key Findings (1,607 runs)
 
-Model-relative category shift tracked as secondary dimension (same skill = Novel for budget models, Workflow for frontier).
+### Model Rankings
+1. GLM-5: 87% (best budget model by far)
+2. glm-4.5-air-free: 72% (best free option)
+3. qwen3-30b: 67% (solid all-rounder)
+4. devstral: 22% (but 67% without skills — catastrophic skill interference)
+5. gemma-4-31b: 23% (timeout-dominated, knows answers but too slow)
+6. Everything else: <12%
 
-## Key Findings — Phase 2 (Pre-taxonomy)
-- CLI Environment determines skill effect direction (CC positive, Kilo negative)
-- Capability threshold theory confirmed
-- Previous findings remain valid but were conflating different uplift types
+### Skill Taxonomy Findings
+- Skills only help models above capability threshold (~65%+ baseline)
+- Novel skills: marginal uplift for strong models on genuinely unknown APIs
+- Workflow light > workflow heavy (concise reminders beat prescriptive recipes)
+- Context heavy > context light (more detail = better compliance)
+- DSPy compilation: negligible effect overall, occasionally helps on specific weak spots
+
+### Critical Discoveries
+- Devstral: 0% on ALL 136 skill-variant runs (fundamental context integration failure)
+- Scores are binary (1.0 or 0.0) — no partial understanding
+- Import errors dominate weak model failures (CLI integration, not coding capability)
+- Kilo outperforms CC for most budget models (leaner protocol = less overhead)
+- Online benchmarks don't predict CLI performance
 
 ## What's Next
-1. Run new taxonomy benchmark matrix to isolate uplift per skill type
-2. Compare light vs heavy intensity — does the uplift come from alignment or being given the answer?
-3. Multi-run statistical validation (5x per key configuration)
-4. Investigate Novel vs Workflow vs Context uplift curves per model capability level
+1. Investigate devstral's context integration failure — is it the skill injection path or the model?
+2. Extended timeout experiments for gemma-4-31b (600s+)
+3. Multi-run statistical validation for top 3 models
+4. Production skill recommendations based on type/intensity findings
