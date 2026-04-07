@@ -205,9 +205,10 @@ Online benchmarks (MMLU, HumanEval, etc.) test models in isolation with direct p
 
 1. **CLI scaffolding overhead**: The model must understand and operate within Claude Code or Kilo's tool-use framework (file read/write/execute tools). This consumes context and requires understanding JSON tool schemas.
 2. **OpenRouter routing**: Adds latency and sometimes truncates or transforms the prompt.
-3. **Timeout pressure**: At 300s per task, slow models (gemma-4-31b avg 223s) hit timeouts on complex tasks even when they "know" the answer.
-4. **Skill document injection**: Extra context in the workspace that some models can't effectively integrate.
-5. **VFX domain specificity**: Most online benchmarks test general coding. Our T3/T4 tasks test niche USD/Houdini APIs that may not be in gemma's training data at all.
+3. **Skill document injection**: Extra context in the workspace that some models can't effectively integrate.
+4. **VFX domain specificity**: Most online benchmarks test general coding. Our T3/T4 tasks test niche USD/Houdini APIs that may not be in gemma's training data at all.
+
+Note: gemma-4-31b achieves **43%** when timeouts are excluded (38 of 66 runs timed out). The model possesses the knowledge but is bottlenecked by inference speed through OpenRouter. With direct API access or extended timeouts, its true capability would likely be substantially higher.
 
 **The benchmark measures "can this model do real work through a CLI tool?" — not "can this model answer coding questions?"**
 

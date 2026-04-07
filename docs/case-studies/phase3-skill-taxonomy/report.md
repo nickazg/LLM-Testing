@@ -1,4 +1,4 @@
-# Skill Taxonomy and Capability Thresholds in CLI-Mediated LLM Code Generation: A 1,607-Run Benchmark Study
+# Skill Taxonomy and Capability Thresholds in CLI-Mediated LLM Code Generation: A 1,444-Run Benchmark Study
 
 **Authors:** Nick Grobler & Claude Code
 **Date:** April 2026
@@ -8,7 +8,7 @@
 
 ## Abstract
 
-Large language models are increasingly used for code generation through CLI scaffolding tools such as Claude Code and Kilo, yet existing benchmarks evaluate models via direct prompting, ignoring the overhead and failure modes introduced by these intermediary tools. We present a 1,607-run benchmark across 13 models, 2 CLIs, and 68 task definitions that introduces a three-dimensional skill taxonomy (novel knowledge, workflow/process, domain context) with two intensity levels (heavy, light) to measure structured knowledge uplift. Our principal finding is that a capability threshold exists at approximately 65% baseline pass rate, below which skill injection provides zero or negative benefit -- most dramatically illustrated by Devstral's complete 0% pass rate across all 136 skill-augmented runs despite a 67% no-skill baseline. We further show that CLI choice is a confounding variable that shifts model rankings by up to 38 percentage points, and that DSPy-compiled skills improve precision for capable models but cannot rescue models below the threshold.
+Large language models are increasingly used for code generation through CLI scaffolding tools such as Claude Code and Kilo, yet existing benchmarks evaluate models via direct prompting, ignoring the overhead and failure modes introduced by these intermediary tools. We present a 1,444-run benchmark (163 timeouts excluded from a 1,607-run corpus) across 13 models, 2 CLIs, and 68 task definitions that introduces a three-dimensional skill taxonomy (novel knowledge, workflow/process, domain context) with two intensity levels (heavy, light) to measure structured knowledge uplift. Our principal finding is that a capability threshold exists at approximately 65% baseline pass rate, below which skill injection provides zero or negative benefit -- most dramatically illustrated by Devstral's complete 0% pass rate across all 136 skill-augmented runs despite a 67% no-skill baseline. We further show that CLI choice is a confounding variable that shifts model rankings by up to 93 percentage points, and that DSPy-compiled skills improve precision for capable models but cannot rescue models below the threshold.
 
 ---
 
@@ -161,12 +161,12 @@ For transparency, raw counts including timeouts are noted where the exclusion ma
 | opus4.6 | 3 | **100%** | 100% | 100% | 0 | Frontier |
 | gemini-3.1-pro | 2 | **100%** | 100% | 100% | 0 | Frontier |
 | GLM-5 | 218 | **87%** | 90% | 84% | 2 | Upper-mid |
-| glm-4.5-air-free | 96 | **78%** | 69% | 82% | 19 | Mid |
-| qwen3-30b | 166 | **69%** | 66% | 71% | 5 | Budget |
+| glm-4.5-air-free | 96 | **78%** | 76% | 79% | 19 | Mid |
+| qwen3-30b | 166 | **69%** | 69% | 69% | 5 | Budget |
 | gpt-5.4 | 2 | **50%** | 0% | 100% | 0 | Frontier |
-| gemma-4-31b | 28 | **43%** | 33% | 50% | 38 | Budget |
-| devstral | 166 | **24%** | 14% | 55% | 21 | Budget |
-| gemma-4-27b | 152 | **12%** | 7% | 34% | 22 | Budget |
+| gemma-4-31b | 28 | **43%** | 25% | 67% | 38 | Budget |
+| devstral | 166 | **24%** | 13% | 96% | 21 | Budget |
+| gemma-4-27b | 152 | **12%** | 7% | 100% | 22 | Budget |
 | glm-4.7-flash | 154 | **3%** | 2% | 11% | 18 | Budget |
 | minimax-m2.7 | 151 | **3%** | 1% | 25% | 0 | Budget |
 | gpt-oss-20b | 153 | **3%** | 1% | 7% | 19 | Budget |
@@ -174,7 +174,7 @@ For transparency, raw counts including timeouts are noted where the exclusion ma
 
 > **Note on gemma-4-31b:** This model's raw pass rate of 23% (including timeouts) is misleading. With 38 timeouts excluded, it achieves 43% — nearly doubling. The model averages 223s per non-timeout run, indicating it possesses the knowledge to solve tasks but is bottlenecked by inference speed through the OpenRouter pipeline. With extended timeouts or direct API access, its true capability would likely be substantially higher.
 
-The score distribution across all 1,607 runs is starkly bimodal: **483 runs scored 1.0** (full pass), **45 runs achieved partial scores** (between 0.0 and 1.0 exclusive), and **1,079 runs scored 0.0** (complete failure). This near-binary distribution validates the pass/fail framing and suggests that partial competence is rare -- models either solve a task completely or fail entirely.
+The score distribution across all 1,444 non-timeout runs is starkly bimodal: **401 runs scored 1.0** (full pass), **86 runs achieved partial scores** (between 0.0 and 1.0 exclusive), and **957 runs scored 0.0** (complete failure). This near-binary distribution validates the pass/fail framing and suggests that partial competence is rare -- models either solve a task completely or fail entirely.
 
 > **Key finding:** The bottom four models (glm-4.7-flash, minimax-m2.7, gpt-oss-20b, gpt-oss-120b) collectively achieve 2-3% pass rates, indicating fundamental inability to operate through CLI scaffolding regardless of task difficulty or skill injection.
 
@@ -196,7 +196,7 @@ Aggregated across all models that received skill-augmented tasks (timeouts exclu
 
 ### 3.3 Per-Model Skill Uplift
 
-#### GLM-5 (87% overall, N=220)
+#### GLM-5 (87% overall, N=218)
 
 GLM-5 is the only budget-accessible model that consistently benefits from skills.
 
@@ -212,7 +212,7 @@ GLM-5 is the only budget-accessible model that consistently benefits from skills
 
 GLM-5 shows modest but consistent uplift across all skill types, with the largest gains from context/heavy (+6pp) and workflow/light (+5pp). This aligns with the hypothesis that capable models benefit from structured guidance but are not dependent on it.
 
-#### qwen3-30b (67% overall, N=171)
+#### qwen3-30b (69% overall, N=166)
 
 | Configuration | Pass Rate | Delta vs Baseline |
 |---|---|---|
@@ -224,7 +224,7 @@ GLM-5 shows modest but consistent uplift across all skill types, with the larges
 
 qwen3-30b sits near the capability threshold. It benefits from workflow and context skills but is harmed by novel knowledge injection, particularly for VFX tasks where the injected API references introduce unfamiliar patterns that compete with the model's existing (incorrect) priors.
 
-#### Devstral (22% overall, N=187)
+#### Devstral (24% overall, N=166)
 
 | Configuration | Pass Rate | Delta vs Baseline |
 |---|---|---|
@@ -261,33 +261,37 @@ For qwen3-30b, DSPy compilation shows a dramatic improvement on expression-parse
 
 | Model | CC Pass Rate | Kilo Pass Rate | Delta (Kilo - CC) |
 |---|---|---|---|
-| GLM-5 | 90% | 84% | **-6pp (CC wins)** |
-| glm-4.5-air-free | 67% | 75% | **+8pp (Kilo wins)** |
-| qwen3-30b | 64% | 69% | **+5pp (Kilo wins)** |
-| devstral | ~3% | ~41% | **+38pp (Kilo wins)** |
-| gemma-4-27b | ~0% | ~26% | **+26pp (Kilo wins)** |
+| GLM-5 | 90% | 84% | **-5pp (CC wins)** |
+| glm-4.5-air-free | 76% | 79% | **+3pp (Kilo wins)** |
+| qwen3-30b | 69% | 69% | **0pp (even)** |
+| gemma-4-31b | 25% | 67% | **+42pp (Kilo wins)** |
+| devstral | 13% | 96% | **+83pp (Kilo wins)** |
+| gemma-4-27b | 7% | 100% | **+93pp (Kilo wins)** |
 
-> **Key finding:** Kilo outperforms Claude Code for the majority of budget models. The effect is most dramatic for devstral (+38pp) and gemma-4-27b (+26pp). Only GLM-5 performs meaningfully better on Claude Code (+6pp). This corroborates Phase 2's finding that CLI choice is a dominant variable, and extends it by quantifying the magnitude: for budget models, the CLI can matter more than the model itself.
+> **Key finding:** Kilo outperforms Claude Code for the majority of budget models. The effect is most dramatic for gemma-4-27b (+93pp) and devstral (+83pp). Only GLM-5 performs meaningfully better on Claude Code (-5pp). This corroborates Phase 2's finding that CLI choice is a dominant variable, and extends it by quantifying the magnitude: for budget models, the CLI can matter more than the model itself.
 
 The pattern suggests that Claude Code's heavier system prompt and tool-use protocol disproportionately burden models with smaller effective context windows or weaker instruction-following capabilities. Kilo's leaner protocol leaves more capacity for the actual task.
 
 ### 3.6 Failure Mode Analysis
 
-| Model | Primary Failure Mode | % of Failures | Details |
-|---|---|---|---|
-| gpt-oss-20b | No files created | >85% | Import/module errors prevent any file output |
-| gpt-oss-120b | No files created | >85% | Same failure pattern as 20B variant |
-| minimax-m2.7 | No files created | >85% | Cannot execute tool-use protocol |
-| gemma-4-27b | Import errors | **86%** | Generates code with unavailable imports |
-| gemma-4-31b | Timeouts | **94%** | Avg 223s/run; 48 of 51 failures are timeouts |
-| devstral | Context interference | **100% on T4** | 67% T3 baseline, 0% on ALL 136 skill runs |
-| glm-4.7-flash | No files created | >90% | Fundamental tool-use incompatibility |
+| Model | Total Failures | No Files Created | Wrong Output | Details |
+|---|---|---|---|---|
+| glm-4.7-flash | 150 | 132 | 18 | Fundamental tool-use incompatibility |
+| gpt-oss-20b | 149 | 130 | 19 | Import/module errors prevent any file output |
+| gpt-oss-120b | 149 | 131 | 18 | Same failure pattern as 20B variant |
+| minimax-m2.7 | 147 | 130 | 17 | Cannot execute tool-use protocol |
+| gemma-4-27b | 133 | 122 | 11 | Generates code with unavailable imports |
+| devstral | 126 | 118 | 8 | 67% T3 baseline, 0% on ALL 136 skill runs |
+| qwen3-30b | 52 | 14 | 38 | Wrong output dominates over missing files |
+| GLM-5 | 29 | 0 | 29 | Always creates files; failures are wrong output |
+| glm-4.5-air-free | 21 | 3 | 18 | Mostly wrong output, rarely missing files |
+| gemma-4-31b | 16 | 3 | 13 | Wrong output; achieves 43% when timeouts excluded |
 
 The failure modes cluster into three distinct categories:
 
 1. **Tool-use incompetence** (gpt-oss, minimax, glm-4.7-flash): These models cannot reliably execute the file-creation tool-use protocol required by CLI scaffolding. They often produce conversational responses or malformed tool calls instead of writing files. Over 85% of their failures result in zero files being created in the workspace.
 
-2. **Resource exhaustion** (gemma-4-31b): This model can engage with the CLI protocol but runs extremely slowly, averaging 223 seconds per run. 48 of its 51 failures (94%) are timeouts rather than incorrect code. The model may be capable but is practically unusable due to latency, likely compounded by OpenRouter routing overhead.
+2. **Wrong output** (GLM-5, glm-4.5-air-free, qwen3-30b, gemma-4-31b): These models successfully engage with the CLI protocol and create files, but produce incorrect implementations. Notably, GLM-5 has zero "no files" failures -- all 29 of its failures are wrong output, indicating robust tool-use competence even when correctness falls short. gemma-4-31b achieves 43% when timeouts are excluded (38 of 66 runs timed out), suggesting the model possesses genuine capability but is bottlenecked by inference speed through OpenRouter.
 
 3. **Context interference** (devstral): A unique failure mode discussed in detail in Section 4.2. The model functions when given only a task prompt but catastrophically fails when any additional context document is present in the workspace.
 
@@ -297,7 +301,7 @@ The failure modes cluster into three distinct categories:
 
 ### 4.1 The Capability Threshold
 
-The data reveals a clear capability threshold at approximately **65% baseline pass rate** (measured on Tier 3 tasks without skill injection). Models above this threshold (GLM-5 at 87%, glm-4.5-air-free at 72%, qwen3-30b at 67%) show neutral to positive skill uplift. Models below this threshold (devstral at 67% T3 but with catastrophic context sensitivity, gemma-4-31b at 23%, gemma-4-27b at 11%) show zero or negative skill uplift.
+The data reveals a clear capability threshold at approximately **65% baseline pass rate** (measured on Tier 3 tasks without skill injection). Models above this threshold (GLM-5 at 87%, glm-4.5-air-free at 78%, qwen3-30b at 69%) show neutral to positive skill uplift. Models below this threshold (devstral at 67% T3 but with catastrophic context sensitivity, gemma-4-31b at 43%, gemma-4-27b at 12%) show zero or negative skill uplift. Notably, gemma-4-31b at 43% (timeout-excluded) sits well above the bottom-tier models, suggesting it is approaching the threshold but has not yet crossed it.
 
 This threshold is not about raw coding ability. gemma-4-27b and gemma-4-31b score competitively on standard coding benchmarks. The threshold is about **CLI tool-use competence** -- the ability to:
 
@@ -305,7 +309,6 @@ This threshold is not about raw coding ability. gemma-4-27b and gemma-4-31b scor
 2. Execute file-creation tool calls correctly
 3. Manage context window capacity with scaffolding overhead
 4. Prioritize task instructions over auxiliary context documents
-5. Complete execution within timeout constraints
 
 Skill injection increases context window load. For models already struggling with the baseline scaffolding overhead, additional context does not help -- it makes the struggle worse.
 
@@ -327,9 +330,9 @@ Whatever the mechanism, the practical implication is clear: **devstral should no
 
 Several models in this study illustrate the disconnect between standard benchmark scores and CLI-mediated performance:
 
-- **gemma-4-31b** scores competitively on HumanEval and MMLU but achieves only 23% in our benchmark, with 94% of failures being timeouts (average 223s/run). The model may produce correct code given unlimited time, but CLI workflows impose practical time constraints that standard benchmarks do not.
-- **gemma-4-27b** achieves 11% pass rate, with 86% of failures being import errors -- the model generates code referencing libraries not available in the execution environment. Standard benchmarks typically test in unconstrained environments with all packages available.
-- **gpt-oss-120b** at 120B parameters achieves only 2% pass rate. Parameter count does not predict CLI competence; the tool-use protocol is a separate capability axis.
+- **gemma-4-31b** scores competitively on HumanEval and MMLU and achieves 43% when timeouts are excluded (38 of 66 runs timed out), suggesting the model possesses the knowledge but is bottlenecked by inference speed through OpenRouter. The timeout-excluded rate reveals genuine capability that raw numbers (23% including timeouts) obscure.
+- **gemma-4-27b** achieves 12% pass rate, with the vast majority of failures being import errors -- the model generates code referencing libraries not available in the execution environment. Standard benchmarks typically test in unconstrained environments with all packages available.
+- **gpt-oss-120b** at 120B parameters achieves only 3% pass rate. Parameter count does not predict CLI competence; the tool-use protocol is a separate capability axis.
 
 The gap exists because CLI scaffolding introduces overheads that standard benchmarks do not measure:
 
@@ -354,14 +357,15 @@ The taxonomy results, when disaggregated by model capability, reveal actionable 
 
 The CLI comparison results reinforce and extend Phase 2's finding that CLI choice is a dominant performance variable. The magnitude of CLI effect for budget models is remarkable:
 
-- Devstral: +38pp on Kilo vs Claude Code
-- gemma-4-27b: +26pp on Kilo vs Claude Code
-- qwen3-30b: +5pp on Kilo vs Claude Code
-- glm-4.5-air-free: +8pp on Kilo vs Claude Code
+- gemma-4-27b: +93pp on Kilo vs Claude Code
+- Devstral: +83pp on Kilo vs Claude Code
+- gemma-4-31b: +42pp on Kilo vs Claude Code
+- glm-4.5-air-free: +3pp on Kilo vs Claude Code
+- qwen3-30b: 0pp (even across CLIs)
 
-Only GLM-5 reverses this pattern, performing 6pp better on Claude Code. GLM-5's larger effective context window and stronger instruction-following may allow it to benefit from Claude Code's richer system prompt rather than being burdened by it.
+Only GLM-5 reverses this pattern, performing 5pp better on Claude Code. GLM-5's larger effective context window and stronger instruction-following may allow it to benefit from Claude Code's richer system prompt rather than being burdened by it.
 
-The practical implication is that **the "best model" depends on which CLI it runs through.** A model evaluation conducted exclusively on Claude Code would rank qwen3-30b at 64%; the same model on Kilo achieves 69%. For devstral, the difference is between near-zero and moderate functionality. Any model recommendation must specify the CLI context.
+The practical implication is that **the "best model" depends on which CLI it runs through.** A model evaluation conducted exclusively on Claude Code would rank devstral at 13%; the same model on Kilo achieves 96%. For gemma-4-27b, the difference is between 7% and 100%. Any model recommendation must specify the CLI context.
 
 ### 4.6 Threats to Validity
 
@@ -393,7 +397,7 @@ This study makes four principal contributions to the understanding of LLM-assist
 
 3. **Context integration failure mode.** We document devstral's catastrophic 0% pass rate on 136 skill-augmented runs despite a 67% no-skill baseline, establishing "context interference" as a distinct failure mode in CLI-mediated code generation that is invisible to standard benchmarks.
 
-4. **CLI as confounding variable.** We quantify CLI-dependent performance swings of up to 38 percentage points for the same model, demonstrating that model evaluations are incomplete without specifying the CLI context.
+4. **CLI as confounding variable.** We quantify CLI-dependent performance swings of up to 93 percentage points for the same model, demonstrating that model evaluations are incomplete without specifying the CLI context.
 
 ### 5.2 Implications for Practitioners
 
@@ -420,28 +424,30 @@ Several directions emerge from this study:
 
 ### A.1 Model x Task Pass/Fail Matrix (Selected Tasks)
 
+*Timeouts excluded from this matrix. Only runs that completed within the timeout window are shown. gemma-4-31b had 38 of 66 total runs excluded as timeouts.*
+
 | Task | GLM-5 | qwen3-30b | devstral | gemma-4-31b | gemma-4-27b |
 |---|---|---|---|---|---|
 | **T1: hello-world** | PASS | PASS | PASS | PASS | FAIL |
 | **T1: fizzbuzz** | PASS | PASS | PASS | PASS | FAIL |
-| **T2: makefile** | PASS | PASS | PASS | TIMEOUT | FAIL |
-| **T2: csv-pipeline** | PASS | PASS | PASS | TIMEOUT | FAIL |
-| **T2: cli-tool** | PASS | PASS | PASS | TIMEOUT | FAIL |
-| **T2: usd-scene** | PASS | FAIL | FAIL | TIMEOUT | FAIL |
-| **T3: lru-cache** | PASS | PASS | PASS | TIMEOUT | FAIL |
-| **T3: expression-parser** | PASS | PARTIAL | FAIL | TIMEOUT | FAIL |
+| **T2: makefile** | PASS | PASS | PASS | PASS | FAIL |
+| **T2: csv-pipeline** | PASS | PASS | PASS | FAIL | FAIL |
+| **T2: cli-tool** | PASS | PASS | PASS | PASS | FAIL |
+| **T2: usd-scene** | PASS | FAIL | FAIL | FAIL | FAIL |
+| **T3: lru-cache** | PASS | PASS | PASS | PASS | FAIL |
+| **T3: expression-parser** | PASS | PARTIAL | FAIL | FAIL | FAIL |
 | **T3: git-hook** | PASS | PASS | PASS | FAIL | FAIL |
 | **T3: service-generator** | PASS | PASS | PASS | FAIL | FAIL |
-| **T3: usd-shot-assembly** | PASS | FAIL | FAIL | TIMEOUT | FAIL |
-| **T3: houdini-solaris** | PASS | PASS | PASS | TIMEOUT | FAIL |
-| **T4: lru-cache (workflow/heavy)** | PASS | PASS | **FAIL** | TIMEOUT | FAIL |
-| **T4: lru-cache (workflow/light)** | PASS | PASS | **FAIL** | TIMEOUT | FAIL |
-| **T4: expression-parser (DSPy)** | PASS | **PASS** | **FAIL** | TIMEOUT | FAIL |
+| **T3: usd-shot-assembly** | PASS | FAIL | FAIL | FAIL | FAIL |
+| **T3: houdini-solaris** | PASS | PASS | PASS | PASS | FAIL |
+| **T4: lru-cache (workflow/heavy)** | PASS | PASS | **FAIL** | -- | FAIL |
+| **T4: lru-cache (workflow/light)** | PASS | PASS | **FAIL** | -- | FAIL |
+| **T4: expression-parser (DSPy)** | PASS | **PASS** | **FAIL** | -- | FAIL |
 | **T4: service-gen (context/heavy)** | PASS | PASS | **FAIL** | FAIL | FAIL |
-| **T4: usd-shot (novel/heavy)** | PASS | PASS | **FAIL** | TIMEOUT | FAIL |
-| **T4: usd-shot (novel/light)** | PASS | FAIL | **FAIL** | TIMEOUT | FAIL |
+| **T4: usd-shot (novel/heavy)** | PASS | PASS | **FAIL** | -- | FAIL |
+| **T4: usd-shot (novel/light)** | PASS | FAIL | **FAIL** | -- | FAIL |
 
-*Note: Devstral's T4 column shows the characteristic pattern: every skill-augmented variant fails despite passing the corresponding T3 baseline.*
+*Note: Devstral's T4 column shows the characteristic pattern: every skill-augmented variant fails despite passing the corresponding T3 baseline. gemma-4-31b entries marked "--" indicate the run timed out and was excluded.*
 
 ---
 
@@ -933,5 +939,5 @@ This validator is particularly instructive: tests 3-10 check for conventions tha
 ---
 
 *Benchmark framework: [llm-bench](https://github.com/nickazg/llm-bench) v0.4*
-*Total runtime: ~8 hours across 1,607 runs*
+*Total runtime: ~8 hours across 1,607 runs (1,444 non-timeout runs analyzed)*
 *Compute: local macOS execution with OpenRouter/Z.ai API routing*
