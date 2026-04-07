@@ -59,6 +59,58 @@ scoring:
     assert config.tier == 4
 
 
+def test_task_config_with_taxonomy_fields(tmp_path):
+    task_dir = tmp_path / "tier4" / "lru-cache-light"
+    task_dir.mkdir(parents=True)
+    (task_dir / "task.yaml").write_text(
+        """
+id: tier4-lru-cache-workflow-light
+name: "LRU Cache — Workflow Light"
+tier: 4
+prompt: "Implement an LRU cache."
+timeout: 300
+skill: lru-cache-workflow-light
+difficulty: 3
+skill_type: workflow
+skill_intensity: light
+skill_pair: lru-cache
+tags: [python, algorithms]
+scoring:
+  automated: [correctness]
+  flagged: []
+"""
+    )
+    config = TaskConfig.from_dir(task_dir)
+    assert config.difficulty == 3
+    assert config.skill_type == "workflow"
+    assert config.skill_intensity == "light"
+    assert config.skill_pair == "lru-cache"
+
+
+def test_task_config_taxonomy_fields_default_none(tmp_path):
+    """Old task.yamls without new fields should still load with None defaults."""
+    task_dir = tmp_path / "tier1" / "basic"
+    task_dir.mkdir(parents=True)
+    (task_dir / "task.yaml").write_text(
+        """
+id: tier1-basic
+name: Basic
+tier: 1
+prompt: Do something
+timeout: 60
+tags: []
+scoring:
+  automated: [correctness]
+  flagged: []
+"""
+    )
+    config = TaskConfig.from_dir(task_dir)
+    assert config.difficulty is None
+    assert config.skill_type is None
+    assert config.skill_intensity is None
+    assert config.skill_pair is None
+
+
 def test_run_result_to_json():
     result = RunResult(
         task_id="tier1-hello",
@@ -90,6 +142,27 @@ def test_run_result_to_json():
     assert data["scores"]["quality"] is None
     assert data["prompt"] == "Write hello world"
     assert data["tier"] == 1
+
+
+def test_run_result_taxonomy_fields_in_json():
+    result = RunResult(
+        task_id="tier4-lru-cache-workflow-light",
+        model="qwen3-30b",
+        cli="kilo",
+        skill="lru-cache-workflow-light",
+        scores=Scores(correctness=0.8),
+        timestamp="2026-04-07T10:00:00Z",
+        tier=4,
+        difficulty=3,
+        skill_type="workflow",
+        skill_intensity="light",
+        skill_pair="lru-cache",
+    )
+    data = result.to_dict()
+    assert data["difficulty"] == 3
+    assert data["skill_type"] == "workflow"
+    assert data["skill_intensity"] == "light"
+    assert data["skill_pair"] == "lru-cache"
 
 
 def test_token_usage_total():

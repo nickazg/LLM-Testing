@@ -83,3 +83,53 @@ scoring:
     tasks = load_tasks(tmp_path / "tasks", tiers=[1], task_ids=["tier1-hello"])
     assert len(tasks) == 1
     assert tasks[0].id == "tier1-hello"
+
+
+def _create_taxonomy_tasks(tmp_path):
+    """Helper to create tasks with taxonomy fields for filter tests."""
+    tasks_dir = tmp_path / "tasks"
+    configs = [
+        ("tier3", "lru-cache", 3, None, None, None),
+        ("tier4", "lru-cache-heavy", 3, "workflow", "heavy", "lru-cache"),
+        ("tier4", "lru-cache-light", 3, "workflow", "light", "lru-cache"),
+        ("tier4", "usd-solaris", 3, "novel", "heavy", "houdini-solaris"),
+        ("tier4", "git-hook-ctx", 3, "context", "heavy", "git-hook"),
+    ]
+    for tier, name, diff, stype, sintensity, spair in configs:
+        d = tasks_dir / tier / name
+        d.mkdir(parents=True)
+        yaml = f"""
+id: {tier}-{name}
+name: {name}
+tier: {int(tier[-1])}
+prompt: Do {name}
+timeout: 60
+difficulty: {diff}
+"""
+        if stype:
+            yaml += f"skill: {name}-skill\nskill_type: {stype}\nskill_intensity: {sintensity}\nskill_pair: {spair}\n"
+        else:
+            yaml += "skill: null\n"
+        yaml += "tags: []\nscoring:\n  automated: [correctness]\n  flagged: []\n"
+        (d / "task.yaml").write_text(yaml)
+    return tasks_dir
+
+
+def test_load_tasks_filter_by_skill_type(tmp_path):
+    tasks_dir = _create_taxonomy_tasks(tmp_path)
+    tasks = load_tasks(tasks_dir, skill_types=["workflow"])
+    assert len(tasks) == 2
+    assert all(t.skill_type == "workflow" for t in tasks)
+
+
+def test_load_tasks_filter_by_difficulty(tmp_path):
+    tasks_dir = _create_taxonomy_tasks(tmp_path)
+    tasks = load_tasks(tasks_dir, difficulties=[3])
+    assert len(tasks) == 5  # all have difficulty 3
+
+
+def test_load_tasks_filter_by_skill_type_and_tier(tmp_path):
+    tasks_dir = _create_taxonomy_tasks(tmp_path)
+    tasks = load_tasks(tasks_dir, tiers=[4], skill_types=["novel"])
+    assert len(tasks) == 1
+    assert tasks[0].skill_type == "novel"

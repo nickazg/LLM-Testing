@@ -3,6 +3,7 @@ name: "Git Pre-commit Hook"
 tier: 3
 prompt: "Create a file called pre-commit (no extension) that works as a git pre-commit hook. The hook should check all staged files and reject the commit if any of these conditions are found:\n\n1. Any staged file larger than 5MB (5242880 bytes)\n2. Any staged Python file containing print() calls used for debugging (lines with just 'print(' that aren't in comments or strings — simple heuristic is fine)\n3. Any staged file with trailing whitespace on any line\n4. Any staged Python file that fails py_compile syntax check\n\nThe hook should:\n- Print a clear error message for each violation found, prefixed with 'ERROR:'\n- Exit 0 if all checks pass (allow commit)\n- Exit 1 if any check fails (reject commit)\n- Only check files that are staged (git diff --cached --name-only)\n- Be written in bash and be POSIX-compatible"
 timeout: 300
+difficulty: 3
 skill: null
 tags: [bash, git, hooks, code-quality]
 scoring:

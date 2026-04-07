@@ -45,10 +45,17 @@ models:
   #   openrouter_id: "qwen/qwen3-coder-next"
   #   NOTE: Not in Kilo model registry — 0/33 Kilo. Works on CC only.
 
-  # gemma-4-31b:
-  #   name: "Google Gemma 4 31B"
-  #   openrouter_id: "google/gemma-4-31b-it"
-  #   NOTE: 0/33 CC in Phase 2. Works on Kilo only (7/33).
+  gemma-4-31b:
+    name: "Google Gemma 4 31B"
+    openrouter_id: "google/gemma-4-31b-it"
+
+  gemma-4-27b:
+    name: "Google Gemma 4 27B (MoE, 4B active)"
+    openrouter_id: "google/gemma-4-26b-a4b-it"
+
+  devstral:
+    name: "Mistral Devstral 25B"
+    openrouter_id: "mistralai/devstral-2512"
 
   gpt-oss-120b:
     name: "GPT OSS 120B"
@@ -60,9 +67,9 @@ models:
     openrouter_id: "openai/gpt-oss-20b"
     disable_adaptive_thinking: true
 
-  # ── GLM (Z.ai direct on CC, OpenRouter on Kilo) ───────────────
-  # Kilo CLI 7.x only supports kilo/ and openrouter/ prefixes.
-  # Z.ai direct not available — GLM routes via OpenRouter on Kilo.
+  # ── GLM (Z.ai direct on both CC and Kilo) ──────────────────────
+  # CC: via Anthropic-compatible endpoint (api.z.ai/api/anthropic)
+  # Kilo: via custom z-ai provider in ~/.config/kilo/kilo.jsonc
   glm-5:
     name: "GLM-5"
     openrouter_id: "z-ai/glm-5"
@@ -70,14 +77,20 @@ models:
       base_url: "https://api.z.ai/api/anthropic"
       auth_env: "GLM_API_KEY"
       model_id: "glm-5"
+    kilo:
+      model_id: "z-ai/glm-5"
 
   glm-4.5-air-free:
     name: "GLM 4.5 Air"
     openrouter_id: "z-ai/glm-4.5-air:free"
+    kilo:
+      model_id: "z-ai/glm-4.5-air"
 
   glm-4.7-flash:
     name: "GLM 4.7 Flash"
     openrouter_id: "z-ai/glm-4.7-flash"
+    kilo:
+      model_id: "z-ai/glm-4.7-flash"
 
   minimax-m2.7:
     name: "MiniMax M2.7"

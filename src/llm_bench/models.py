@@ -48,6 +48,10 @@ class TaskConfig:
     scoring_automated: list[str]
     scoring_flagged: list[str]
     task_dir: Path = field(repr=False)
+    difficulty: Optional[int] = None
+    skill_type: Optional[str] = None  # "novel" | "workflow" | "context"
+    skill_intensity: Optional[str] = None  # "light" | "heavy"
+    skill_pair: Optional[str] = None  # links to baseline task name
 
     @property
     def skill_domain(self) -> Optional[str]:
@@ -79,6 +83,10 @@ class TaskConfig:
             scoring_automated=data.get("scoring", {}).get("automated", []),
             scoring_flagged=data.get("scoring", {}).get("flagged", []),
             task_dir=task_dir,
+            difficulty=data.get("difficulty"),
+            skill_type=data.get("skill_type"),
+            skill_intensity=data.get("skill_intensity"),
+            skill_pair=data.get("skill_pair"),
         )
 
 
@@ -109,6 +117,10 @@ class RunResult:
     conversation: list[ConversationMessage] = field(default_factory=list)
     files: list[OutputFile] = field(default_factory=list)
     tier: int = 0
+    difficulty: Optional[int] = None
+    skill_type: Optional[str] = None
+    skill_intensity: Optional[str] = None
+    skill_pair: Optional[str] = None
 
     def to_dict(self) -> dict:
         return asdict(self)

@@ -103,7 +103,13 @@ def resolve_model(
         # CLI override can change provider (e.g. GLM via z-ai direct on Kilo)
         cli_provider = cli_override.get("provider", provider) if cli_override else provider
 
-        if cli_provider == "openrouter" and openrouter_id:
+        # If kilo override has model_id with provider prefix (e.g. "z-ai/glm-5"),
+        # use it directly — the provider is registered in Kilo's global config
+        kilo_model_override = cli_override.get("model_id", "") if cli_override else ""
+        if kilo_model_override and "/" in kilo_model_override and "provider" not in (cli_override or {}):
+            env["LLM_BENCH_MODEL_ID"] = kilo_model_override
+            env["LLM_BENCH_KILO_PROVIDER"] = kilo_model_override.split("/")[0]
+        elif cli_provider == "openrouter" and openrouter_id:
             env["OPENROUTER_API_KEY"] = keys.get("OPENROUTER_API_KEY", "")
             env["LLM_BENCH_MODEL_ID"] = f"openrouter/{openrouter_id}"
             env["LLM_BENCH_KILO_PROVIDER"] = "openrouter"
@@ -113,6 +119,9 @@ def resolve_model(
             auth_env_key = cli_override.get("auth_env", "") if cli_override else ""
             if auth_env_key:
                 env["LLM_BENCH_PROVIDER_API_KEY"] = keys.get(auth_env_key, "")
+            base_url = cli_override.get("base_url", "") if cli_override else ""
+            if base_url:
+                env["LLM_BENCH_PROVIDER_BASE_URL"] = base_url
             env["LLM_BENCH_MODEL_ID"] = model_id_kilo
             env["LLM_BENCH_KILO_PROVIDER"] = cli_provider
 

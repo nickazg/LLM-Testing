@@ -3,6 +3,7 @@ name: "USD Scene with Materials"
 tier: 2
 prompt: "Create a Python file called build_scene.py that uses the pxr library (Pixar USD) to programmatically build a USD scene and export it as scene.usda. The scene must contain:\n\n1. A root prim /World (Xform) set as the default prim\n2. /World/Ground — a Mesh prim representing a ground plane (UsdGeom.Mesh with points for a quad, faceVertexCounts=[4], faceVertexIndices=[0,1,2,3])\n3. /World/Ground with xformOp:translate set to (0, 0, 0)\n4. /World/Character — an Xform prim with xformOp:translate at (0, 1, 0)\n5. /World/Character/Body — a Mesh prim (can be a simple cube with 8 points, 6 faces)\n6. /World/Light — a DomeLight (UsdLux.DomeLight) with intensity=1000\n7. /World/Looks/GroundMaterial — a UsdShade.Material with a UsdPreviewSurface shader that has diffuseColor=(0.3, 0.3, 0.3)\n8. The Ground mesh must be bound to GroundMaterial using UsdShade.MaterialBindingAPI\n\nUse: from pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf"
 timeout: 300
+difficulty: 2
 skill: null
 tags: [python, usd, pixar, 3d]
 scoring:

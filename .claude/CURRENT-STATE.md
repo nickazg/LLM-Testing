@@ -1,58 +1,46 @@
 # Current State
 
 ## Project Direction
-Automated LLM benchmarking framework comparing coding performance across CLI interfaces (Claude Code, Kilo CLI) with free/cheap models via OpenRouter. Core experiment: measuring skill uplift delta per model. Phase 2 clean benchmark complete with definitive dataset.
+Automated LLM benchmarking framework comparing coding performance across CLI interfaces (Claude Code, Kilo CLI) with free/cheap models via OpenRouter. Core experiment: measuring skill uplift delta per model, now with a three-category skill taxonomy to isolate different types of uplift.
 
 ## Current Phase
-Phase 2 complete. 478 clean benchmark results. CLI environment confirmed as dominant variable for skill effectiveness.
+Skill taxonomy expansion complete. 68 tasks across 3 skill categories (novel/workflow/context) x 2 intensities (heavy/light). Ready for benchmark runs with new matrix.
 
 ## What's Built
 - Python package `llm-bench` with `run`, `dashboard`, `info`, and `compile-skill` subcommands
 - 3 CLI adapters (Claude Code, Open Code, Kilo) with async subprocess execution
-- 33 benchmark tasks across 4 tiers + 4 domain skills (with 15+ variants)
-- Skill variant system: `domain:variant` format, VARIANTS.yaml, resolve_skill_path()
-- DSPy skill compiler with proxy + live metrics, model-specific compilation for 7 models
-- Mock hou module (SOP + Solaris variants) for Houdini testing without license
-- FastAPI dashboard with matrix, skill uplift, efficiency, and run history views
-- Case study skill with structured logging and report generation
-- 69 unit tests passing
+- **68 benchmark tasks** across 4 tiers (was 33):
+  - 23 baselines (T1-T3): 2 trivial, 6 multi-file, 15 domain-specific
+  - 45 skill variants (T4): classified by type and intensity
+- **Skill taxonomy** with 3 categories:
+  - **Novel Knowledge** — genuinely new info (VFX APIs: USD, Houdini Solaris, PDG)
+  - **Workflow/Process** — structured guidance on known tech (LRU cache, expression parser)
+  - **Domain Context** — org-specific conventions on known tech (git hooks, systemd services)
+- Each category has **heavy** (full reference/recipe) and **light** (guardrails/key patterns) intensity variants
+- New task.yaml fields: `difficulty`, `skill_type`, `skill_intensity`, `skill_pair`
+- CLI filtering: `--skill-types novel,workflow` and `--difficulties 1,2,3`
+- Dashboard: skill type/intensity filters, uplift-by-type breakdown table
+- 26 skills total (was 4): 18 novel (heavy+light for 9 VFX tasks), 4 workflow, 4 context
+- DSPy skill compiler with proxy + live metrics (15+ compiled variants carry over)
+- 75 unit tests passing
 - 478 Phase 2 results + 268 archived Phase 1 results = 746 total
 
-## Key Findings — Phase 2 (Definitive)
+## Skill Taxonomy
+| Category | What it measures | Tasks |
+|----------|-----------------|-------|
+| Novel Knowledge | Can the model learn from genuinely new API info? | 11 VFX tasks (USD render/skel/layers/shaders/metadata, Houdini solaris/PDG/instancing/render/lighting) |
+| Workflow/Process | Does structured guidance improve execution of known tasks? | 2 tasks (LRU cache, expression parser) |
+| Domain Context | Can the model apply org-specific rules it couldn't know? | 2 tasks (git hooks, systemd services) |
 
-### Headline: CLI Environment Determines Skill Effect Direction
-- 266 paired tier3-vs-tier4 comparisons
-- **Claude Code: mean uplift +0.147** (40 positive, 84 neutral, 9 negative)
-- **Kilo: mean uplift -0.068** (9 positive, 95 neutral, 29 negative)
-- Same skill, same model, opposite outcome depending on CLI
+Model-relative category shift tracked as secondary dimension (same skill = Novel for budget models, Workflow for frontier).
 
-### Model Rankings (Phase 2, 478 runs)
-| Model | Pass Rate | CC | Kilo |
-|-------|-----------|-----|------|
-| opus4.6 (ceiling) | 62% | 10/10 | 0/6 (OpenRouter error) |
-| glm-5 | 61% | 25/33 | 15/33 |
-| qwen3-30b | 44% | 18/33 | 11/33 |
-| glm-4.5-air-free | 39% | 13/33 | 13/33 |
-| qwen3-coder-next | 32% | 21/33 | **0/33** |
-| glm-4.7-flash | 30% | 9/33 | 11/33 |
-| gemma-4-31b | 11% | **0/33** | 7/33 |
-| minimax-m2.7 | 0% | 0/33 | 0/33 (dead) |
-
-### Skill Uplift Highlights
-- **Houdini Solaris**: +1.0 for glm-5, qwen3-30b, qwen3-coder-next on CC; 0 on Kilo
-- **Expression parser**: ±1.0 extreme swings (helps or destroys depending on model+CLI)
-- **USD shot assembly**: highly variable, best on CC with live-compiled variants
-- **LRU cache**: mostly neutral — well-known domain, skills don't add much
-
-### Confirmed Findings
-1. **CLI is the dominant variable** — not skill content, not model capability
-2. **Capability threshold still real** — skills help "at threshold" models, neutral/harmful otherwise
-3. **High run-to-run variance** — qwen3-30b scored 1.0 (Phase 1) then 0.0 (Phase 2) on same task
-4. **Model-CLI coupling is asymmetric** — qwen3-coder-next: 64% CC / 0% Kilo; gemma-4-31b: 0% CC / 21% Kilo
+## Key Findings — Phase 2 (Pre-taxonomy)
+- CLI Environment determines skill effect direction (CC positive, Kilo negative)
+- Capability threshold theory confirmed
+- Previous findings remain valid but were conflating different uplift types
 
 ## What's Next
-1. Multi-run statistical validation (5x per key configuration)
-2. Investigate WHY CC amplifies skills constructively vs Kilo destructively
-3. Adaptive skill injection prototype (inject only when uplift is predicted)
-4. Expand to more domains beyond USD/Houdini
-5. CLI-controlled ablation study (disable LSP, strip hooks)
+1. Run new taxonomy benchmark matrix to isolate uplift per skill type
+2. Compare light vs heavy intensity — does the uplift come from alignment or being given the answer?
+3. Multi-run statistical validation (5x per key configuration)
+4. Investigate Novel vs Workflow vs Context uplift curves per model capability level

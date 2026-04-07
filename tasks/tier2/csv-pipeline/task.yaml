@@ -3,6 +3,7 @@ name: "CSV Data Pipeline"
 tier: 2
 prompt: "Create a Python script called `pipeline.py` that reads `input.csv` (columns: name, department, salary, status), filters rows where status equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department,avg_salary,count`. Sort rows alphabetically by department name. Include a header row. Use only the Python standard library (csv module)."
 timeout: 120
+difficulty: 2
 skill: null
 tags: [python, data-processing, csv, tier2]
 scoring:

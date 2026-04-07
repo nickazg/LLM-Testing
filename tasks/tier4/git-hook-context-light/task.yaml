@@ -1,0 +1,19 @@
+id: tier4-git-hook-context-light
+name: "Git Pre-commit Hook — Context Light"
+tier: 4
+prompt: "Create a file called pre-commit (no extension) that works as a git pre-commit hook following our internal repository conventions (documented in your skills).\n\nThe hook should check all staged files and reject the commit if any violations are found.\n\nThe hook should:\n- Enforce ALL rules from our internal repository conventions\n- Print a clear error message for each violation found, prefixed with 'ERROR:'\n- Exit 0 if all checks pass (allow commit)\n- Exit 1 if any check fails (reject commit)\n- Only check files that are staged (git diff --cached --name-only)\n- Be written in bash and be POSIX-compatible"
+timeout: 300
+skill: git-hook-context-light
+difficulty: 3
+skill_type: context
+skill_intensity: light
+skill_pair: git-hook
+tags: [bash, git, hooks, code-quality]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following

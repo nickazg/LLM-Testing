@@ -29,6 +29,8 @@ def main():
     run_parser.add_argument("--clis", required=True, help="Comma-separated CLI names (claude-code, open-code, kilo)")
     run_parser.add_argument("--tiers", default="1,2,3,4", help="Comma-separated tier numbers")
     run_parser.add_argument("--tasks", help="Comma-separated task IDs (default: all)")
+    run_parser.add_argument("--skill-types", help="Filter by skill type: novel,workflow,context")
+    run_parser.add_argument("--difficulties", help="Filter by difficulty levels: 1,2,3")
     run_parser.add_argument("--tasks-dir", default="tasks", help="Path to tasks directory")
     run_parser.add_argument("--skills-dir", default="skills", help="Path to skills directory")
     run_parser.add_argument("--results-dir", default="results", help="Path to results directory")
@@ -84,8 +86,10 @@ def _handle_run(args):
     models = args.models.split(",")
     cli_names = args.clis.split(",")
     task_ids = args.tasks.split(",") if args.tasks else None
+    skill_types = args.skill_types.split(",") if args.skill_types else None
+    difficulties = [int(d) for d in args.difficulties.split(",")] if args.difficulties else None
 
-    tasks = load_tasks(tasks_dir, tiers=tiers, task_ids=task_ids)
+    tasks = load_tasks(tasks_dir, tiers=tiers, task_ids=task_ids, skill_types=skill_types, difficulties=difficulties)
     if not tasks:
         print(f"No tasks found in {tasks_dir} for tiers {tiers}")
         sys.exit(1)
@@ -225,7 +229,9 @@ def _handle_info(args):
                 print(f"  Tier {tier}:")
                 for t in by_tier[tier]:
                     skill_tag = f" [skill: {t.skill}]" if t.skill else ""
-                    print(f"    {t.id:<30} {t.name}{skill_tag}")
+                    type_tag = f" [{t.skill_type}/{t.skill_intensity}]" if t.skill_type else ""
+                    diff_tag = f" (d={t.difficulty})" if t.difficulty else ""
+                    print(f"    {t.id:<30} {t.name}{skill_tag}{type_tag}{diff_tag}")
             print(f"\n  Total: {len(tasks)} tasks")
         else:
             print("  (none found)")

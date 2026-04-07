@@ -13,31 +13,30 @@ from llm_bench.models import TokenUsage, ConversationMessage
 class KiloAdapter(CLIAdapter):
     name = "kilo"
 
-    def build_command(self, prompt: str, model_id: str | None = None) -> list[str]:
+    def build_command(self, prompt: str, model_id: str | None = None, skip_model_flag: bool = False) -> list[str]:
         cmd = [
             "kilo",
             "run",
             "--auto",
             "--format", "json",
         ]
-        if model_id:
+        if model_id and not skip_model_flag:
             cmd += ["--model", model_id]
         cmd.append(prompt)
         return cmd
 
     # Provider config templates for kilo.json
+    # Note: z-ai is registered in Kilo's global config (~/.config/kilo/kilo.jsonc)
+    # so it's NOT listed here — we just set the model and let global config handle auth
     _PROVIDER_CONFIGS = {
         "openrouter": lambda env: {
             "openrouter": {"env": ["OPENROUTER_API_KEY"]}
         },
-        "z-ai": lambda env: {
-            "z-ai": {"options": {
-                "apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", ""),
-                "baseUrl": "https://api.z.ai/api/coding/paas/v4",
-            }}
-        },
         "openai": lambda env: {
-            "openai": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
+            "openai": {"options": {
+                "apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", ""),
+                **({"baseUrl": env["LLM_BENCH_PROVIDER_BASE_URL"]} if env.get("LLM_BENCH_PROVIDER_BASE_URL") else {}),
+            }}
         },
         "google": lambda env: {
             "google": {"options": {"apiKey": env.get("LLM_BENCH_PROVIDER_API_KEY", "")}}
@@ -50,13 +49,20 @@ class KiloAdapter(CLIAdapter):
     def _write_kilo_config(self, cwd: Path, model_id: str):
         env = self._get_env() or {}
         provider_name = env.get("LLM_BENCH_KILO_PROVIDER", "openrouter")
-        provider_factory = self._PROVIDER_CONFIGS.get(
-            provider_name, self._PROVIDER_CONFIGS["openrouter"]
-        )
-        config = {
-            "model": model_id,
-            "provider": provider_factory(env),
-        }
+
+        # For providers registered in Kilo's global config (e.g. z-ai),
+        # only set the model — don't write a provider block that would
+        # override the global config's API keys
+        if provider_name not in self._PROVIDER_CONFIGS:
+            config = {"model": model_id}
+        else:
+            provider_factory = self._PROVIDER_CONFIGS.get(
+                provider_name, self._PROVIDER_CONFIGS["openrouter"]
+            )
+            config = {
+                "model": model_id,
+                "provider": provider_factory(env),
+            }
         (Path(cwd) / "kilo.json").write_text(json.dumps(config, indent=2))
 
     @staticmethod
@@ -171,7 +177,9 @@ class KiloAdapter(CLIAdapter):
             env = os.environ.copy()
 
         model_id = self._resolve_model_id()
-        cmd = self.build_command(prompt, model_id=model_id)
+        # Skip --model flag for custom providers (model set in kilo.json instead)
+        skip_model_flag = self.env and self.env.get("LLM_BENCH_KILO_PROVIDER") not in (None, "", "openrouter")
+        cmd = self.build_command(prompt, model_id=model_id, skip_model_flag=skip_model_flag)
         self._write_kilo_config(cwd, model_id)
 
         start = time.monotonic()

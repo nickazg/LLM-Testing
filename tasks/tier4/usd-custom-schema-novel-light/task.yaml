@@ -1,0 +1,19 @@
+id: tier4-usd-custom-schema-novel-light
+name: "Custom Metadata + Extensibility"
+tier: 4
+prompt: "Create a Python script called custom_metadata.py that uses the pxr library to demonstrate USD's extensibility features. The script must create a file called pipeline.usda containing:\n\n1. Default prim /Project\n2. /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\"\n3. /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\"\n4. /Project/Hero — an Xform with purpose set to \"render\" (UsdGeom.Tokens.render)\n5. /Project/Hero/Proxy — an Xform with purpose set to \"proxy\" (UsdGeom.Tokens.proxy)\n6. /Project/Hero/Guide — an Xform with purpose set to \"guide\" (UsdGeom.Tokens.guide)\n7. /Project/Hero has custom properties:\n   - \"custom:shotName\" as a string property with value \"SH010\"\n   - \"custom:frameRange\" as a Int2 property with value (1001, 1100)\n8. /Project/Hero should have UsdGeom.ModelAPI applied with kind set to \"component\"\n\nUse: from pxr import Usd, UsdGeom, Sdf, Gf, Kind"
+timeout: 300
+skill: usd-custom-schema-light
+difficulty: 3
+skill_type: novel
+skill_intensity: light
+skill_pair: usd-custom-schema
+tags: [python, usd, pixar, metadata, pipeline]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following

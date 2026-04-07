@@ -1,0 +1,19 @@
+id: tier4-usd-render-settings-novel
+name: "Render Pipeline Configuration"
+tier: 4
+prompt: "Create a Python script called render_config.py that uses the pxr library to build a USD render pipeline configuration. The script must create TWO files:\n\n1. camera_rig.usda — contains:\n   - Default prim /CameraRig\n   - /CameraRig/MainCamera — a UsdGeom.Camera with focalLength=50, horizontalAperture=36, clippingRange=(0.1, 10000)\n   - /CameraRig/MainCamera has xformOp:translate at (0, 5, 20) and xformOp:rotateXYZ at (-15, 0, 0)\n\n2. render_config.usda — contains:\n   - Default prim /Render\n   - References camera_rig.usda\n   - /Render/RenderProduct — a UsdRender.Product with productName set to \"beauty.exr\"\n   - /Render/RenderProduct/beauty — a UsdRender.Var with dataType \"color3f\" and sourceName \"Ci\"\n   - /Render/RenderProduct/depth — a UsdRender.Var with dataType \"float\" and sourceName \"z\"\n   - /Render/RenderProduct/normal — a UsdRender.Var with dataType \"normal3f\" and sourceName \"N\"\n   - /Render/RenderSettings — a UsdRender.Settings with resolution (1920, 1080) and pixelAspectRatio 1.0\n   - /Render/RenderSettings should reference /CameraRig/MainCamera as the camera\n\nUse: from pxr import Usd, UsdGeom, UsdRender, Sdf, Gf"
+timeout: 300
+skill: usd-render-settings
+difficulty: 3
+skill_type: novel
+skill_intensity: heavy
+skill_pair: usd-render-settings
+tags: [python, usd, pixar, render, camera]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following

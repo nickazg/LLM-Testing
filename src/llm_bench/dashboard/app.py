@@ -30,11 +30,17 @@ async def get_summary():
     models = sorted(set(r["model"] for r in results))
     clis = sorted(set(r["cli"] for r in results))
     tasks = sorted(set(r["task_id"] for r in results))
+    skill_types = sorted(set(r.get("skill_type") or "" for r in results) - {""})
+    skill_intensities = sorted(set(r.get("skill_intensity") or "" for r in results) - {""})
+    difficulties = sorted(set(r.get("difficulty") for r in results if r.get("difficulty")))
     return {
         "total_runs": len(results),
         "models": models,
         "clis": clis,
         "tasks": tasks,
+        "skill_types": skill_types,
+        "skill_intensities": skill_intensities,
+        "difficulties": difficulties,
     }
 
 
@@ -296,8 +302,12 @@ function renderRunsView() {
     f += '</select><label>Task</label><select id="f-task"><option value="">All</option>';
     tasks.forEach(t=>f+='<option>'+t+'</option>');
     f += '</select><label>Result</label><select id="f-result"><option value="">All</option><option>Pass</option><option>Fail</option></select>';
+    const stypes=uniq(R.filter(r=>r.skill_type),'skill_type');
+    if(stypes.length){f+='<label>Skill Type</label><select id="f-stype"><option value="">All</option>';stypes.forEach(s=>f+='<option>'+s+'</option>');f+='</select>';}
+    const sintens=uniq(R.filter(r=>r.skill_intensity),'skill_intensity');
+    if(sintens.length){f+='<label>Intensity</label><select id="f-sintensity"><option value="">All</option>';sintens.forEach(s=>f+='<option>'+s+'</option>');f+='</select>';}
     document.getElementById('run-filters').innerHTML = f;
-    ['f-model','f-cli','f-task','f-result'].forEach(id=>document.getElementById(id).onchange=renderRunTable);
+    ['f-model','f-cli','f-task','f-result','f-stype','f-sintensity'].forEach(id=>{const el=document.getElementById(id);if(el)el.onchange=renderRunTable;});
     renderRunTable();
 }
 
@@ -306,15 +316,19 @@ function renderRunTable() {
     const fc=document.getElementById('f-cli').value;
     const ft=document.getElementById('f-task').value;
     const fr=document.getElementById('f-result').value;
+    const fst=document.getElementById('f-stype')?document.getElementById('f-stype').value:'';
+    const fsi=document.getElementById('f-sintensity')?document.getElementById('f-sintensity').value:'';
     let filtered=R.filter(r=>{
         if(fm&&r.model!==fm) return false;
         if(fc&&r.cli!==fc) return false;
         if(ft&&r.task_id!==ft) return false;
         if(fr==='Pass'&&(r.scores.correctness||0)<0.5) return false;
         if(fr==='Fail'&&(r.scores.correctness||0)>=0.5) return false;
+        if(fst&&(r.skill_type||'')!==fst) return false;
+        if(fsi&&(r.skill_intensity||'')!==fsi) return false;
         return true;
     });
-    let h='<table><tr><th>#</th><th>Task</th><th>Tier</th><th>Model</th><th>CLI</th><th>Correct</th><th>Tokens</th><th>In/Think/Out</th><th>Time</th><th>Cost</th><th>Skill</th></tr>';
+    let h='<table><tr><th>#</th><th>Task</th><th>Tier</th><th>Model</th><th>CLI</th><th>Correct</th><th>Tokens</th><th>In/Think/Out</th><th>Time</th><th>Cost</th><th>Skill</th><th>Type</th><th>Intensity</th></tr>';
     filtered.forEach((r,i) => {
         const e=r.scores.efficiency||{};
         const t=e.tokens||{};
@@ -332,6 +346,8 @@ function renderRunTable() {
         h += '<td class="mono">'+(e.wall_time_s?fmt(e.wall_time_s,1)+'s':'-')+'</td>';
         h += '<td class="mono">'+(e.cost_usd?'$'+fmt(e.cost_usd,4):'-')+'</td>';
         h += '<td>'+(r.skill||'-')+'</td>';
+        h += '<td>'+(r.skill_type||'-')+'</td>';
+        h += '<td>'+(r.skill_intensity||'-')+'</td>';
         h += '</tr>';
     });
     h += '</table>';
@@ -355,6 +371,8 @@ function showRunDetail(idx) {
     mp += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">';
     mp += df('Model', '<b>'+r.model+'</b>') + df('CLI', r.cli);
     mp += df('Tier', r.tier||'-') + df('Skill', r.skill||'none');
+    mp += df('Skill Type', r.skill_type||'-') + df('Intensity', r.skill_intensity||'-');
+    mp += df('Difficulty', r.difficulty||'-') + df('Skill Pair', r.skill_pair||'-');
     mp += df('Correctness', '<span class="'+sc(r.scores.correctness||0)+'"><b>'+fmt(r.scores.correctness)+'</b></span>');
     mp += df('Completion', fmt(r.scores.completion));
     mp += df('Wall Time', e.wall_time_s?'<b>'+fmt(e.wall_time_s,1)+'s</b>':'-');
@@ -573,12 +591,39 @@ function renderUpliftView() {
         return;
     }
 
+    // === SKILL TYPE BREAKDOWN ===
+    const skillTypes=[...new Set(tier4.map(r=>r.skill_type||'').filter(Boolean))].sort();
+    const skillIntensities=[...new Set(tier4.map(r=>r.skill_intensity||'').filter(Boolean))].sort();
+
     // Detect skill variants in tier4 results
     const skillSpecs = [...new Set(tier4.map(r=>r.skill||'').filter(Boolean))].sort();
     const hasVariants = skillSpecs.length > 1;
 
     let h = '<div class="card"><h2>Skill Uplift — Correctness Delta (Tier 4 - Tier 3)</h2>';
     h += '<canvas id="uplift-chart" style="max-height:300px"></canvas></div>';
+
+    // Skill type x intensity breakdown
+    if(skillTypes.length) {
+        h += '<div class="card"><h2>Uplift by Skill Type &amp; Intensity</h2>';
+        h += '<table><tr><th>Model</th><th>Baseline</th>';
+        skillTypes.forEach(st=>{skillIntensities.forEach(si=>{h+='<th>'+st+'/'+si+'</th>';});});
+        h += '</tr>';
+        models.forEach(m=>{
+            const r3m=tier3.filter(r=>r.model===m);
+            const v3=r3m.length?r3m.reduce((s,r)=>s+(r.scores.correctness||0),0)/r3m.length:null;
+            h+='<tr><td><b>'+m+'</b></td>';
+            h+='<td class="mono '+(v3!=null?sc(v3):'')+'">'+(v3!=null?fmt(v3):'-')+'</td>';
+            skillTypes.forEach(st=>{skillIntensities.forEach(si=>{
+                const r4f=tier4.filter(r=>r.model===m&&r.skill_type===st&&r.skill_intensity===si);
+                const v4=r4f.length?r4f.reduce((s,r)=>s+(r.scores.correctness||0),0)/r4f.length:null;
+                const d=v3!=null&&v4!=null?(v4-v3):null;
+                if(d!==null){const cls=Math.abs(d)<0.01?'zero':d>0?'pos':'neg';h+='<td class="mono delta '+cls+'">'+(d>0?'+':'')+fmt(d)+'</td>';}
+                else{h+='<td class="mono" style="color:var(--muted)">-</td>';}
+            });});
+            h+='</tr>';
+        });
+        h += '</table></div>';
+    }
 
     if (hasVariants) {
         // === VARIANT COMPARISON MATRIX ===

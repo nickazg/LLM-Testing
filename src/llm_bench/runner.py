@@ -165,6 +165,10 @@ async def run_single_task(
             conversation=output.conversation,
             files=files,
             tier=task.tier,
+            difficulty=task.difficulty,
+            skill_type=task.skill_type,
+            skill_intensity=task.skill_intensity,
+            skill_pair=task.skill_pair,
         )
     finally:
         workspace.cleanup()

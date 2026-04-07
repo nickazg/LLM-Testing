@@ -1,0 +1,19 @@
+id: tier4-service-generator-context-heavy
+name: "Systemd Unit Generator — Context Heavy"
+tier: 4
+prompt: "Create a Python file called generate_service.py that generates systemd service unit files from command-line arguments, following our internal infrastructure standards (documented in your skills).\n\nUsage:\n  python generate_service.py --name myapp --exec /usr/bin/myapp --description 'My Application' --output myapp.service\n\nRequired args: --name, --exec\nOptional args:\n  --description (default: '{name} service')\n  --after (additional dependencies beyond our required ones)\n  --output (default: {name}.service)\n  --env (repeatable, KEY=VALUE pairs for additional Environment= lines)\n  --working-dir (override default working directory)\n\nThe generated .service file must be valid systemd unit format with [Unit], [Service], and [Install] sections and conform to ALL our internal infrastructure standards."
+timeout: 300
+skill: service-generator-context-heavy
+difficulty: 3
+skill_type: context
+skill_intensity: heavy
+skill_pair: service-generator
+tags: [python, cli, systemd, devops]
+scoring:
+  automated:
+    - correctness
+    - completion
+    - efficiency
+  flagged:
+    - quality
+    - instruction_following
