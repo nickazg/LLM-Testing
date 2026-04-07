@@ -1,0 +1,70 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 10394,
+        "output": 3,
+        "thinking": 0,
+        "cache_read": 2560
+      },
+      "tool_calls": 0,
+      "wall_time_s": 32.10857529193163,
+      "cost_usd": 0.00364586
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T01:36:12.112207+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775525756119,\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"part\":{\"id\":\"prt_d6594fcd4001jLHZ77QalAn5BT\",\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"messageID\":\"msg_d6594c44e001kKtJdmpWf21ve4\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775525759661,\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"part\":{\"id\":\"prt_d6594feec001IwPjHFs8hUcbFr\",\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"messageID\":\"msg_d6594c44e001kKtJdmpWf21ve4\",\"type\":\"tool\",\"callID\":\"chatcmpl-tool-8c87423efe616f7a\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"print('Hello, World!')\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-giqoc2yg/hello.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-giqoc2yg/hello.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-giqoc2yg/hello.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-giqoc2yg/hello.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775525758867,\"end\":1775525759659}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775525759663,\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"part\":{\"id\":\"prt_d65950aad0011OrnQXKmn6ujD0\",\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"messageID\":\"msg_d6594c44e001kKtJdmpWf21ve4\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0018311,\"tokens\":{\"total\":12940,\"input\":12865,\"output\":75,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775525770674,\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"part\":{\"id\":\"prt_d659535ae001c3wmpSPT72NyC5\",\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"messageID\":\"msg_d65950ab1001nj0jwyXJ6OUZJR\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775525771507,\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"part\":{\"id\":\"prt_d659535b1001dwG4mzXofF6Qiw\",\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"messageID\":\"msg_d65950ab1001nj0jwyXJ6OUZJR\",\"type\":\"text\",\"text\":\"Done.\",\"time\":{\"start\":1775525771506,\"end\":1775525771506}}}\n{\"type\":\"step_finish\",\"timestamp\":1775525771509,\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"part\":{\"id\":\"prt_d659538f40015yaBqKz0SDK8H2\",\"sessionID\":\"ses_29a6b3dd8ffeWZr4vue20QMAAO\",\"messageID\":\"msg_d65950ab1001nj0jwyXJ6OUZJR\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00181476,\"tokens\":{\"total\":12957,\"input\":10394,\"output\":3,\"reasoning\":0,\"cache\":{\"read\":2560,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"print('Hello, World!')\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-giqoc2yg/hello.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "Done.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/14885612169184110114",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-giqoc2yg\u0001\bhello.py\ufffd\ufffd\ufffd\ufffd7\ufffd\u001f\u000b\ufffd\ufffd\ufffd\u0007\ufffde\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "hello.py",
+      "content": "print(\"Hello, World!\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 1,
+  "difficulty": 1,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

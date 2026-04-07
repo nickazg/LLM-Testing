@@ -1,0 +1,51 @@
+{
+  "task_id": "tier4-lru-cache",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": "lru-cache-pattern",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 13566,
+        "output": 21,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 152.8869509169599,
+      "cost_usd": 0.00395024
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T11:06:19.745841+00:00",
+  "prompt": "Create a Python file called lru_cache.py implementing an LRUCache class with the following requirements:\n\n1. Constructor: LRUCache(capacity: int) \u2014 maximum number of items\n2. get(key) \u2192 value or -1 if not found. Accessing moves item to most-recently-used\n3. put(key, value) \u2192 None. If at capacity, evict the least-recently-used item first\n4. Both get() and put() must be O(1) time complexity\n5. Do NOT use collections.OrderedDict \u2014 implement with a dict + doubly-linked list\n6. Must be thread-safe using threading.Lock\n7. Include a size() method returning current number of items",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775473434944,\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"part\":{\"id\":\"prt_d6276a14000176WsFzgCxpQGuJ\",\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"messageID\":\"msg_d627689c00016D382AWoO9LI9e\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775473568590,\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"part\":{\"id\":\"prt_d6276a429001IolVAWhxAXZhlI\",\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"messageID\":\"msg_d627689c00016D382AWoO9LI9e\",\"type\":\"tool\",\"callID\":\"chatcmpl-tool-9e7dd7b811c27f81\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"import threading\\n\\nclass Node:\\n    def __init__(self, key=0, value=0):\\n        self.key = key\\n        self.value = value\\n        self.prev = None\\n        self.next = None\\n\\nclass LRUCache:\\n    def __init__(self, capacity: int):\\n        self.capacity = capacity\\n        self.cache = {}\\n        self.lock = threading.Lock()\\n        self.size_count = 0\\n        \\n        self.head = Node()\\n        self.tail = Node()\\n        self.head.next = self.tail\\n        self.tail.prev = self.head\\n\\n    def _remove(self, node):\\n        prev_node = node.prev\\n        next_node = node.next\\n        prev_node.next = next_node\\n        next_node.prev = prev_node\\n\\n    def _add(self, node):\\n        node.prev = self.head\\n        node.next = self.head.next\\n        self.head.next.prev = node\\n        self.head.next = node\\n\\n    def get(self, key):\\n        with self.lock:\\n            if key in self.cache:\\n                node = self.cache[key]\\n                self._remove(node)\\n                self._add(node)\\n                return node.value\\n            return -1\\n\\n    def put(self, key, value):\\n        with self.lock:\\n            if key in self.cache:\\n                node = self.cache[key]\\n                node.value = value\\n                self._remove(node)\\n                self._add(node)\\n            else:\\n                if self.size_count >= self.capacity:\\n                    lru = self.tail.prev\\n                    self._remove(lru)\\n                    del self.cache[lru.key]\\n                    self.size_count -= 1\\n                \\n                new_node = Node(key, value)\\n                self._add(new_node)\\n                self.cache[key] = new_node\\n                self.size_count += 1\\n\\n    def size(self):\\n        with self.lock:\\n            return self.size_count\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-qvgfxowa/lru_cache.py`\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-qvgfxowa/lru_cache.py`\",\"metadata\":{\"diagnostics\":{},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-qvgfxowa/lru_cache.py`\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775473568586,\"end\":1775473568589}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775473568948,\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"part\":{\"id\":\"prt_d6278acb2001BxJeu0TQQmwgrx\",\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"messageID\":\"msg_d627689c00016D382AWoO9LI9e\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0020426,\"tokens\":{\"total\":13550,\"input\":12990,\"output\":560,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775473572711,\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"part\":{\"id\":\"prt_d6278bb66001Jd8PXxLqm9CtOb\",\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"messageID\":\"msg_d6278acb60019xMrm0YvOLhh2t\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775473579177,\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"part\":{\"id\":\"prt_d6278bb670018gjhRmeZJQBkoN\",\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"messageID\":\"msg_d6278acb60019xMrm0YvOLhh2t\",\"type\":\"text\",\"text\":\"Created `lru_cache.py` implementing the LRUCache class with the requested specifications.\",\"time\":{\"start\":1775473579175,\"end\":1775473579175}}}\n{\"type\":\"step_finish\",\"timestamp\":1775473579178,\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"part\":{\"id\":\"prt_d6278d4a9001XyhCTYAStPqhi6\",\"sessionID\":\"ses_29d897b3bffe3KQVwaw4KV4Nae\",\"messageID\":\"msg_d6278acb60019xMrm0YvOLhh2t\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00190764,\"tokens\":{\"total\":13587,\"input\":13566,\"output\":21,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"import threading\\n\\nclass Node:\\n    def __init__(self, key=0, value=0):\\n        self.key = key\\n        self.value = value\\n        self.prev = None\\n        self.next = None\\n\\nclass LRUCache:\\n    def __init__(self, capacity: int):\\n        self.capacity = capacity\\n        self.cache = {}\\n        self.lock = threading.Lock()\\n        self.size_count = 0\\n        \\n        self.head = Node()\\n        self.tail = Node()\\n        self.head.next = self.tail\\n        self.tail.prev = self.head\\n\\n    def _remove(self, node):\\n        prev_node = node.prev\\n        next_node = node.next\\n        prev_node.next = next_node\\n        next_node.prev = prev_node\\n\\n    def _add(self, node):\\n        node.prev = self.head\\n        node.next = self.head.next\\n        self.head.next.prev = node\\n        self.head.next = node\\n\\n    def get(self, key):\\n        with self.lock:\\n            if key in self.cache:\\n                node = self.cache[key]\\n                self._remove(node)\\n                self._add(node)\\n                return node.value\\n            return -1\\n\\n    def put(self, key, value):\\n        with self.lock:\\n            if key in self.cache:\\n                node = self.cache[key]\\n                node.value = value\\n                self._remove(node)\\n                self._add(node)\\n            else:\\n                if self.size_count >= self.capacity:\\n                    lru = self.tail.prev\\n                    self._remove(lru)\\n                    del self.cache[lru.key]\\n                    self.size_count -= 1\\n                \\n                new_node = Node(key, value)\\n                self._add(new_node)\\n                self.cache[key] = new_node\\n                self.size_count += 1\\n\\n    def size(self):\\n        with self.lock:\\n            return self.size_count\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-qvgfxowa/lru_cache.py`\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "Created `lru_cache.py` implementing the LRUCache class with the requested specifications.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "lru_cache.py`",
+      "content": "import threading\n\nclass Node:\n    def __init__(self, key=0, value=0):\n        self.key = key\n        self.value = value\n        self.prev = None\n        self.next = None\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.capacity = capacity\n        self.cache = {}\n        self.lock = threading.Lock()\n        self.size_count = 0\n        \n        self.head = Node()\n        self.tail = Node()\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def _remove(self, node):\n        prev_node = node.prev\n        next_node = node.next\n        prev_node.next = next_node\n        next_node.prev = prev_node\n\n    def _add(self, node):\n        node.prev = self.head\n        node.next = self.head.next\n        self.head.next.prev = node\n        self.head.next = node\n\n    def get(self, key):\n        with self.lock:\n            if key in self.cache:\n                node = self.cache[key]\n                self._remove(node)\n                self._add(node)\n                return node.value\n            return -1\n\n    def put(self, key, value):\n        with self.lock:\n            if key in self.cache:\n                node = self.cache[key]\n                node.value = value\n                self._remove(node)\n                self._add(node)\n            else:\n                if self.size_count >= self.capacity:\n                    lru = self.tail.prev\n                    self._remove(lru)\n                    del self.cache[lru.key]\n                    self.size_count -= 1\n                \n                new_node = Node(key, value)\n                self._add(new_node)\n                self.cache[key] = new_node\n                self.size_count += 1\n\n    def size(self):\n        with self.lock:\n            return self.size_count\n",
+      "language": ""
+    }
+  ],
+  "tier": 4
+}

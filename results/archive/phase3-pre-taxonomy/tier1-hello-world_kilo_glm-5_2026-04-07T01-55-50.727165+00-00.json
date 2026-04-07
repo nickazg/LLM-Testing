@@ -1,0 +1,39 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.1147863330552354,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T01:55:50.727165+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775526949683,\"sessionID\":\"ses_29a58d103ffeCshYHuYWfSSRiy\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: glm-5/.\"}}}\n",
+  "conversation": [
+    {
+      "role": "error",
+      "content": "Model not found: glm-5/.",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 1,
+  "difficulty": 1,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": "tier4-expression-parser-compiled-gemma-4-31b",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": "recursive-descent-parser:compiled-gemma-4-31b",
+  "scores": {
+    "correctness": 0.7,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.24080979207065,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T14:05:14.547776+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "expr_parser.py",
+      "content": "from dataclasses import dataclass\nfrom typing import Union, Optional\n\n\n@dataclass\nclass ASTNode:\n    \"\"\"AST node for mathematical expressions\"\"\"\n    type: str  # 'number', 'binop', 'unary'\n    value: Optional[float] = None  # for numbers\n    op: Optional[str] = None  # for operators\n    left: Optional['ASTNode'] = None  # for binop\n    right: Optional['ASTNode'] = None  # for binop\n    operand: Optional['ASTNode'] = None  # for unary\n\n\ndef tokenize(expression: str) -> list:\n    \"\"\"Tokenize the expression string\"\"\"\n    tokens = []\n    i = 0\n    n = len(expression)\n\n    while i < n:\n        c = expression[i]\n\n        if c.isspace():\n            i += 1\n            continue\n\n        if c in '()+-*/':\n            tokens.append(c)\n            i += 1\n        elif c.isdigit() or c == '.':\n            # Parse number\n            num_str = []\n            while i < n and (expression[i].isdigit() or expression[i] == '.'):\n                num_str.append(expression[i])\n                i += 1\n            tokens.append(''.join(num_str))\n        else:\n            raise ValueError(f\"Invalid token: '{c}'\")\n\n    return tokens\n\n\ndef parse_expression(tokens: list, precedence: dict) -> ASTNode:\n    \"\"\"Parse expression with operator precedence\"\"\"\n    def parse_expression_helper(index, min_precedence):\n        # Parse left operand\n        left, index = parse_primary(tokens, index)\n\n        while index < len(tokens):\n            op = tokens[index]\n            if op not in precedence:\n                break\n\n            op_precedence = precedence[op]\n            if op_precedence < min_precedence:\n                break\n\n            index += 1\n            right, index = parse_expression_helper(index, op_precedence + 1)\n            left = ASTNode(type='binop', op=op, left=left, right=right)\n\n        return left, index\n\n    return parse_expression_helper(0, 0)[0]\n\n\ndef parse_primary(tokens: list, index: int) -> tuple:\n    \"\"\"Parse primary expressions (numbers, parenthesized expressions, unary operators)\"\"\"\n    if index >= len(tokens):\n        raise ValueError(\"Unexpected end of expression\")\n\n    token = tokens[index]\n\n    if token == '(':\n        # Parse parenthesized expression\n        index += 1\n        expr, index = parse_expression(tokens, {'+': 1, '-': 1, '*': 2, '/': 2})\n        if index >= len(tokens) or tokens[index] != ')':\n            raise ValueError(\"Unmatched parentheses\")\n        index += 1\n        return expr, index\n\n    elif token == '-':\n        # Unary minus\n        index += 1\n        operand, index = parse_primary(tokens, index)\n        return ASTNode(type='unary', op='-', operand=operand), index\n\n    elif token == '+':\n        # Unary plus (ignore)\n        index += 1\n        return parse_primary(tokens, index)\n\n    elif token.replace('.', '', 1).isdigit():\n        # Number\n        value = float(token)\n        return ASTNode(type='number', value=value), index + 1\n\n    else:\n        raise ValueError(f\"Unexpected token: '{token}'\")\n\n\ndef parse(expression: str) -> ASTNode:\n    \"\"\"Parse a string expression into an AST\"\"\"\n    if not expression.strip():\n        raise ValueError(\"Empty expression\")\n\n    tokens = tokenize(expression)\n    if not tokens:\n        raise ValueError(\"Empty expression\")\n\n    return parse_expression(tokens, {'+': 1, '-': 1, '*': 2, '/': 2})\n\n\ndef evaluate(node: ASTNode) -> float:\n    \"\"\"Evaluate an AST node to a numeric result\"\"\"\n    if node.type == 'number':\n        return node.value\n\n    elif node.type == 'binop':\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n\n        if node.op == '+':\n            return left_val + right_val\n        elif node.op == '-':\n            return left_val - right_val\n        elif node.op == '*':\n            return left_val * right_val\n        elif node.op == '/':\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n        else:\n            raise ValueError(f\"Unknown binary operator: {node.op}\")\n\n    elif node.type == 'unary':\n        operand_val = evaluate(node.operand)\n        if node.op == '-':\n            return -operand_val\n        elif node.op == '+':\n            return operand_val\n        else:\n            raise ValueError(f\"Unknown unary operator: {node.op}\")\n\n    else:\n        raise ValueError(f\"Unknown node type: {node.type}\")",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "workflow",
+  "skill_intensity": "heavy",
+  "skill_pair": "expression-parser"
+}

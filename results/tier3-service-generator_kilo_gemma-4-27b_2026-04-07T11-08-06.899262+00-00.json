@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-service-generator",
+  "model": "gemma-4-27b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00681329192594,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T11:08:06.899262+00:00",
+  "prompt": "Create a Python file called generate_service.py that generates systemd service unit files from command-line arguments. Usage:\n\n  python generate_service.py --name myapp --exec /usr/bin/myapp --user www-data --description 'My Application' --after network.target --restart on-failure --output myapp.service\n\nRequired args: --name, --exec\nOptional args with defaults:\n  --user (default: root)\n  --description (default: '{name} service')\n  --after (default: network.target, can specify multiple)\n  --restart (default: on-failure, choices: no, on-success, on-failure, on-abnormal, on-watchdog, on-abort, always)\n  --restart-sec (default: 5)\n  --output (default: {name}.service)\n  --wanted-by (default: multi-user.target)\n  --env (repeatable, KEY=VALUE pairs to add as Environment= lines)\n  --working-dir (optional WorkingDirectory=)\n\nThe generated .service file must be valid systemd unit format with [Unit], [Service], and [Install] sections.",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

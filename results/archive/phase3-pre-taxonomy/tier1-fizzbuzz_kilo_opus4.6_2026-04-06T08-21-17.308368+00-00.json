@@ -1,0 +1,35 @@
+{
+  "task_id": "tier1-fizzbuzz",
+  "model": "opus4.6",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.9753411249257624,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T08:21:17.308368+00:00",
+  "prompt": "Create a Python file called fizzbuzz.py that prints numbers 1 to 100, but prints 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, and 'FizzBuzz' for multiples of both. One value per line.",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775463676239,\"sessionID\":\"ses_29e1e4c15ffe2FiTDIuF1S8xBg\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: openrouter/anthropic/claude-opus-4-6.\"}}}\n",
+  "conversation": [
+    {
+      "role": "error",
+      "content": "Model not found: openrouter/anthropic/claude-opus-4-6.",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 1
+}

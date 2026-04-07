@@ -1,0 +1,125 @@
+{
+  "task_id": "tier4-git-hook-context-light",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": "git-hook-context-light",
+  "scores": {
+    "correctness": 0.6,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 6,
+        "output": 192,
+        "thinking": 0,
+        "cache_read": 18173
+      },
+      "tool_calls": 0,
+      "wall_time_s": 32.99995562492404,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:56:56.184893+00:00",
+  "prompt": "Create a file called pre-commit (no extension) that works as a git pre-commit hook following our internal repository conventions (documented in your skills).\n\nThe hook should check all staged files and reject the commit if any violations are found.\n\nThe hook should:\n- Enforce ALL rules from our internal repository conventions\n- Print a clear error message for each violation found, prefixed with 'ERROR:'\n- Exit 0 if all checks pass (allow commit)\n- Exit 1 if any check fails (reject commit)\n- Only check files that are staged (git diff --cached --name-only)\n- Be written in bash and be POSIX-compatible",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775570188866,\"sessionID\":\"ses_297c51b46ffebdjbCWxsQ1euiv\",\"part\":{\"id\":\"prt_d683afa40001tCUYIqaE6kTJ1p\",\"sessionID\":\"ses_297c51b46ffebdjbCWxsQ1euiv\",\"messageID\":\"msg_d683ae8e7001RoF2SXBNZX552c\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775570189374,\"sessionID\":\"ses_297c51b46ffebdjbCWxsQ1euiv\",\"part\":{\"id\":\"prt_d683afc38001B36DlSBBmTnOVO\",\"sessionID\":\"ses_297c51b46ffebdjbCWxsQ1euiv\",\"messageID\":\"msg_d683ae8e7001RoF2SXBNZX552c\",\"type\":\"tool\",\"callID\":\"call_6aafa9386d554bbc95af659a\",\"tool\":\"skill\",\"state\":{\"status\":\"completed\",\"input\":{\"name\":\"kilo-config\"},\"output\":\"<skill_content name=\\\"kilo-config\\\">\\n# Skill: kilo-config\\n\\n<h1>Kilo CLI Configuration Reference</h1>\\n<p>All config lives in <code>kilo.json</code> (or <code>kilo.jsonc</code>). Precedence low-to-high: remote well-known, global (<code>~/.config/kilo/kilo.json</code>), env <code>KILO_CONFIG</code>, project <code>./kilo.json</code>, <code>.kilo/kilo.json</code>, <code>KILO_CONFIG_CONTENT</code>, managed (see Config File Locations). Deep-merged; later wins.</p>\\n<h2>Commands (<code>.kilo/command/*.md</code>)</h2>\\n<p>Markdown files with YAML frontmatter. The filename (minus <code>.md</code>) becomes the command name invoked via <code>/name</code>.</p>\\n<pre><code class=\\\"language-yaml\\\">---\\ndescription: Run tests # optional, shown in command list\\nagent: code # optional, route to a specific agent\\nmodel: anthropic/claude-sonnet # optional, override model\\nsubtask: true # optional, run as subtask\\n---\\nRun all tests in $1 and fix failures.\\nUse $ARGUMENTS for the full arg string.\\nReference files with @file and shell output with !`cmd`.\\n</code></pre>\\n<p>Template variables: <code>$1</code>-<code>$N</code> (positional args), <code>$ARGUMENTS</code> (full string), <code>@file</code> (file contents), <code>!`cmd`</code> (shell output).</p>\\n<h2>Agents (<code>.kilo/agent/*.md</code>)</h2>\\n<pre><code class=\\\"language-yaml\\\">---\\ndescription: When to use this agent\\nmode: primary # primary | subagent | all\\nmodel: anthropic/claude-sonnet # optional override\\nsteps: 25 # max agentic iterations\\nhidden: false # hide from @ menu (subagent only)\\ncolor: &quot;#FF5733&quot; # hex or theme name\\npermission: # optional, agent-level permissions\\n  bash: allow\\n  edit:\\n    &quot;src/**&quot;: allow\\n    &quot;*&quot;: ask\\n---\\nSystem prompt for this agent.\\n</code></pre>\\n<p><code>mode</code> values: <code>primary</code> = selectable as main agent, <code>subagent</code> = only via Task tool, <code>all</code> = both.</p>\\n<h2>Permissions</h2>\\n<p>Scalar form applies to all patterns. Object form maps glob patterns to actions. Evaluated top-to-bottom; first match wins.</p>\\n<pre><code class=\\\"language-jsonc\\\">{\\n  &quot;permission&quot;: {\\n    &quot;bash&quot;: &quot;allow&quot;, // scalar: allow all bash\\n    &quot;edit&quot;: {\\n      // object: pattern-matched\\n      &quot;src/**&quot;: &quot;allow&quot;,\\n      &quot;*.lock&quot;: &quot;deny&quot;,\\n      &quot;*&quot;: &quot;ask&quot;, // fallback\\n    },\\n    &quot;read&quot;: &quot;ask&quot;,\\n    &quot;skill&quot;: { &quot;my-skill&quot;: &quot;allow&quot; },\\n    &quot;external_directory&quot;: &quot;deny&quot;,\\n  },\\n}\\n</code></pre>\\n<p>Actions: <code>&quot;allow&quot;</code>, <code>&quot;ask&quot;</code>, <code>&quot;deny&quot;</code>. Set <code>null</code> to delete an inherited key.</p>\\n<p>Tool permissions: <code>read</code>, <code>edit</code>, <code>glob</code>, <code>grep</code>, <code>list</code>, <code>bash</code>, <code>task</code>, <code>webfetch</code>, <code>websearch</code>, <code>codesearch</code>, <code>lsp</code>, <code>skill</code>, <code>external_directory</code>, <code>todowrite</code>, <code>todoread</code>, <code>question</code>, <code>doom_loop</code>.</p>\\n<h2>MCP Servers</h2>\\n<pre><code class=\\\"language-jsonc\\\">{\\n  &quot;mcp&quot;: {\\n    &quot;local-server&quot;: {\\n      &quot;type&quot;: &quot;local&quot;,\\n      &quot;command&quot;: [&quot;node&quot;, &quot;server.js&quot;],\\n      &quot;environment&quot;: { &quot;PORT&quot;: &quot;3000&quot; },\\n      &quot;enabled&quot;: true,\\n      &quot;timeout&quot;: 10000,\\n    },\\n    &quot;remote-server&quot;: {\\n      &quot;type&quot;: &quot;remote&quot;,\\n      &quot;url&quot;: &quot;https://mcp.example.com&quot;,\\n      &quot;headers&quot;: { &quot;Authorization&quot;: &quot;Bearer ...&quot; },\\n      &quot;oauth&quot;: { &quot;clientId&quot;: &quot;...&quot;, &quot;scope&quot;: &quot;read&quot; },\\n      &quot;enabled&quot;: true,\\n    },\\n  },\\n}\\n</code></pre>\\n<p>Disable an inherited server: <code>{ &quot;server-name&quot;: { &quot;enabled&quot;: false } }</code>.</p>\\n<h2>Providers</h2>\\n<pre><code class=\\\"language-jsonc\\\">{\\n  &quot;provider&quot;: {\\n    &quot;anthropic&quot;: {\\n      &quot;options&quot;: {\\n        &quot;apiKey&quot;: &quot;sk-...&quot;,\\n        &quot;baseURL&quot;: &quot;https://custom.endpoint/v1&quot;,\\n        &quot;timeout&quot;: 300000,\\n      },\\n      &quot;models&quot;: {\\n        &quot;custom-model&quot;: { &quot;name&quot;: &quot;My Model&quot; },\\n      },\\n      &quot;whitelist&quot;: [&quot;claude-*&quot;],\\n      &quot;blacklist&quot;: [&quot;claude-2*&quot;],\\n    },\\n  },\\n  &quot;disabled_providers&quot;: [&quot;openai&quot;],\\n  &quot;enabled_providers&quot;: [&quot;anthropic&quot;],\\n}\\n</code></pre>\\n<h2>Skills</h2>\\n<p>Additional skill directories and remote URLs:</p>\\n<pre><code class=\\\"language-jsonc\\\">{\\n  &quot;skills&quot;: {\\n    &quot;paths&quot;: [&quot;./my-skills&quot;, &quot;~/shared-skills&quot;],\\n    &quot;urls&quot;: [&quot;https://example.com/.well-known/skills/&quot;],\\n  },\\n}\\n</code></pre>\\n<p>Skills are markdown files at <code>skills/&lt;name&gt;/SKILL.md</code> with <code>name</code> and <code>description</code> in frontmatter.</p>\\n<h2>Other Top-Level Fields</h2>\\n<table>\\n<thead>\\n<tr><th>Field</th><th>Type</th><th>Description</th></tr>\\n</thead>\\n<tbody>\\n<tr><td><code>model</code></td><td><code>&quot;provider/model&quot;</code></td><td>Default model</td></tr>\\n<tr><td><code>small_model</code></td><td><code>&quot;provider/model&quot;</code></td><td>Model for titles/summaries</td></tr>\\n<tr><td><code>default_agent</code></td><td><code>string</code></td><td>Default primary agent (fallback: <code>code</code>)</td></tr>\\n<tr><td><code>instructions</code></td><td><code>string[]</code></td><td>Glob patterns for additional instruction files</td></tr>\\n<tr><td><code>plugin</code></td><td><code>string[]</code></td><td>Plugin specifiers (npm packages or <code>file://</code> paths)</td></tr>\\n<tr><td><code>snapshot</code></td><td><code>boolean</code></td><td>Enable git snapshots</td></tr>\\n<tr><td><code>share</code></td><td><code>&quot;manual&quot;|&quot;auto&quot;|&quot;disabled&quot;</code></td><td>Session sharing mode</td></tr>\\n<tr><td><code>autoupdate</code></td><td><code>boolean|&quot;notify&quot;</code></td><td>Auto-update behavior</td></tr>\\n<tr><td><code>username</code></td><td><code>string</code></td><td>Display name override</td></tr>\\n<tr><td><code>compaction.auto</code></td><td><code>boolean</code></td><td>Auto-compact when context full (default: true)</td></tr>\\n<tr><td><code>compaction.prune</code></td><td><code>boolean</code></td><td>Prune old tool outputs (default: true)</td></tr>\\n</tbody>\\n</table>\\n<h2>TUI Settings (Ctrl+P Command Palette)</h2>\\n<p>The CLI TUI has runtime settings accessible via <code>Ctrl+P</code> (command palette) or slash commands. <strong>These are user-interactive only \u2014 the agent cannot change them programmatically.</strong> When users ask to change these settings, tell them which command palette entry, keybind, or slash command to use.</p>\\n<p>Leader key default: <code>ctrl+x</code>. Keybinds below use <code>&lt;leader&gt;</code> prefix (e.g. <code>&lt;leader&gt;t</code> = <code>ctrl+x</code> then <code>t</code>).</p>\\n<h3>Theme &amp; Appearance</h3>\\n<table>\\n<thead>\\n<tr><th>Action</th><th>Keybind</th><th>Slash</th><th>Notes</th></tr>\\n</thead>\\n<tbody>\\n<tr><td>Switch theme</td><td><code>&lt;leader&gt;t</code></td><td><code>/themes</code></td><td>Pick from 35+ built-in themes (kilo, catppuccin, dracula, github, gruvbox, nord, tokyonight, etc.)</td></tr>\\n<tr><td>Toggle appearance (dark/light)</td><td>\u2014</td><td>\u2014</td><td>Ctrl+P \u2192 &quot;Toggle appearance&quot;</td></tr>\\n</tbody>\\n</table>\\n<p>Custom themes: place JSON files in <code>~/.config/kilo/themes/</code> or <code>.kilo/themes/</code>.</p>\\n<h3>Session</h3>\\n<table>\\n<thead>\\n<tr><th>Action</th><th>Keybind</th><th>Slash</th></tr>\\n</thead>\\n<tbody>\\n<tr><td>List sessions</td><td><code>&lt;leader&gt;l</code></td><td><code>/sessions</code></td></tr>\\n<tr><td>New session</td><td><code>&lt;leader&gt;n</code></td><td><code>/new</code>, <code>/clear</code></td></tr>\\n<tr><td>Share session</td><td>\u2014</td><td><code>/share</code></td></tr>\\n<tr><td>Rename session</td><td><code>ctrl+r</code></td><td><code>/rename</code></td></tr>\\n<tr><td>Jump to message</td><td><code>&lt;leader&gt;g</code></td><td><code>/timeline</code></td></tr>\\n<tr><td>Fork from message</td><td>\u2014</td><td><code>/fork</code></td></tr>\\n<tr><td>Compact/summarize</td><td><code>&lt;leader&gt;c</code></td><td><code>/compact</code>, <code>/summarize</code></td></tr>\\n<tr><td>Undo message</td><td><code>&lt;leader&gt;u</code></td><td><code>/undo</code></td></tr>\\n<tr><td>Redo</td><td><code>&lt;leader&gt;r</code></td><td><code>/redo</code></td></tr>\\n<tr><td>Copy last response</td><td><code>&lt;leader&gt;y</code></td><td>\u2014</td></tr>\\n<tr><td>Copy transcript</td><td>\u2014</td><td><code>/copy</code></td></tr>\\n</tbody>\\n</table>\\n<h3>Agent &amp; Model</h3>\\n<table>\\n<thead>\\n<tr><th>Action</th><th>Keybind</th><th>Slash</th></tr>\\n</thead>\\n<tbody>\\n<tr><td>Switch model</td><td><code>&lt;leader&gt;m</code></td><td><code>/models</code></td></tr>\\n<tr><td>Switch agent</td><td><code>&lt;leader&gt;a</code></td><td><code>/agents</code></td></tr>\\n<tr><td>Toggle MCPs</td><td>\u2014</t",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"name\": \"kilo-config\"\n}",
+      "tool_name": "skill"
+    },
+    {
+      "role": "tool_result",
+      "content": "<skill_content name=\"kilo-config\">\n# Skill: kilo-config\n\n<h1>Kilo CLI Configuration Reference</h1>\n<p>All config lives in <code>kilo.json</code> (or <code>kilo.jsonc</code>). Precedence low-to-high: remote well-known, global (<code>~/.config/kilo/kilo.json</code>), env <code>KILO_CONFIG</code>, project <code>./kilo.json</code>, <code>.kilo/kilo.json</code>, <code>KILO_CONFIG_CONTENT</code>, managed (see Config File Locations). Deep-merged; later wins.</p>\n<h2>Commands (<code>.kilo/command/*.md</code>)</h2>\n<p>Markdown files with YAML frontmatter. The filename (minus <code>.md</code>) becomes the command name invoked via <code>/name</code>.</p>\n<pre><code class=\"language-yaml\">---\ndescription: Run tests # optional, shown in command list\nagent: code # optional, route to a specific agent\nmodel: anthropic/claude-sonnet # optional, override model\nsubtask: true # optional, run as subtask\n---\nRun all tests in $1 and fix failures.\nUse $ARGUMENTS for the full arg string.\nReference files with @file and shell output with !`cmd`.\n</code></pre>\n<p>Template variables: <code>$1</code>-<code>$N</code> (positional args), <code>$ARGUMENTS</code> (full string), <code>@file</code> (file contents), <code>!`cmd`</code> (shell output).</p>\n<h2>Agents (<code>.kilo/agent/*.md</code>)</h2>\n<pre><code class=\"language-yaml\">---\ndescription: When to use this agent\nmode: primary # primary | subagent | all\nmodel: anthropic/claude-sonnet # optional override\nsteps: 25 # max agentic iterations\nhidden: false # hide from @ menu (subagent only)\ncolor: &quot;#FF5733&quot; # hex or theme name\npermission: # optional, agent-level permissions\n  bash: allow\n  edit:\n    &quot;src/**&quot;: allow\n    &quot;*&quot;: ask\n---\nSystem prompt for this agent.\n</code></pre>\n<p><code>mode</code> values: <code>primary</code> = selectable as main agent, <code>subagent</code> = only via Task tool, <code>all</code> = both.</p>\n<h2>Permissions</h2>\n<p>Scalar form applies to all patterns. Object form maps glob patterns to ac",
+      "tool_name": "skill"
+    },
+    {
+      "role": "response",
+      "content": "\nI'll help you create a pre-commit hook that enforces your internal repository conventions. Let me first explore your project structure and find the documented conventions.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/AGENTS.md\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/AGENTS.md</path>\n<type>file</type>\n<content>1: Complete the task described in your prompt. Do not ask questions.\n\n(End of file - total 1 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "response",
+      "content": "\nLet me check for any internal repository conventions in the project:",
+      "tool_name": ""
+    },
+    {
+      "role": "response",
+      "content": "\nLet me explore the project structure to find any convention documentation:",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"pattern\": \"**/*.md\"\n}",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_result",
+      "content": "/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/AGENTS.md\n/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/.claude/skills/git-hook-context-light/SKILL.md",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/.claude/skills/git-hook-context-light/SKILL.md\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/.claude/skills/git-hook-context-light/SKILL.md</path>\n<type>file</type>\n<content>1: # Internal Repository Conventions \u2014 Key Rules\n2: \n3: Our top 3 mandatory pre-commit rules:\n4: \n5: 1. **Commit message format**: must match `^(feat|fix|chore|docs|refactor): [A-Z].+`\n6: 2. **No credential files**: `.env`, `.credentials`, `*.pem`, `*.key` \u2014 hard block, never commit\n7: 3. **Python linting**: all staged Python files must pass `ruff check`\n\n(End of file - total 7 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "response",
+      "content": "\nPerfect! I found the internal repository conventions. Let me create the pre-commit hook based on these rules:",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"#!/bin/sh\\n\\n# Pre-commit hook to enforce internal repository conventions\\n# Exits 0 if all checks pass, 1 if any check fails\\n\\n# Get staged files\\nstaged_files=$(git diff --cached --name-only)\\n\\n# If no staged files, exit successfully\\nif [ -z \\\"$staged_files\\\" ]; then\\n    exit 0\\nfi\\n\\n# Track if any violations were found\\nviolations=0\\n\\n# Check each staged file for violations\\necho \\\"Checking staged files for repository conventions...\\\"\\n\\n# Rule 1: Check for credential files in staging\\necho \\\"Checking for credential files...\\\"\\nfor file in $staged_files; do\\n    case \\\"$file\\\" in\\n        .env|.credentials|*.pem|*.key)\\n            echo \\\"ERROR: Credential file '$file' is staged for commit\\\"\\n            violations=$((violations + 1))\\n            ;;\\n    esac\\ndone\\n\\n# Rule 2: Check Python files for linting\\necho \\\"Checking Python files for linting...\\\"\\nfor file in $staged_files; do\\n    case \\\"$file\\\" in\\n        *.py)\\n            # Check if file exists (it should, but just in case)\\n            if [ -f \\\"$file\\\" ]; then\\n                # Run ruff check on the file\\n                if ! ruff check \\\"$file\\\" > /dev/null 2>&1; then\\n                    echo \\\"ERROR: Python file '$file' fails ruff linting\\\"\\n                    violations=$((violations + 1))\\n                fi\\n            fi\\n            ;;\\n    esac\\ndone\\n\\n# Rule 3: Check commit message format\\necho \\\"Checking commit message format...\\\"\\ncommit_msg_file=\\\"$1\\\"\\nif [ -f \\\"$commit_msg_file\\\" ]; then\\n    commit_msg=$(cat \\\"$commit_msg_file\\\")\\n    if ! echo \\\"$commit_msg\\\" | grep -qE '^(feat|fix|chore|docs|refactor): [A-Z].+'; then\\n        echo \\\"ERROR: Commit message does not match required format: '^(feat|fix|chore|docs|refactor): [A-Z].+'\\\"\\n        echo \\\"Current commit message:\\\"\\n        echo \\\"$commit_msg\\\"\\n        violations=$((violations + 1))\\n    fi\\nelse\\n    echo \\\"ERROR: Commit message file not found\\\"\\n    violations=$((violations + 1))\\nfi\\n\\n# Final result\\nif [ $violations -gt 0 ]; then\\n    echo \\\"\\\"\\n    echo \\\"Found $violations convention violation(s). Commit rejected.\\\"\\n    echo \\\"Please fix all violations before committing.\\\"\\n    exit 1\\nelse\\n    echo \\\"\\\"\\n    echo \\\"All convention checks passed. Commit allowed.\\\"\\n    exit 0\\nfi\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/pre-commit\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "\nNow let me make the pre-commit hook executable:",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"chmod +x /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ifjfr4ge/pre-commit\",\n  \"description\": \"Make pre-commit hook executable\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "response",
+      "content": "\nI've created a pre-commit hook that enforces your internal repository conventions. The hook:\n\n1. **Checks for credential files** - rejects `.env`, `.credentials`, `*.pem`, and `*.key` files\n2. **Validates Python files** - ensures all staged Python files pass `ruff check`\n3. **Verifies commit message format** - enforces `^(feat|fix|chore|docs|refactor): [A-Z].+` pattern\n\nThe hook is POSIX-compatible bash script that:\n- Uses `git diff --cached --name-only` to get only staged files\n- Prints clear error messages prefixed with 'ERROR:' for violations\n- Exits 0 if all checks pass (allows commit)\n- Exits 1 if any check fails (rejects commit)\n\nTo use it, place this file in your `.git/hooks/pre-commit` directory or symlink it there.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "pre-commit",
+      "content": "#!/bin/sh\n\n# Pre-commit hook to enforce internal repository conventions\n# Exits 0 if all checks pass, 1 if any check fails\n\n# Get staged files\nstaged_files=$(git diff --cached --name-only)\n\n# If no staged files, exit successfully\nif [ -z \"$staged_files\" ]; then\n    exit 0\nfi\n\n# Track if any violations were found\nviolations=0\n\n# Check each staged file for violations\necho \"Checking staged files for repository conventions...\"\n\n# Rule 1: Check for credential files in staging\necho \"Checking for credential files...\"\nfor file in $staged_files; do\n    case \"$file\" in\n        .env|.credentials|*.pem|*.key)\n            echo \"ERROR: Credential file '$file' is staged for commit\"\n            violations=$((violations + 1))\n            ;;\n    esac\ndone\n\n# Rule 2: Check Python files for linting\necho \"Checking Python files for linting...\"\nfor file in $staged_files; do\n    case \"$file\" in\n        *.py)\n            # Check if file exists (it should, but just in case)\n            if [ -f \"$file\" ]; then\n                # Run ruff check on the file\n                if ! ruff check \"$file\" > /dev/null 2>&1; then\n                    echo \"ERROR: Python file '$file' fails ruff linting\"\n                    violations=$((violations + 1))\n                fi\n            fi\n            ;;\n    esac\ndone\n\n# Rule 3: Check commit message format\necho \"Checking commit message format...\"\ncommit_msg_file=\"$1\"\nif [ -f \"$commit_msg_file\" ]; then\n    commit_msg=$(cat \"$commit_msg_file\")\n    if ! echo \"$commit_msg\" | grep -qE '^(feat|fix|chore|docs|refactor): [A-Z].+'; then\n        echo \"ERROR: Commit message does not match required format: '^(feat|fix|chore|docs|refactor): [A-Z].+'\"\n        echo \"Current commit message:\"\n        echo \"$commit_msg\"\n        violations=$((violations + 1))\n    fi\nelse\n    echo \"ERROR: Commit message file not found\"\n    violations=$((violations + 1))\nfi\n\n# Final result\nif [ $violations -gt 0 ]; then\n    echo \"\"\n    echo \"Found $violations convention violation(s). Commit rejected.\"\n    echo \"Please fix all violations before committing.\"\n    exit 1\nelse\n    echo \"\"\n    echo \"All convention checks passed. Commit allowed.\"\n    exit 0\nfi",
+      "language": ""
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "context",
+  "skill_intensity": "light",
+  "skill_pair": "git-hook"
+}

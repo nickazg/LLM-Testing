@@ -1,0 +1,54 @@
+{
+  "task_id": "tier3-usd-stage-layers",
+  "model": "devstral",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00601895793807,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T10:29:13.478354+00:00",
+  "prompt": "Create a Python script called layer_opinions.py that uses the pxr library to demonstrate USD's layer opinion system. The script must create THREE .usda files and a composed result:\n\n1. base_layer.usda \u2014 contains:\n   - Default prim /Scene\n   - /Scene/Character \u2014 an Xform with xformOp:translate at (0, 0, 0)\n   - /Scene/Character/Body \u2014 a Mesh (simple cube)\n\n2. anim_layer.usda \u2014 a STRONGER layer that overrides:\n   - /Scene/Character xformOp:translate with time-sampled values: frame 1 at (0,0,0), frame 24 at (5,0,0)\n\n3. look_layer.usda \u2014 the STRONGEST layer that adds:\n   - /Scene/Character/Body gets a Material binding to /Scene/Looks/HeroMat\n   - /Scene/Looks/HeroMat \u2014 a UsdShade.Material with a UsdPreviewSurface shader, diffuseColor (0.9, 0.1, 0.1)\n\n4. The script should print the composed translate value at frame 12 to stdout as verification\n\nLayer stack order (strongest to weakest): look_layer.usda, anim_layer.usda, base_layer.usda\n\nUse: from pxr import Usd, UsdGeom, UsdShade, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/7875501061016635032",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-oi8n4t44\u0001\u0011layer_opinions.py\ufffdJ~=\ufffd0s\ufffd\ufffd\ufffd\ufffd\ufffdxg\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "layer_opinions.py",
+      "content": "from pxr import Usd, UsdGeom, UsdShade, Sdf, Gf\n\n# Create base_layer.usda\nbase_layer = Sdf.Layer.CreateAnonymous(\"base_layer.usda\")\nbase_stage = Usd.Stage.Open(base_layer)\n\n# Define root prim\nscene = UsdGeom.Xform.Define(base_stage, \"/Scene\")\nbase_stage.SetDefaultPrim(scene.GetPrim())\n\n# Define Character\ncharacter = UsdGeom.Xform.Define(base_stage, \"/Scene/Character\")\ncharacter.AddTranslateOp().Set(Gf.Vec3d(0, 0, 0))\n\n# Define Body\nbody = UsdGeom.Mesh.Define(base_stage, \"/Scene/Character/Body\")\nbody.GetPointsAttr().Set(\n    [\n        Gf.Vec3f(-0.5, -0.5, -0.5),\n        Gf.Vec3f(0.5, -0.5, -0.5),\n        Gf.Vec3f(0.5, 0.5, -0.5),\n        Gf.Vec3f(-0.5, 0.5, -0.5),\n        Gf.Vec3f(-0.5, -0.5, 0.5),\n        Gf.Vec3f(0.5, -0.5, 0.5),\n        Gf.Vec3f(0.5, 0.5, 0.5),\n        Gf.Vec3f(-0.5, 0.5, 0.5),\n    ]\n)\nbody.GetFaceVertexIndicesAttr().Set(\n    [0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]\n)\n\nbase_layer.Save()\n\n# Create anim_layer.usda\nanim_layer = Sdf.Layer.CreateAnonymous(\"anim_layer.usda\")\nanim_stage = Usd.Stage.Open(anim_layer)\n\n# Define root prim\nscene = UsdGeom.Xform.Define(anim_stage, \"/Scene\")\nanim_stage.SetDefaultPrim(scene.GetPrim())\n\n# Define Character with animated translate\ncharacter = UsdGeom.Xform.Define(anim_stage, \"/Scene/Character\")\ntranslate_op = character.AddTranslateOp()\ntranslate_op.Set(Gf.Vec3d(0, 0, 0), Usd.TimeCode(1))\ntranslate_op.Set(Gf.Vec3d(5, 0, 0), Usd.TimeCode(24))\n\nanim_layer.Save()\n\n# Create look_layer.usda\nlook_layer = Sdf.Layer.CreateAnonymous(\"look_layer.usda\")\nlook_stage = Usd.Stage.Open(look_layer)\n\n# Define root prim\nscene = UsdGeom.Xform.Define(look_stage, \"/Scene\")\nlook_stage.SetDefaultPrim(scene.GetPrim())\n\n# Define Looks\nlooks = UsdGeom.Scope.Define(look_stage, \"/Scene/Looks\")\nhero_mat = UsdShade.Material.Define(look_stage, \"/Scene/Looks/HeroMat\")\nshader = UsdShade.Shader.Define(look_stage, \"/Scene/Looks/HeroMat/Shader\")\nshader.CreateIdAttr(\"UsdPreviewSurface\")\nshader.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Color3f).Set(\n    Gf.Vec3f(0.9, 0.1, 0.1)\n)\nhero_mat.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), \"surface\")\n\n# Bind material to Body\nbody = UsdGeom.Mesh.Define(look_stage, \"/Scene/Character/Body\")\nUsdShade.MaterialBindingAPI(body).Bind(hero_mat)\n\nlook_layer.Save()\n\n# Compose layers\ncomposed_stage = Usd.Stage.Open(\"base_layer.usda\")\ncomposed_stage.GetRootLayer().subLayerPaths.append(Sdf.Path(\"anim_layer.usda\"))\ncomposed_stage.GetRootLayer().subLayerPaths.append(Sdf.Path(\"look_layer.usda\"))\n\n# Verify translate value at frame 12\ncharacter = UsdGeom.Xform(composed_stage.GetPrimAtPath(\"/Scene/Character\"))\ntranslate_op = character.GetOrderedXformOps()[0]\ntranslate_value = translate_op.GetAttr().Get(Usd.TimeCode(12))\nprint(f\"Composed translate value at frame 12: {translate_value}\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

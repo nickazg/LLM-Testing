@@ -1,0 +1,35 @@
+{
+  "task_id": "tier4-expression-parser",
+  "model": "minimax-m2.7",
+  "cli": "kilo",
+  "skill": "recursive-descent-parser",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.205240249983035,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T09:51:40.785317+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775469099751,\"sessionID\":\"ses_29dcb8a73ffeM217m95OWwefkK\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: openrouter/minimax/minimax-m2-7.\"}}}\n",
+  "conversation": [
+    {
+      "role": "error",
+      "content": "Model not found: openrouter/minimax/minimax-m2-7.",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 4
+}

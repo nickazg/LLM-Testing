@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-usd-render-settings",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00458037503995,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T09:18:42.550615+00:00",
+  "prompt": "Create a Python script called render_config.py that uses the pxr library to build a USD render pipeline configuration. The script must create TWO files:\n\n1. camera_rig.usda \u2014 contains:\n   - Default prim /CameraRig\n   - /CameraRig/MainCamera \u2014 a UsdGeom.Camera with focalLength=50, horizontalAperture=36, clippingRange=(0.1, 10000)\n   - /CameraRig/MainCamera has xformOp:translate at (0, 5, 20) and xformOp:rotateXYZ at (-15, 0, 0)\n\n2. render_config.usda \u2014 contains:\n   - Default prim /Render\n   - References camera_rig.usda\n   - /Render/RenderProduct \u2014 a UsdRender.Product with productName set to \"beauty.exr\"\n   - /Render/RenderProduct/beauty \u2014 a UsdRender.Var with dataType \"color3f\" and sourceName \"Ci\"\n   - /Render/RenderProduct/depth \u2014 a UsdRender.Var with dataType \"float\" and sourceName \"z\"\n   - /Render/RenderProduct/normal \u2014 a UsdRender.Var with dataType \"normal3f\" and sourceName \"N\"\n   - /Render/RenderSettings \u2014 a UsdRender.Settings with resolution (1920, 1080) and pixelAspectRatio 1.0\n   - /Render/RenderSettings should reference /CameraRig/MainCamera as the camera\n\nUse: from pxr import Usd, UsdGeom, UsdRender, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

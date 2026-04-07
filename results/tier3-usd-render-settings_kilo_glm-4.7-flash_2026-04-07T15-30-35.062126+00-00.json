@@ -1,0 +1,64 @@
+{
+  "task_id": "tier3-usd-render-settings",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.375,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00770037504844,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T15:30:35.062126+00:00",
+  "prompt": "Create a Python script called render_config.py that uses the pxr library to build a USD render pipeline configuration. The script must create TWO files:\n\n1. camera_rig.usda \u2014 contains:\n   - Default prim /CameraRig\n   - /CameraRig/MainCamera \u2014 a UsdGeom.Camera with focalLength=50, horizontalAperture=36, clippingRange=(0.1, 10000)\n   - /CameraRig/MainCamera has xformOp:translate at (0, 5, 20) and xformOp:rotateXYZ at (-15, 0, 0)\n\n2. render_config.usda \u2014 contains:\n   - Default prim /Render\n   - References camera_rig.usda\n   - /Render/RenderProduct \u2014 a UsdRender.Product with productName set to \"beauty.exr\"\n   - /Render/RenderProduct/beauty \u2014 a UsdRender.Var with dataType \"color3f\" and sourceName \"Ci\"\n   - /Render/RenderProduct/depth \u2014 a UsdRender.Var with dataType \"float\" and sourceName \"z\"\n   - /Render/RenderProduct/normal \u2014 a UsdRender.Var with dataType \"normal3f\" and sourceName \"N\"\n   - /Render/RenderSettings \u2014 a UsdRender.Settings with resolution (1920, 1080) and pixelAspectRatio 1.0\n   - /Render/RenderSettings should reference /CameraRig/MainCamera as the camera\n\nUse: from pxr import Usd, UsdGeom, UsdRender, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/14119346669083087208",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-6bg5uyxm\u0001\u0010render_config.py\ufffd\"\ufffd\ufffd\u007f+$\ufffd\ufffd\ufffd\ufffd\u0690h\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "camera_rig.usda",
+      "content": "#usda 1.0\n\ndef \"CameraRig\"\n{\n    def Camera \"MainCamera\"\n    {\n        float2 clippingRange = (0.1, 10000)\n        float focalLength = 50\n        float horizontalAperture = 36\n        float3 xformOp:rotateXYZ = (-15, 0, 0)\n        double3 xformOp:translate = (0, 5, 20)\n        uniform token[] xformOpOrder = [\"xformOp:translate\", \"xformOp:rotateXYZ\"]\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "render_config.py",
+      "content": "from pxr import Usd, UsdGeom, UsdRender, Sdf, Gf\n\n\ndef create_camera_rig(file_path):\n    stage = Usd.Stage.CreateNew(file_path)\n    stage.SetDefaultPrim(stage.GetPseudoRoot().GetPrimAtPath(\"/CameraRig\"))\n\n    camera_rig = UsdGeom.Xform.Define(stage, \"/CameraRig/MainCamera\")\n\n    camera = UsdGeom.Camera.Define(stage, \"/CameraRig/MainCamera\")\n    camera.CreateFocalLengthAttr(50)\n    camera.CreateHorizontalApertureAttr(36)\n    camera.CreateClippingRangeAttr(Gf.Vec2f(0.1, 10000))\n\n    xform_op_translate = camera_rig.AddTranslateOp()\n    xform_op_rotate_xyz = camera_rig.AddRotateXYZOp()\n\n    xform_op_translate.Set(Gf.Vec3d(0, 5, 20))\n    xform_op_rotate_xyz.Set(Gf.Vec3d(-15, 0, 0))\n\n    stage.GetRootLayer().Save()\n    print(f\"Created camera rig: {file_path}\")\n\n\ndef create_render_config(file_path, camera_rig_path):\n    stage = Usd.Stage.CreateNew(file_path)\n    stage.SetDefaultPrim(stage.GetPseudoRoot().GetPrimAtPath(\"/Render\"))\n\n    render = UsdRender.Product.Define(stage, \"/Render/RenderProduct\")\n    render.CreateProductNameAttr(\"beauty.exr\")\n\n    beauty = UsdRender.Var.Define(stage, \"/Render/RenderProduct/beauty\")\n    beauty.CreateDataTypeAttr(\"color3f\")\n    beauty.CreateSourceNameAttr(\"Ci\")\n\n    depth = UsdRender.Var.Define(stage, \"/Render/RenderProduct/depth\")\n    depth.CreateDataTypeAttr(\"float\")\n    depth.CreateSourceNameAttr(\"z\")\n\n    normal = UsdRender.Var.Define(stage, \"/Render/RenderProduct/normal\")\n    normal.CreateDataTypeAttr(\"normal3f\")\n    normal.CreateSourceNameAttr(\"N\")\n\n    render_settings = UsdRender.RenderSettings.Define(stage, \"/Render/RenderSettings\")\n    render_settings.CreateResolutionAttr(Gf.Vec2i(1920, 1080))\n    render_settings.CreatePixelAspectRatioAttr(1.0)\n\n    render_settings.GetPrim().GetReferences().AddReference(camera_rig_path)\n\n    stage.GetRootLayer().Save()\n    print(f\"Created render config: {file_path}\")\n\n\nif __name__ == \"__main__\":\n    create_camera_rig(\"camera_rig.usda\")\n    create_render_config(\"render_config.usda\", \"camera_rig.usda\")\n",
+      "language": "python"
+    },
+    {
+      "path": "render_config.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": "tier3-usd-procedural-animation",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2542946250178,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:25:20.909828+00:00",
+  "prompt": "Create a Python script called animate_skeleton.py that uses the pxr library to build a skeletal animation setup. The script must create a file called skeleton_anim.usda containing:\n\n1. /Root \u2014 a UsdSkel.Root (default prim)\n2. /Root/Skeleton \u2014 a UsdSkel.Skeleton with joints: [\"Hips\", \"Hips/Spine\", \"Hips/Spine/Head\", \"Hips/LeftLeg\", \"Hips/RightLeg\"]\n3. /Root/Skeleton should have restTransforms and bindTransforms for each joint (use identity or simple offsets \u2014 Hips at origin, Spine at (0,1,0), Head at (0,2,0), LeftLeg at (-0.5,-1,0), RightLeg at (0.5,-1,0))\n4. /Root/Anim \u2014 a UsdSkel.Animation with:\n   - joints matching the skeleton\n   - Time-sampled translations for frames 1-24 (animate Hips translating up and down in Y by 0.5 units over the cycle)\n5. /Root/Mesh \u2014 a UsdGeom.Mesh (simple cube/box) bound to the skeleton using UsdSkel.BindingAPI\n   - Set skel:jointIndices and skel:jointWeights (all vertices bound to Hips joint is fine)\n\nUse: from pxr import Usd, UsdGeom, UsdSkel, Sdf, Gf, Vt",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "animate_skeleton.py",
+      "content": "#!/usr/bin/env python\n\nfrom pxr import Usd, UsdGeom, UsdSkel, Sdf, Gf, Vt, Math\nimport sys\n\ndef create_skeleton_animation():\n    \"\"\"Create a USD file with a basic skeletal animation setup.\"\"\"\n\n    # Create a new USD stage\n    stage = Usd.Stage.CreateInMemory()\n\n    # Define joint names\n    joint_names = [\n        \"Hips\",\n        \"Hips/Spine\",\n        \"Hips/Spine/Head\",\n        \"Hips/LeftLeg\",\n        \"Hips/RightLeg\"\n    ]\n\n    # Create the root prim\n    root_prim = stage.DefinePrim(\"/Root\")\n    root_prim.SetTypeName(\"UsdSkelRoot\")\n\n    # Create Skeleton prim\n    skeleton_prim = stage.DefinePrim(\"/Root/Skeleton\")\n    skeleton_prim.SetTypeName(\"UsdSkelSkeleton\")\n\n    # Set up joints for the skeleton\n    skeleton_prim.CreateAttribute(\"joints\", Sdf.ValueTypeNames.StringArray).Set(joint_names)\n\n    # Create rest transforms (identity transforms for all joints)\n    rest_transforms = []\n    for joint in joint_names:\n        rest_transforms.append(Gf.Matrix4d(1))  # Identity matrix\n\n    # Create bind transforms with simple offsets\n    bind_transforms = []\n\n    # Hips at origin\n    bind_transforms.append(Gf.Matrix4d(1))\n\n    # Spine at (0, 1, 0)\n    spine_transform = Gf.Matrix4d()\n    spine_transform.SetTranslate(Gf.Vec3d(0, 1, 0))\n    bind_transforms.append(spine_transform)\n\n    # Head at (0, 2, 0)\n    head_transform = Gf.Matrix4d()\n    head_transform.SetTranslate(Gf.Vec3d(0, 2, 0))\n    bind_transforms.append(head_transform)\n\n    # LeftLeg at (-0.5, -1, 0)\n    left_leg_transform = Gf.Matrix4d()\n    left_leg_transform.SetTranslate(Gf.Vec3d(-0.5, -1, 0))\n    bind_transforms.append(left_leg_transform)\n\n    # RightLeg at (0.5, -1, 0)\n    right_leg_transform = Gf.Matrix4d()\n    right_leg_transform.SetTranslate(Gf.Vec3d(0.5, -1, 0))\n    bind_transforms.append(right_leg_transform)\n\n    # Set rest and bind transforms\n    skeleton_prim.CreateAttribute(\"restTransforms\", Sdf.ValueTypeNames.Matrix4dArray).Set(rest_transforms)\n    skeleton_prim.CreateAttribute(\"bindTransforms\", Sdf.ValueTypeNames.Matrix4dArray).Set(bind_transforms)\n\n    # Create Animation prim\n    anim_prim = stage.DefinePrim(\"/Root/Anim\")\n    anim_prim.SetTypeName(\"UsdSkelAnimation\")\n\n    # Set joints for animation\n    anim_prim.CreateAttribute(\"joints\", Sdf.ValueTypeNames.StringArray).Set(joint_names)\n\n    # Create time-sampled translations for Hips (frames 1-24)\n    time_samples = []\n    translations = []\n\n    # Animate Hips moving up and down in Y by 0.5 units over 24 frames\n    for frame in range(1, 25):\n        time_samples.append(frame)\n        # Sinusoidal motion: Y position oscillates between -0.25 and 0.25\n        y_pos = 0.25 * Gf.Math.Sin(frame * 2 * Gf.Math.PI / 24)\n        translations.append(Gf.Vec3d(0, y_pos, 0))\n\n    # Create animated attribute\n    anim_attr = anim_prim.CreateAttribute(\"translations\", Sdf.ValueTypeNames.Vector3dArray)\n    anim_attr.Set(Vt.Vec3dArray(len(joint_names), Gf.Vec3d(0)))  # Default to all zeros\n\n    # Set time samples for Hips (first joint)\n    for i, (time, trans) in enumerate(zip(time_samples, translations)):\n        anim_attr.Set(Vt.Vec3dArray([trans] + [Gf.Vec3d(0)] * (len(joint_names) - 1)), time)\n\n    # Create a simple cube mesh\n    mesh_prim = stage.DefinePrim(\"/Root/Mesh\")\n    mesh_prim.SetTypeName(\"UsdGeomMesh\")\n\n    # Create a simple cube geometry\n    cube = UsdGeom.Mesh(mesh_prim)\n\n    # Define cube points (8 vertices of a unit cube)\n    points = [\n        (-0.5, -0.5, -0.5),  # 0\n        (0.5, -0.5, -0.5),   # 1\n        (0.5, 0.5, -0.5),    # 2\n        (-0.5, 0.5, -0.5),   # 3\n        (-0.5, -0.5, 0.5),   # 4\n        (0.5, -0.5, 0.5),    # 5\n        (0.5, 0.5, 0.5),     # 6\n        (-0.5, 0.5, 0.5)     # 7\n    ]\n\n    # Define face indices for 6 faces of cube\n    faceVertexCounts = [4, 4, 4, 4, 4, 4]\n    faceVertexIndices = [\n        0, 4, 7, 3,  # bottom face\n        1, 5, 6, 2,  # top face\n        0, 1, 2, 3,  # front face\n        4, 5, 6, 7,  # back face\n        0, 1, 5, 4,  # left face\n        3, 7, 6, 2   # right face\n    ]\n\n    # Set geometry\n    cube.GetPointsAttr().Set(Vt.Vec3fArray(len(points), Gf.Vec3f(0)))\n    for i, point in enumerate(points):\n        cube.GetPointsAttr().Set(Gf.Vec3f(*point), i)\n\n    cube.GetFaceVertexCountsAttr().Set(faceVertexCounts)\n    cube.GetFaceVertexIndicesAttr().Set(faceVertexIndices)\n\n    # Create BindingAPI for skeletal binding\n    binding_api = UsdSkel.BindingAPI.Apply(mesh_prim)\n\n    # Set joint indices (all vertices bound to Hips joint)\n    joint_indices = [0] * 8  # 8 vertices, all bound to Hips (index 0)\n    binding_api.CreateJointIndicesAttr().Set(joint_indices)\n\n    # Set joint weights (all weight on Hips joint)\n    joint_weights = [[1.0]] * 8  # Each vertex has full weight on Hips\n    binding_api.CreateJointWeightsAttr().Set(joint_weights)\n\n    # Set the skeleton prim for binding\n    binding_api.CreateSkelSkeletonAttr().Set(skeleton_prim.GetPath())\n\n    # Write the stage to a file\n    stage.GetRootLayer().Export(\"skeleton_anim.usda\")\n    print(\"Successfully created skeleton_anim.usda\")\n\nif __name__ == \"__main__\":\n    try:\n        create_skeleton_animation()\n    except Exception as e:\n        print(f\"Error creating skeleton animation: {e}\")\n        sys.exit(1)",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-houdini-solaris-light-linking",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0043132499559,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:47:42.296182+00:00",
+  "prompt": "Create a Python script called solaris_light_linking.py for Houdini Solaris (LOPs context). Using the editableStage from a Python Script LOP, the script should:\n\n1. Get the stage: stage = hou.pwd().editableStage()\n2. Create /Scene as default prim (UsdGeom.Xform)\n3. Create geometry:\n   - /Scene/Hero \u2014 a UsdGeom.Xform with /Scene/Hero/Body (Mesh cube), purpose set to \"render\"\n   - /Scene/Environment \u2014 a UsdGeom.Xform with /Scene/Environment/Ground (Mesh quad), purpose set to \"render\"\n   - /Scene/Proxy \u2014 a UsdGeom.Xform with purpose set to \"proxy\"\n4. Create lights:\n   - /Scene/Lighting/KeyLight \u2014 a UsdLux.DistantLight, intensity=50000, angle=1.0, rotateXYZ (-45, 30, 0)\n   - /Scene/Lighting/FillLight \u2014 a UsdLux.DomeLight, intensity=500\n   - /Scene/Lighting/RimLight \u2014 a UsdLux.DistantLight, intensity=25000, rotateXYZ (-30, -150, 0)\n5. Create a UsdLux.LightFilter child under KeyLight:\n   - /Scene/Lighting/KeyLight/BarnDoor \u2014 type it as a generic prim with custom attributes for barn door parameters (top=0.2, bottom=-0.1, left=-0.3, right=0.3)\n6. Light linking using UsdCollectionAPI:\n   - On KeyLight: create collection \"lightLink\" that includes /Scene/Hero and excludes /Scene/Environment\n   - On RimLight: create collection \"lightLink\" that includes only /Scene/Hero/Body\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf, Vt",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": "tier4-expression-parser-compiled-gemma-4-27b",
+  "model": "gemma-4-31b",
+  "cli": "claude-code",
+  "skill": "recursive-descent-parser:compiled-gemma-4-27b",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2487581670284,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T09:42:54.243800+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "expr_parser.py`",
+      "content": "import re\nfrom dataclasses import dataclass\nfrom typing import Union, Optional\n\n@dataclass\nclass ASTNode:\n    type: str  # 'number', 'binop', 'unary'\n    value: Optional[float] = None\n    op: Optional[str] = None\n    left: Optional['ASTNode'] = None\n    right: Optional['ASTNode'] = None\n    operand: Optional['ASTNode'] = None\n\ndef parse(expression: str) -> ASTNode:\n    expression = expression.replace(' ', '')\n    if not expression:\n        raise ValueError(\"Empty input\")\n\n    tokens = tokenize(expression)\n    pos = 0\n\n    def peek():\n        nonlocal pos\n        return tokens[pos] if pos << len len(tokens) else None\n\n    def consume():\n        nonlocal pos\n        token = peek()\n        pos += 1\n        return token\n\n    def parse_primary():\n        token = peek()\n        if token == '(':\n            consume()\n            node = parse_expr()\n            if consume() != ')':\n                raise ValueError(\"Unmatched parentheses\")\n            return node\n        elif token == '-':\n            consume()\n            return ASTNode(type='unary', op='-', operand=parse_primary())\n        elif token is not None and re.match(r'^\\d+(\\.\\d+)?$', token):\n            return ASTNode(type='number', value=float(consume()))\n        else:\n            raise ValueError(f\"Invalid token: {token}\")\n\n    def parse_mul_div():\n        node = parse_primary()\n        while peek() in ('*', '/'):\n            op = consume()\n            right = parse_primary()\n            node = ASTNode(type='binop', op=op, left=node, right=right)\n        return node\n\n    def parse_expr():\n        node = parse_mul_div()\n        while peek() in ('+', '-'):\n            op = consume()\n            right = parse_mul_div()\n            node = ASTNode(type='binop', op=op, left=node, right=right)\n        return node\n\n    result = parse_expr()\n    if pos << len len(tokens):\n        raise ValueError(f\"Unexpected token at end of expression: {peek()}\")\n    return result\n\ndef tokenize(expression: str):\n    token_specification = [\n        ('NUMBER', r'\\d+(\\.\\d+)?'),\n        ('OP',     r'[+\\-*/()]'),\n        ('SKIP',   r'\\s+'),\n        ('MISMATCH',r'.'),\n    ]\n    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)\n    tokens = []\n    for mo in re.finditer(tok_regex, expression):\n        kind = mo.lastgroup\n        value = mo.group()\n        if kind == 'NUMBER' or kind == 'OP':\n            tokens.append(value)\n        elif kind == 'MISMATCH':\n            raise ValueError(f\"Invalid character: {value}\")\n    return tokens\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == 'number':\n        return node.value\n    elif node.type == 'unary':\n        return -evaluate(node.operand)\n    elif node.type == 'binop':\n        left = evaluate(node.left)\n        right = evaluate(node.right)\n        if node.op == '+': return left + right\n        if node.op == '-': return left - right\n        if node.op == '*': return left * right\n        if node.op == '/':\n            if right == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left / right\n    raise ValueError(\"Invalid AST node\")\n",
+      "language": ""
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "workflow",
+  "skill_intensity": "heavy",
+  "skill_pair": "expression-parser"
+}

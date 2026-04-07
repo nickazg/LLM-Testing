@@ -1,0 +1,49 @@
+{
+  "task_id": "tier2-makefile",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 190.00726941600442,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T14:24:45.869490+00:00",
+  "prompt": "Create a Makefile for this C project. The project has source files in src/ and headers in include/. Requirements:\n\n1. Variables: CC=gcc, CFLAGS=-Wall -Wextra -I include, SRC=$(wildcard src/*.c), OBJ=$(SRC:.c=.o), TARGET=myapp\n\n2. Targets:\n   - 'all' (default): build the TARGET executable from object files\n   - Individual .o rules: compile .c to .o with proper dependencies\n   - 'clean': remove all .o files and the TARGET executable\n   - 'test': run the built executable and check exit code\n   - 'install': copy TARGET to /usr/local/bin (use install command)\n\n3. Use automatic variables ($@, $<, $^) where appropriate\n4. Include proper .PHONY declarations",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "include/utils.h",
+      "content": "#ifndef UTILS_H\n#define UTILS_H\n\nvoid print_version(void);\n\n#endif\n",
+      "language": "c"
+    },
+    {
+      "path": "src/main.c",
+      "content": "#include <stdio.h>\n#include \"utils.h\"\n\nint main(void) {\n    printf(\"Hello from myapp!\\n\");\n    print_version();\n    return 0;\n}\n",
+      "language": "c"
+    },
+    {
+      "path": "src/utils.c",
+      "content": "#include <stdio.h>\n#include \"utils.h\"\n\nvoid print_version(void) {\n    printf(\"Version 1.0.0\\n\");\n}\n",
+      "language": "c"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

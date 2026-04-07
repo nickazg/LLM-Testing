@@ -1,0 +1,70 @@
+{
+  "task_id": "tier4-houdini-pdg-novel",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": "houdini-pdg",
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 616,
+        "output": 212,
+        "thinking": 0,
+        "cache_read": 13248
+      },
+      "tool_calls": 0,
+      "wall_time_s": 32.20456491690129,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:53:00.430990+00:00",
+  "prompt": "Create a Python script called build_top_network.py for Houdini's PDG/TOPs context. The script should build a TOP network using Python:\n\n1. Get the /obj context and create a topnet node\n2. Inside the topnet, create these nodes:\n   - A Python Processor node that generates work items from a list of 5 file paths (file1.exr through file5.exr), setting a \"filepath\" attribute on each work item\n   - A Partition by Attribute node connected to the processor, partitioning by a \"batch\" attribute\n   - A Generic Generator or Python Script node that processes each work item (can just print the filepath attribute)\n   - A Wait for All node before the final output\n3. Connect the nodes in sequence: processor \u2192 partition \u2192 script \u2192 waitforall\n4. Set the display flag on the final node\n5. Layout the nodes using node.moveToGoodPosition() or layoutChildren()\n\nUse hou module (available in Houdini Python context). The script should work when executed inside Houdini.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775566355885,\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"part\":{\"id\":\"prt_d68007dab0013TR00qIXF3KchO\",\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"messageID\":\"msg_d680068f7001dDP4pLaz3V68zx\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775566368890,\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"part\":{\"id\":\"prt_d6800adae001Q90rIE9PcUg0zu\",\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"messageID\":\"msg_d680068f7001dDP4pLaz3V68zx\",\"type\":\"tool\",\"callID\":\"call_fc69b2ecebd941f48c8d390a\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"import hou\\n\\nobj = hou.node(\\\"/obj\\\")\\ntopnet = obj.createNode(\\\"topnet\\\", \\\"topnet\\\")\\n\\npython_processor = topnet.createNode(\\\"pdg::pythonprocessor\\\", \\\"python_processor\\\")\\npython_processor.parm(\\\"script\\\").set('''import pdg\\n\\nfiles = [\\\"file1.exr\\\", \\\"file2.exr\\\", \\\"file3.exr\\\", \\\"file4.exr\\\", \\\"file5.exr\\\"]\\nfor i, filepath in enumerate(files):\\n    work_item = item_holder.addWorkItem(index=i)\\n    work_item.setStringAttrib(\\\"filepath\\\", filepath)\\n    work_item.setIntAttrib(\\\"batch\\\", i % 2)\\n''')\\n\\npartition = topnet.createNode(\\\"pdg::partitionbyattribute\\\", \\\"partition_by_attribute\\\")\\npartition.parm(\\\"partitionby\\\").set(\\\"batch\\\")\\n\\ngeneric_generator = topnet.createNode(\\\"pdg::genericgenerator\\\", \\\"generic_generator\\\")\\ngeneric_generator.parm(\\\"script\\\").set('''import pdg\\nfilepath = work_item.stringAttribValue(\\\"filepath\\\")\\nprint(f\\\"Processing: {filepath}\\\")\\n''')\\n\\nwait_all = topnet.createNode(\\\"pdg::waitforall\\\", \\\"wait_for_all\\\")\\n\\npartition.setInput(0, python_processor)\\ngeneric_generator.setInput(0, partition)\\nwait_all.setInput(0, generic_generator)\\n\\nwait_all.setDisplayFlag(True)\\nwait_all.setRenderFlag(True)\\n\\ntopnet.layoutChildren()\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\"},\"output\":\"Wrote file successfully.\\n\\nLSP errors detected in this file, please fix:\\n<diagnostics file=\\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\\\">\\nERROR [1:8] Import \\\"hou\\\" could not be resolved\\n</diagnostics>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\":[{\"range\":{\"start\":{\"line\":0,\"character\":7},\"end\":{\"line\":0,\"character\":10}},\"message\":\"Import \\\"hou\\\" could not be resolved\",\"severity\":1,\"code\":\"reportMissingImports\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportMissingImports\"}}]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775566368180,\"end\":1775566368888}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775566368894,\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"part\":{\"id\":\"prt_d6800b07b001zX5WTJL30xB6hB\",\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"messageID\":\"msg_d680068f7001dDP4pLaz3V68zx\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13778,\"input\":12792,\"output\":474,\"reasoning\":0,\"cache\":{\"read\":512,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775566373592,\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"part\":{\"id\":\"prt_d6800c2d7001JWVZmhSfMVZPxJ\",\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"messageID\":\"msg_d6800b080001ZToliUMVt3PvTv\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775566379848,\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"part\":{\"id\":\"prt_d6800d54e001O4AZ1N9IEg1pud\",\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"messageID\":\"msg_d6800b080001ZToliUMVt3PvTv\",\"type\":\"text\",\"text\":\"Created `build_top_network.py`. The LSP error about `hou` is expected - it's a Houdini-specific module only available in Houdini's Python context. The script is ready to execute in Houdini.\",\"time\":{\"start\":1775566379847,\"end\":1775566379847}}}\n{\"type\":\"step_finish\",\"timestamp\":1775566379849,\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"part\":{\"id\":\"prt_d6800db48001etQw3Vyv0XfvCs\",\"sessionID\":\"ses_297ff9b36ffe2cToN92XpbdmO9\",\"messageID\":\"msg_d6800b080001ZToliUMVt3PvTv\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0,\"tokens\":{\"total\":14076,\"input\":616,\"output\":212,\"reasoning\":0,\"cache\":{\"read\":13248,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"import hou\\n\\nobj = hou.node(\\\"/obj\\\")\\ntopnet = obj.createNode(\\\"topnet\\\", \\\"topnet\\\")\\n\\npython_processor = topnet.createNode(\\\"pdg::pythonprocessor\\\", \\\"python_processor\\\")\\npython_processor.parm(\\\"script\\\").set('''import pdg\\n\\nfiles = [\\\"file1.exr\\\", \\\"file2.exr\\\", \\\"file3.exr\\\", \\\"file4.exr\\\", \\\"file5.exr\\\"]\\nfor i, filepath in enumerate(files):\\n    work_item = item_holder.addWorkItem(index=i)\\n    work_item.setStringAttrib(\\\"filepath\\\", filepath)\\n    work_item.setIntAttrib(\\\"batch\\\", i % 2)\\n''')\\n\\npartition = topnet.createNode(\\\"pdg::partitionbyattribute\\\", \\\"partition_by_attribute\\\")\\npartition.parm(\\\"partitionby\\\").set(\\\"batch\\\")\\n\\ngeneric_generator = topnet.createNode(\\\"pdg::genericgenerator\\\", \\\"generic_generator\\\")\\ngeneric_generator.parm(\\\"script\\\").set('''import pdg\\nfilepath = work_item.stringAttribValue(\\\"filepath\\\")\\nprint(f\\\"Processing: {filepath}\\\")\\n''')\\n\\nwait_all = topnet.createNode(\\\"pdg::waitforall\\\", \\\"wait_for_all\\\")\\n\\npartition.setInput(0, python_processor)\\ngeneric_generator.setInput(0, partition)\\nwait_all.setInput(0, generic_generator)\\n\\nwait_all.setDisplayFlag(True)\\nwait_all.setRenderFlag(True)\\n\\ntopnet.layoutChildren()\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s/build_top_network.py\">\nERROR [1:8] Import \"hou\" could not be resolved\n</diagnostics>",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "Created `build_top_network.py`. The LSP error about `hou` is expected - it's a Houdini-specific module only available in Houdini's Python context. The script is ready to execute in Houdini.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/6445643574518970626",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-d_txgf7s\u0001\u0014build_top_network.py\ufffdGm\ufffd|\u001d\ufffdm\u0014\ufffd\u056d\u0000h\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "build_top_network.py",
+      "content": "import hou\n\nobj = hou.node(\"/obj\")\ntopnet = obj.createNode(\"topnet\", \"topnet\")\n\npython_processor = topnet.createNode(\"pdg::pythonprocessor\", \"python_processor\")\npython_processor.parm(\"script\").set(\"\"\"import pdg\n\nfiles = [\"file1.exr\", \"file2.exr\", \"file3.exr\", \"file4.exr\", \"file5.exr\"]\nfor i, filepath in enumerate(files):\n    work_item = item_holder.addWorkItem(index=i)\n    work_item.setStringAttrib(\"filepath\", filepath)\n    work_item.setIntAttrib(\"batch\", i % 2)\n\"\"\")\n\npartition = topnet.createNode(\"pdg::partitionbyattribute\", \"partition_by_attribute\")\npartition.parm(\"partitionby\").set(\"batch\")\n\ngeneric_generator = topnet.createNode(\"pdg::genericgenerator\", \"generic_generator\")\ngeneric_generator.parm(\"script\").set(\"\"\"import pdg\nfilepath = work_item.stringAttribValue(\"filepath\")\nprint(f\"Processing: {filepath}\")\n\"\"\")\n\nwait_all = topnet.createNode(\"pdg::waitforall\", \"wait_for_all\")\n\npartition.setInput(0, python_processor)\ngeneric_generator.setInput(0, partition)\nwait_all.setInput(0, generic_generator)\n\nwait_all.setDisplayFlag(True)\nwait_all.setRenderFlag(True)\n\ntopnet.layoutChildren()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "novel",
+  "skill_intensity": "heavy",
+  "skill_pair": "houdini-pdg"
+}

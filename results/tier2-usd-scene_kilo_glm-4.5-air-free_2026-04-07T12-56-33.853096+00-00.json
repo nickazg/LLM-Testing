@@ -1,0 +1,54 @@
+{
+  "task_id": "tier2-usd-scene",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0070200000191,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:56:33.853096+00:00",
+  "prompt": "Create a Python file called build_scene.py that uses the pxr library (Pixar USD) to programmatically build a USD scene and export it as scene.usda. The scene must contain:\n\n1. A root prim /World (Xform) set as the default prim\n2. /World/Ground \u2014 a Mesh prim representing a ground plane (UsdGeom.Mesh with points for a quad, faceVertexCounts=[4], faceVertexIndices=[0,1,2,3])\n3. /World/Ground with xformOp:translate set to (0, 0, 0)\n4. /World/Character \u2014 an Xform prim with xformOp:translate at (0, 1, 0)\n5. /World/Character/Body \u2014 a Mesh prim (can be a simple cube with 8 points, 6 faces)\n6. /World/Light \u2014 a DomeLight (UsdLux.DomeLight) with intensity=1000\n7. /World/Looks/GroundMaterial \u2014 a UsdShade.Material with a UsdPreviewSurface shader that has diffuseColor=(0.3, 0.3, 0.3)\n8. The Ground mesh must be bound to GroundMaterial using UsdShade.MaterialBindingAPI\n\nUse: from pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/1171875838969115029",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-80n89klr\u0001\u000ebuild_scene.py\ufffd\ufffd\ufffd\u0005y\ufffdH\ufffd\ufffd\ufffd\ufffdM\u0003h\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "build_scene.py",
+      "content": "#!/usr/bin/env python\n\nfrom pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf\n\n\ndef build_scene():\n    \"\"\"Build the complete USD scene.\"\"\"\n    # Create a new USD stage\n    stage = Usd.Stage.CreateInMemory()\n\n    # Set default prim to /World\n    world = UsdGeom.Xform.Define(stage, \"/World\")\n    stage.SetDefaultPrim(world.GetPrim())\n\n    # Create ground plane using Xform\n    ground_xform = UsdGeom.Xform.Define(stage, \"/World/Ground\")\n\n    # Create ground mesh as a child of the Xform\n    ground = UsdGeom.Mesh.Define(stage, \"/World/Ground/Geometry\")\n\n    # Define a quad: 4 points forming a 10x10 unit ground plane\n    points = [\n        Gf.Vec3f(-5, -5, 0),  # point 0\n        Gf.Vec3f(5, -5, 0),  # point 1\n        Gf.Vec3f(5, 5, 0),  # point 2\n        Gf.Vec3f(-5, 5, 0),  # point 3\n    ]\n\n    # Set mesh points\n    ground.GetPointsAttr().Set(points)\n\n    # Set topology: one quad face with 4 vertices\n    ground.GetFaceVertexCountsAttr().Set([4])\n    ground.GetFaceVertexIndicesAttr().Set([0, 1, 2, 3])\n\n    # Set normals for proper shading\n    normals = [\n        Gf.Vec3f(0, 0, 1),  # normal for point 0\n        Gf.Vec3f(0, 0, 1),  # normal for point 1\n        Gf.Vec3f(0, 0, 1),  # normal for point 2\n        Gf.Vec3f(0, 0, 1),  # normal for point 3\n    ]\n    ground.GetNormalsAttr().Set(normals)\n\n    # Set transform for ground\n    ground_xform.GetPrim().GetAttribute(\"xformOp:translate\").Set(Gf.Vec3f(0, 0, 0))\n\n    # Create character\n    character = UsdGeom.Xform.Define(stage, \"/World/Character\")\n    character.GetPrim().GetAttribute(\"xformOp:translate\").Set(Gf.Vec3f(0, 1, 0))\n\n    # Create character body\n    body = UsdGeom.Mesh.Define(stage, \"/World/Character/Body\")\n\n    # Define a cube: 8 points forming a 1x1x1 unit cube\n    body_points = [\n        Gf.Vec3f(-0.5, -0.5, -0.5),  # point 0\n        Gf.Vec3f(0.5, -0.5, -0.5),  # point 1\n        Gf.Vec3f(0.5, 0.5, -0.5),  # point 2\n        Gf.Vec3f(-0.5, 0.5, -0.5),  # point 3\n        Gf.Vec3f(-0.5, -0.5, 0.5),  # point 4\n        Gf.Vec3f(0.5, -0.5, 0.5),  # point 5\n        Gf.Vec3f(0.5, 0.5, 0.5),  # point 6\n        Gf.Vec3f(-0.5, 0.5, 0.5),  # point 7\n    ]\n\n    # Set body points\n    body.GetPointsAttr().Set(body_points)\n\n    # Set topology: 6 faces (quads) forming the cube\n    body.GetFaceVertexCountsAttr().Set([4, 4, 4, 4, 4, 4])\n    body.GetFaceVertexIndicesAttr().Set(\n        [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 2, 6, 7, 3, 0, 3, 7, 4, 1, 5, 6, 2]\n    )\n\n    # Create dome light\n    light = UsdLux.DomeLight.Define(stage, \"/World/Light\")\n    light.GetIntensityAttr().Set(1000)\n\n    # Create material\n    material = UsdShade.Material.Define(stage, \"/World/Looks/GroundMaterial\")\n\n    # Create a UsdPreviewSurface shader\n    shader = UsdShade.Shader.Define(\n        stage, \"/World/Looks/GroundMaterial/PreviewSurfaceShader\"\n    )\n    shader.CreateIdAttr(\"UsdPreviewSurface\")\n\n    # Set shader parameters\n    shader.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Color3f).Set(\n        Gf.Vec3f(0.3, 0.3, 0.3)\n    )\n\n    # Connect shader to material\n    material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), \"surface\")\n\n    # Bind material to ground using MaterialBindingAPI\n    binding_api = UsdShade.MaterialBindingAPI(ground.GetPrim())\n    binding_api.Bind(material)\n\n    # Export the stage to a file\n    usda_string = stage.GetRootLayer().ExportToString()\n\n    with open(\"scene.usda\", \"w\") as f:\n        f.write(usda_string)\n\n    print(\"USD scene created successfully as scene.usda\")\n\n\nif __name__ == \"__main__\":\n    build_scene()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

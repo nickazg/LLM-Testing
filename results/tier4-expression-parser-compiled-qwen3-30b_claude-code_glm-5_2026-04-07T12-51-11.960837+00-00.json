@@ -1,0 +1,69 @@
+{
+  "task_id": "tier4-expression-parser-compiled-qwen3-30b",
+  "model": "glm-5",
+  "cli": "claude-code",
+  "skill": "recursive-descent-parser:compiled-qwen3-30b",
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.3191683749901,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:51:11.960837+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".pytest_cache/.gitignore",
+      "content": "# Created by pytest automatically.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55\n# This file is a cache directory tag created by pytest.\n# For information about cache directory tags, see:\n#\thttps://bford.info/cachedir/spec.html\n",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/README.md",
+      "content": "# pytest cache directory #\n\nThis directory contains data from the pytest's cache plugin,\nwhich provides the `--lf` and `--ff` options, as well as the `cache` fixture.\n\n**Do not** commit this to version control.\n\nSee [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.\n",
+      "language": "markdown"
+    },
+    {
+      "path": ".pytest_cache/v/cache/lastfailed",
+      "content": "{}",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/v/cache/nodeids",
+      "content": "[\n  \"test_expr_parser.py::TestBinaryOperators::test_evaluate_addition\",\n  \"test_expr_parser.py::TestBinaryOperators::test_evaluate_division\",\n  \"test_expr_parser.py::TestBinaryOperators::test_evaluate_multiplication\",\n  \"test_expr_parser.py::TestBinaryOperators::test_evaluate_subtraction\",\n  \"test_expr_parser.py::TestBinaryOperators::test_parse_addition\",\n  \"test_expr_parser.py::TestBinaryOperators::test_parse_division\",\n  \"test_expr_parser.py::TestBinaryOperators::test_parse_multiplication\",\n  \"test_expr_parser.py::TestBinaryOperators::test_parse_subtraction\",\n  \"test_expr_parser.py::TestOperatorPrecedence::test_complex_expression\",\n  \"test_expr_parser.py::TestOperatorPrecedence::test_division_before_subtraction\",\n  \"test_expr_parser.py::TestOperatorPrecedence::test_left_to_right_same_precedence\",\n  \"test_expr_parser.py::TestOperatorPrecedence::test_multiplication_before_addition\",\n  \"test_expr_parser.py::TestParentheses::test_nested_parentheses\",\n  \"test_expr_parser.py::TestParentheses::test_parentheses_override_precedence\",\n  \"test_expr_parser.py::TestParentheses::test_parentheses_with_division\",\n  \"test_expr_parser.py::TestParentheses::test_simple_parentheses\",\n  \"test_expr_parser.py::TestParseSimpleNumber::test_evaluate_simple_float\",\n  \"test_expr_parser.py::TestParseSimpleNumber::test_evaluate_simple_integer\",\n  \"test_expr_parser.py::TestParseSimpleNumber::test_parse_simple_float\",\n  \"test_expr_parser.py::TestParseSimpleNumber::test_parse_simple_integer\"\n]",
+      "language": ""
+    },
+    {
+      "path": "expr_parser.py",
+      "content": "import re\n\n\nclass ASTNode:\n    def __init__(self, type, value=None, op=None, left=None, right=None, operand=None):\n        self.type = type\n        self.value = value\n        self.op = op\n        self.left = left\n        self.right = right\n        self.operand = operand\n\n\nclass _Tokenizer:\n    def __init__(self, expression):\n        self.tokens = re.findall(r'\\d+\\.?\\d*|[+\\-*/()]', expression.replace(' ', ''))\n        self.pos = 0\n\n    def peek(self):\n        if self.pos < len(self.tokens):\n            return self.tokens[self.pos]\n        return None\n\n    def consume(self):\n        token = self.peek()\n        self.pos += 1\n        return token\n\n\ndef parse(expression: str) -> ASTNode:\n    if not expression or not expression.strip():\n        raise ValueError(\"Empty input\")\n\n    tokenizer = _Tokenizer(expression)\n    result = _parse_expression(tokenizer)\n\n    if tokenizer.peek() is not None:\n        raise ValueError(f\"Unexpected token: {tokenizer.peek()}\")\n\n    return result\n\n\ndef _parse_expression(tokenizer):\n    return _parse_additive(tokenizer)\n\n\ndef _parse_additive(tokenizer):\n    left = _parse_multiplicative(tokenizer)\n\n    while tokenizer.peek() in ('+', '-'):\n        op = tokenizer.consume()\n        right = _parse_multiplicative(tokenizer)\n        left = ASTNode(type=\"binop\", op=op, left=left, right=right)\n\n    return left\n\n\ndef _parse_multiplicative(tokenizer):\n    left = _parse_primary(tokenizer)\n\n    while tokenizer.peek() in ('*', '/'):\n        op = tokenizer.consume()\n        right = _parse_primary(tokenizer)\n        left = ASTNode(type=\"binop\", op=op, left=left, right=right)\n\n    return left\n\n\ndef _parse_primary(tokenizer):\n    token = tokenizer.peek()\n\n    if token is None:\n        raise ValueError(\"Unexpected end of expression\")\n\n    if token == '(':\n        tokenizer.consume()\n        node = _parse_expression(tokenizer)\n        if tokenizer.peek() != ')':\n            raise ValueError(\"Unmatched parenthesis\")\n        tokenizer.consume()\n        return node\n\n    if token == '-':\n        tokenizer.consume()\n        operand = _parse_primary(tokenizer)\n        return ASTNode(type=\"unary\", op='-', operand=operand)\n\n    # Number\n    tokenizer.consume()\n    try:\n        return ASTNode(type=\"number\", value=float(token))\n    except ValueError:\n        raise ValueError(f\"Invalid token: {token}\")\n\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == \"number\":\n        return node.value\n\n    if node.type == \"unary\":\n        if node.op == '-':\n            return -evaluate(node.operand)\n        raise ValueError(f\"Unknown unary operator: {node.op}\")\n\n    if node.type == \"binop\":\n        left = evaluate(node.left)\n        right = evaluate(node.right)\n\n        if node.op == '+':\n            return left + right\n        if node.op == '-':\n            return left - right\n        if node.op == '*':\n            return left * right\n        if node.op == '/':\n            if right == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left / right\n\n        raise ValueError(f\"Unknown operator: {node.op}\")\n\n    raise ValueError(f\"Unknown node type: {node.type}\")\n",
+      "language": "python"
+    },
+    {
+      "path": "test_expr_parser.py",
+      "content": "import pytest\nfrom expr_parser import parse, evaluate, ASTNode\n\n\nclass TestParseSimpleNumber:\n    def test_parse_simple_integer(self):\n        node = parse(\"42\")\n        assert node.type == \"number\"\n        assert node.value == 42\n        assert node.op is None\n        assert node.left is None\n        assert node.right is None\n        assert node.operand is None\n\n    def test_evaluate_simple_integer(self):\n        node = parse(\"42\")\n        assert evaluate(node) == 42.0\n\n    def test_parse_simple_float(self):\n        node = parse(\"3.14\")\n        assert node.type == \"number\"\n        assert node.value == 3.14\n\n    def test_evaluate_simple_float(self):\n        node = parse(\"3.14\")\n        assert evaluate(node) == 3.14\n\n\nclass TestBinaryOperators:\n    def test_parse_addition(self):\n        node = parse(\"2 + 3\")\n        assert node.type == \"binop\"\n        assert node.op == \"+\"\n        assert node.left.type == \"number\"\n        assert node.left.value == 2\n        assert node.right.type == \"number\"\n        assert node.right.value == 3\n\n    def test_evaluate_addition(self):\n        assert evaluate(parse(\"2 + 3\")) == 5.0\n\n    def test_parse_subtraction(self):\n        node = parse(\"10 - 4\")\n        assert node.type == \"binop\"\n        assert node.op == \"-\"\n\n    def test_evaluate_subtraction(self):\n        assert evaluate(parse(\"10 - 4\")) == 6.0\n\n    def test_parse_multiplication(self):\n        node = parse(\"3 * 4\")\n        assert node.type == \"binop\"\n        assert node.op == \"*\"\n\n    def test_evaluate_multiplication(self):\n        assert evaluate(parse(\"3 * 4\")) == 12.0\n\n    def test_parse_division(self):\n        node = parse(\"10 / 2\")\n        assert node.type == \"binop\"\n        assert node.op == \"/\"\n\n    def test_evaluate_division(self):\n        assert evaluate(parse(\"10 / 2\")) == 5.0\n\n\nclass TestOperatorPrecedence:\n    def test_multiplication_before_addition(self):\n        # 2 + 3 * 4 = 2 + 12 = 14\n        assert evaluate(parse(\"2 + 3 * 4\")) == 14.0\n\n    def test_division_before_subtraction(self):\n        # 10 - 6 / 2 = 10 - 3 = 7\n        assert evaluate(parse(\"10 - 6 / 2\")) == 7.0\n\n    def test_left_to_right_same_precedence(self):\n        # 10 / 2 * 3 = 5 * 3 = 15 (left-to-right)\n        assert evaluate(parse(\"10 / 2 * 3\")) == 15.0\n\n    def test_complex_expression(self):\n        # 2 + 3 * 4 - 6 / 2 = 2 + 12 - 3 = 11\n        assert evaluate(parse(\"2 + 3 * 4 - 6 / 2\")) == 11.0\n\n\nclass TestParentheses:\n    def test_simple_parentheses(self):\n        # (2 + 3) = 5\n        assert evaluate(parse(\"(2 + 3)\")) == 5.0\n\n    def test_parentheses_override_precedence(self):\n        # (2 + 3) * 4 = 5 * 4 = 20\n        assert evaluate(parse(\"(2 + 3) * 4\")) == 20.0\n\n    def test_nested_parentheses(self):\n        # ((2 + 3) * (4 - 1)) = 5 * 3 = 15\n        assert evaluate(parse(\"((2 + 3) * (4 - 1))\")) == 15.0\n\n    def test_parentheses_with_division(self):\n        # 10 / (2 + 3) = 10 / 5 = 2\n        assert evaluate(parse(\"10 / (2 + 3)\")) == 2.0\n",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "workflow",
+  "skill_intensity": "heavy",
+  "skill_pair": "expression-parser"
+}

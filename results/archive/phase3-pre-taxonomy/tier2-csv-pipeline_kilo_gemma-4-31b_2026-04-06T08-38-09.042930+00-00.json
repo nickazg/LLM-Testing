@@ -1,0 +1,76 @@
+{
+  "task_id": "tier2-csv-pipeline",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 13336,
+        "output": 8,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 98.62580249994062,
+      "cost_usd": 0.00383308
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T08:38:09.042930+00:00",
+  "prompt": "Create a Python script called `pipeline.py` that reads `input.csv` (columns: name, department, salary, status), filters rows where status equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department,avg_salary,count`. Sort rows alphabetically by department name. Include a header row. Use only the Python standard library (csv module).",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775464604625,\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"part\":{\"id\":\"prt_d61efe3d0001GyTPvkxkKNAKub\",\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"messageID\":\"msg_d61efb547001i4dE8nred0O17E\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775464684265,\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"part\":{\"id\":\"prt_d61efe614001wLnkM50kBtIFc8\",\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"messageID\":\"msg_d61efb547001i4dE8nred0O17E\",\"type\":\"tool\",\"callID\":\"chatcmpl-tool-88b90687a533a2ed\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"import csv\\nfrom collections import defaultdict\\n\\ndef process_pipeline():\\n    dept_data = defaultdict(list)\\n    \\n    try:\\n        with open('input.csv', mode='r', newline='', encoding='utf-8') as infile:\\n            reader = csv.DictReader(infile)\\n            for row in reader:\\n                if row['status'] == 'active':\\n                    dept = row['department']\\n                    salary = float(row['salary'])\\n                    dept_data[dept].append(salary)\\n    except FileNotFoundError:\\n        return\\n\\n    results = []\\n    for dept, salaries in dept_data.items():\\n        avg_salary = round(sum(salaries) / len(salaries), 2)\\n        results.append({\\n            'department': dept,\\n            'avg_salary': f\\\"{avg_salary:.2f}\\\",\\n            'count': len(salaries)\\n        })\\n\\n    results.sort(key=lambda x: x['department'])\\n\\n    with open('output.csv', mode='w', newline='', encoding='utf-8') as outfile:\\n        fieldnames = ['department', 'avg_salary', 'count']\\n        writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n        writer.writeheader()\\n        writer.writerows(results)\\n\\nif __name__ == \\\"__main__\\\":\\n    process_pipeline()\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-33qlcfb8/pipeline.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-33qlcfb8/pipeline.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-33qlcfb8/pipeline.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-33qlcfb8/pipeline.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775464683314,\"end\":1775464684264}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775464684268,\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"part\":{\"id\":\"prt_d61f11aea001zJjsKgw54sr30m\",\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"messageID\":\"msg_d61efb547001i4dE8nred0O17E\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.00196284,\"tokens\":{\"total\":13322,\"input\":12946,\"output\":376,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775464687762,\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"part\":{\"id\":\"prt_d61f128900016PTDo7h8H9vumb\",\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"messageID\":\"msg_d61f11af0001Mkul7B3RKOI5VI\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775464688441,\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"part\":{\"id\":\"prt_d61f12891001086tfGnHvwuReT\",\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"messageID\":\"msg_d61f11af0001Mkul7B3RKOI5VI\",\"type\":\"text\",\"text\":\"`pipeline.py` created.\",\"time\":{\"start\":1775464688439,\"end\":1775464688439}}}\n{\"type\":\"step_finish\",\"timestamp\":1775464688443,\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"part\":{\"id\":\"prt_d61f12b39001RDPNMFGHcj3W5m\",\"sessionID\":\"ses_29e104ffbffeDRNKPJmQyxaCsE\",\"messageID\":\"msg_d61f11af0001Mkul7B3RKOI5VI\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00187024,\"tokens\":{\"total\":13344,\"input\":13336,\"output\":8,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"import csv\\nfrom collections import defaultdict\\n\\ndef process_pipeline():\\n    dept_data = defaultdict(list)\\n    \\n    try:\\n        with open('input.csv', mode='r', newline='', encoding='utf-8') as infile:\\n            reader = csv.DictReader(infile)\\n            for row in reader:\\n                if row['status'] == 'active':\\n                    dept = row['department']\\n                    salary = float(row['salary'])\\n                    dept_data[dept].append(salary)\\n    except FileNotFoundError:\\n        return\\n\\n    results = []\\n    for dept, salaries in dept_data.items():\\n        avg_salary = round(sum(salaries) / len(salaries), 2)\\n        results.append({\\n            'department': dept,\\n            'avg_salary': f\\\"{avg_salary:.2f}\\\",\\n            'count': len(salaries)\\n        })\\n\\n    results.sort(key=lambda x: x['department'])\\n\\n    with open('output.csv', mode='w', newline='', encoding='utf-8') as outfile:\\n        fieldnames = ['department', 'avg_salary', 'count']\\n        writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n        writer.writeheader()\\n        writer.writerows(results)\\n\\nif __name__ == \\\"__main__\\\":\\n    process_pipeline()\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-33qlcfb8/pipeline.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "`pipeline.py` created.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/8005394797187917668",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-33qlcfb8\u0001\u000bpipeline.py\ufffd\\b\ufffd\ufffd\ufffd-\ufffdH\ufffd\ufffd\u0017\ufffda\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "input.csv",
+      "content": "name,department,salary,status\nAlice Johnson,Engineering,95000,active\nBob Smith,Marketing,72000,active\nCarol White,Engineering,88000,active\nDave Brown,Sales,65000,inactive\nEve Davis,Marketing,78000,active\nFrank Miller,Engineering,102000,active\nGrace Wilson,Sales,71000,active\nHenry Taylor,Marketing,69000,inactive\nIris Anderson,Engineering,91000,active\nJack Thomas,Sales,68000,active\nKaren Jackson,HR,82000,active\nLeo Harris,Engineering,97000,inactive\nMia Martin,HR,79000,active\nNathan Clark,Sales,73000,active\nOlivia Lewis,Marketing,85000,active\nPatrick Robinson,HR,76000,active\nQuinn Walker,Engineering,105000,active\nRachel Hall,Sales,62000,inactive\nSam Young,Marketing,71000,active\nTina King,HR,88000,active\n",
+      "language": ""
+    },
+    {
+      "path": "output.csv",
+      "content": "department,avg_salary,count\nEngineering,96200.00,5\nHR,81250.00,4\nMarketing,76500.00,4\nSales,70666.67,3\n",
+      "language": ""
+    },
+    {
+      "path": "pipeline.py",
+      "content": "import csv\nfrom collections import defaultdict\n\n\ndef process_pipeline():\n    dept_data = defaultdict(list)\n\n    try:\n        with open(\"input.csv\", mode=\"r\", newline=\"\", encoding=\"utf-8\") as infile:\n            reader = csv.DictReader(infile)\n            for row in reader:\n                if row[\"status\"] == \"active\":\n                    dept = row[\"department\"]\n                    salary = float(row[\"salary\"])\n                    dept_data[dept].append(salary)\n    except FileNotFoundError:\n        return\n\n    results = []\n    for dept, salaries in dept_data.items():\n        avg_salary = round(sum(salaries) / len(salaries), 2)\n        results.append(\n            {\n                \"department\": dept,\n                \"avg_salary\": f\"{avg_salary:.2f}\",\n                \"count\": len(salaries),\n            }\n        )\n\n    results.sort(key=lambda x: x[\"department\"])\n\n    with open(\"output.csv\", mode=\"w\", newline=\"\", encoding=\"utf-8\") as outfile:\n        fieldnames = [\"department\", \"avg_salary\", \"count\"]\n        writer = csv.DictWriter(outfile, fieldnames=fieldnames)\n        writer.writeheader()\n        writer.writerows(results)\n\n\nif __name__ == \"__main__\":\n    process_pipeline()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2
+}

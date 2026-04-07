@@ -1,0 +1,44 @@
+{
+  "task_id": "tier3-usd-shader-graph",
+  "model": "qwen3-30b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.125,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2653489999939,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:42:28.996991+00:00",
+  "prompt": "Create a Python script called shader_graph.py that uses the pxr library to build a multi-material shader network. The script must create a file called materials.usda containing:\n\n1. Default prim /Materials\n2. /Materials/WoodMat \u2014 a UsdShade.Material containing:\n   - /Materials/WoodMat/Surface \u2014 a UsdPreviewSurface shader with diffuseColor input connected to a texture\n   - /Materials/WoodMat/WoodTex \u2014 a UsdUVTexture shader with file input set to \"wood_diffuse.png\" and outputs:rgb connected to Surface's diffuseColor\n   - /Materials/WoodMat/UVReader \u2014 a UsdPrimvarReader_float2 with varname \"st\", outputs:result connected to WoodTex's st input\n   - Surface roughness=0.7, metallic=0.0\n\n3. /Materials/MetalMat \u2014 a UsdShade.Material containing:\n   - /Materials/MetalMat/Surface \u2014 a UsdPreviewSurface shader with diffuseColor (0.8, 0.8, 0.85), roughness=0.2, metallic=1.0\n\n4. /Geometry/Table \u2014 a UsdGeom.Mesh (simple quad/cube)\n   - Create a UsdGeom.Subset \"top_face\" on the mesh and bind WoodMat to it\n   - Bind MetalMat to the overall mesh (the subset binding overrides for those faces)\n\nUse: from pxr import Usd, UsdGeom, UsdShade, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "materials.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "shader_graph.py",
+      "content": "#!/usr/bin/env python3\n\n\"\"\"\nScript to create a multi-material shader network using USD and pxr library.\nCreates a materials.usda file with:\n1. Default prim /Materials\n2. /Materials/WoodMat with texture-based surface shader\n3. /Materials/MetalMat with solid color surface shader\n4. /Geometry/Table mesh with material bindings\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, UsdShade, Sdf, Gf\n\ndef create_shader_graph():\n    # Create a new USD stage\n    stage = Usd.Stage.CreateNew('materials.usda')\n\n    # Create the default prim /Materials\n    materials_prim = UsdGeom.Xform.Define(stage, \"/Materials\")\n\n    # Create WoodMat material\n    wood_mat = UsdShade.Material.Define(stage, \"/Materials/WoodMat\")\n\n    # Create Surface shader for WoodMat\n    wood_surface = UsdShade.Shader.Define(stage, \"/Materials/WoodMat/Surface\")\n    wood_surface.CreateIdAttr(\"UsdPreviewSurface\")\n\n    # Set Surface shader properties\n    wood_surface.CreateInput(\"roughness\", Sdf.ValueTypeNames.Float).Set(0.7)\n    wood_surface.CreateInput(\"metallic\", Sdf.ValueTypeNames.Float).Set(0.0)\n\n    # Create UV texture shader for WoodMat\n    wood_tex = UsdShade.Shader.Define(stage, \"/Materials/WoodMat/WoodTex\")\n    wood_tex.CreateIdAttr(\"UsdUVTexture\")\n\n    # Set texture file path\n    wood_tex.CreateInput(\"file\", Sdf.ValueTypeNames.String).Set(\"wood_diffuse.png\")\n\n    # Create UV reader for WoodMat\n    uv_reader = UsdShade.Shader.Define(stage, \"/Materials/WoodMat/UVReader\")\n    uv_reader.CreateIdAttr(\"UsdPrimvarReader_float2\")\n    uv_reader.CreateInput(\"varname\", Sdf.ValueTypeNames.String).Set(\"st\")\n\n    # Connect UVReader to WoodTex st\n    uv_reader_result = uv_reader.CreateOutput(\"result\", Sdf.ValueTypeNames.Float2)\n    wood_tex.CreateInput(\"st\", Sdf.ValueTypeNames.Float2).ConnectToSource(uv_reader_result)\n\n    # Connect texture RGB to surface diffuseColor\n    wood_tex_rgb = wood_tex.CreateOutput(\"rgb\", Sdf.ValueTypeNames.Float3)\n    wood_surface.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Float3).ConnectToSource(wood_tex_rgb)\n\n    # Create MetalMat material\n    metal_mat = UsdShade.Material.Define(stage, \"/Materials/MetalMat\")\n\n    # Create Surface shader for MetalMat\n    metal_surface = UsdShade.Shader.Define(stage, \"/Materials/MetalMat/Surface\")\n    metal_surface.CreateIdAttr(\"UsdPreviewSurface\")\n\n    # Set MetalMat surface properties\n    metal_surface.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.8, 0.8, 0.85))\n    metal_surface.CreateInput(\"roughness\", Sdf.ValueTypeNames.Float).Set(0.2)\n    metal_surface.CreateInput(\"metallic\", Sdf.ValueTypeNames.Float).Set(1.0)\n\n    # Create Geometry/Table mesh (simple quad/cube)\n    table_geom = UsdGeom.Mesh.Define(stage, \"/Geometry/Table\")\n\n    # Set up a simple quad for demonstration\n    points = [\n        Gf.Vec3f(-1.0, -1.0, 0.0),\n        Gf.Vec3f(1.0, -1.0, 0.0),\n        Gf.Vec3f(1.0, 1.0, 0.0),\n        Gf.Vec3f(-1.0, 1.0, 0.0)\n    ]\n\n    # Set mesh properties\n    table_geom.CreatePointsAttr(points)\n    table_geom.CreateFaceVertexCountsAttr([4])\n    table_geom.CreateFaceVertexIndicesAttr([0, 1, 2, 3])\n\n    # Create UVs for the mesh\n    uvs = [\n        Gf.Vec2f(0.0, 0.0),\n        Gf.Vec2f(1.0, 0.0),\n        Gf.Vec2f(1.0, 1.0),\n        Gf.Vec2f(0.0, 1.0)\n    ]\n    table_geom.CreatePrimvar(\"st\", Sdf.ValueTypeNames.TexCoord2f, \"faceVarying\").Set(uvs)\n\n    # Create a subset for the top face and bind WoodMat to it\n    subset = UsdGeom.Subset.Define(stage, \"/Geometry/Table/top_face\")\n    subset.CreateMembershipAttr().Set([\"0\"])\n\n    # Bind WoodMat to the subset\n    UsdShade.ShadeSurfaceBindingAPI(subset).Bind(wood_mat)\n\n    # Bind MetalMat to the overall mesh (this will be overridden by subset binding)\n    UsdShade.ShadeSurfaceBindingAPI(table_geom).Bind(metal_mat)\n\n    # Save the stage to file\n    stage.Save()\n\n    print(\"Shader graph created successfully in materials.usda\")\n\nif __name__ == \"__main__\":\n    create_shader_graph()",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,75 @@
+{
+  "task_id": "tier3-lru-cache",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.6666666666666666,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0068011250114,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T10:29:05.623014+00:00",
+  "prompt": "Create a Python file called lru_cache.py implementing an LRUCache class with the following requirements:\n\n1. Constructor: LRUCache(capacity: int) \u2014 maximum number of items\n2. get(key) \u2192 value or -1 if not found. Accessing moves item to most-recently-used\n3. put(key, value) \u2192 None. If at capacity, evict the least-recently-used item first\n4. Both get() and put() must be O(1) time complexity\n5. Do NOT use collections.OrderedDict \u2014 implement with a dict + doubly-linked list\n6. Must be thread-safe using threading.Lock\n7. Include a size() method returning current number of items",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".pytest_cache/.gitignore",
+      "content": "# Created by pytest automatically.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55\n# This file is a cache directory tag created by pytest.\n# For information about cache directory tags, see:\n#\thttps://bford.info/cachedir/spec.html\n",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/README.md",
+      "content": "# pytest cache directory #\n\nThis directory contains data from the pytest's cache plugin,\nwhich provides the `--lf` and `--ff` options, as well as the `cache` fixture.\n\n**Do not** commit this to version control.\n\nSee [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.\n",
+      "language": "markdown"
+    },
+    {
+      "path": ".pytest_cache/v/cache/nodeids",
+      "content": "[]",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/12228718488340711946",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-blyhyi16\u0002\u0011test_lru_cache.py\ufffd\ufffd\b\ufffd\ufffdi,\ufffdR\ufffd\b\u0014Vb\ufffd\u0001\u0000\u0000\u0000\u0001\flru_cache.py\ufffd\ufffd\u0012\u001e5\ufffdWO\u0002\ufffd\ufffd\ufffdSb\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "lru_cache.py",
+      "content": "\"\"\"\nThread-safe LRUCache implementation using dict + doubly-linked list.\n\nTime complexity: O(1) for get(), put(), and size()\nSpace complexity: O(capacity)\n\nKey features:\n- Uses dict for O(1) key lookup\n- Uses doubly-linked list to maintain access order\n- Thread-safe using threading.Lock\n- Supports up to `capacity` items\n\"\"\"\n\nimport threading\nfrom typing import Any, Optional\n\n\nclass Node:\n    \"\"\"Doubly-linked list node for LRUCache.\"\"\"\n\n    __slots__ = (\"key\", \"value\", \"prev\", \"next\")\n\n    def __init__(self, key: Any, value: Any):\n        self.key = key\n        self.value = value\n        self.prev = None\n        self.next = None\n\n\nclass LRUCache:\n    \"\"\"\n    Least Recently Used (LRU) Cache implementation.\n\n    Evicts the least recently used item first when the cache is full.\n    All operations are O(1) time complexity.\n\n    Attributes:\n        capacity: Maximum number of items the cache can hold\n        _cache: Dict mapping keys to Node objects\n        _head: Sentinel node at the head of the list (most recently used)\n        _tail: Sentinel node at the tail of the list (least recently used)\n        _size: Current number of items in the cache\n        _lock: Lock for thread safety\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        if capacity <= 0:\n            raise ValueError(\"capacity must be positive\")\n\n        self.capacity = capacity\n        self._cache: dict[Any, Node] = {}\n        self._head = Node(None, None)\n        self._tail = Node(None, None)\n        self._size = 0\n        self._lock = threading.Lock()\n\n        # Initialize doubly-linked list\n        self._head.next = self._tail\n        self._tail.prev = self._head\n\n    def get(self, key: Any) -> int:\n        \"\"\"\n        Get value for key. Moves item to most-recently-used position.\n\n        Args:\n            key: Key to look up\n\n        Returns:\n            Value associated with key, or -1 if not found\n\n        Time complexity: O(1)\n        \"\"\"\n        with self._lock:\n            node = self._cache.get(key)\n            if node is None:\n                return -1\n\n            self._move_to_front(node)\n            return node.value\n\n    def put(self, key: Any, value: Any) -> None:\n        \"\"\"\n        Put key-value pair into cache. Evicts LRU if at capacity.\n\n        Args:\n            key: Key to store\n            value: Value to associate with key\n\n        Time complexity: O(1)\n        \"\"\"\n        with self._lock:\n            node = self._cache.get(key)\n\n            if node is not None:\n                # Update existing key\n                node.value = value\n                self._move_to_front(node)\n            else:\n                # Insert new key\n                new_node = Node(key, value)\n                self._cache[key] = new_node\n                self._add_to_front(new_node)\n                self._size += 1\n\n                # Evict if at capacity\n                if self._size > self.capacity:\n                    self._evict_least_recently_used()\n\n    def size(self) -> int:\n        \"\"\"\n        Get current number of items in cache.\n\n        Returns:\n            Number of items currently stored\n\n        Time complexity: O(1)\n        \"\"\"\n        with self._lock:\n            return self._size\n\n    def _add_to_front(self, node: Node) -> None:\n        \"\"\"\n        Add node after head (most recently used position).\n\n        Args:\n            node: Node to add\n\n        Time complexity: O(1)\n        \"\"\"\n        self._head.next.prev = node\n        self._head.next = node\n        node.next = self._head.next\n        node.prev = self._head\n\n    def _remove_node(self, node: Node) -> None:\n        \"\"\"\n        Remove node from doubly-linked list.\n\n        Args:\n            node: Node to remove\n\n        Time complexity: O(1)\n        \"\"\"\n        node.prev.next = node.next\n        node.next.prev = node.prev\n\n    def _move_to_front(self, node: Node) -> None:\n        \"\"\"\n        Move node to front (most recently used position).\n\n        Args:\n            node: Node to move\n\n        Time complexity: O(1)\n        \"\"\"\n        self._remove_node(node)\n        self._add_to_front(node)\n\n    def _evict_least_recently_used(self) -> None:\n        \"\"\"\n        Remove the least recently used node (before tail).\n\n        Time complexity: O(1)\n        \"\"\"\n        if self._size == 0:\n            return\n\n        lru_node = self._tail.prev\n        self._remove_node(lru_node)\n        del self._cache[lru_node.key]\n        self._size -= 1\n\n    def __repr__(self) -> str:\n        \"\"\"String representation of cache contents.\"\"\"\n        with self._lock:\n            items = []\n            current = self._head.next\n            while current != self._tail:\n                items.append(f\"({current.key}: {current.value})\")\n                current = current.next\n            return f\"LRUCache(capacity={self.capacity}, size={self._size}, items={[', '.join(items)]})\"\n\n\nif __name__ == \"__main__\":\n    import sys\n    import unittest\n\n    class TestLRUCache(unittest.TestCase):\n        def setUp(self):\n            self.cache = LRUCache(3)\n\n        def test_basic_operations(self):\n            self.assertEqual(self.cache.size(), 0)\n\n            self.cache.put(1, 1)\n            self.assertEqual(self.cache.size(), 1)\n            self.assertEqual(self.cache.get(1), 1)\n\n            self.cache.put(2, 2)\n            self.cache.put(3, 3)\n            self.assertEqual(self.cache.size(), 3)\n\n            self.assertEqual(self.cache.get(2), 2)\n            self.assertEqual(self.cache.size(), 3)\n\n            self.cache.put(4, 4)\n            self.assertEqual(self.cache.size(), 3)\n            self.assertEqual(self.cache.get(1), -1)\n            self.assertEqual(self.cache.get(2), 2)\n            self.assertEqual(self.cache.get(3), -1)\n            self.assertEqual(self.cache.get(4), 4)\n\n        def test_update_existing_key(self):\n            self.cache.put(1, 1)\n            self.cache.put(2, 2)\n\n            self.cache.put(1, 10)\n            self.assertEqual(self.cache.get(1), 10)\n            self.assertEqual(self.cache.get(2), 2)\n\n        def test_update_move_to_front(self):\n            self.cache.put(1, 1)\n            self.cache.put(2, 2)\n            self.cache.put(3, 3)\n\n            self.cache.get(2)\n            self.cache.get(1)\n\n            self.cache.put(4, 4)\n\n            self.assertEqual(self.cache.get(1), -1)\n            self.assertEqual(self.cache.get(2), 2)\n            self.assertEqual(self.cache.get(3), 3)\n            self.assertEqual(self.cache.get(4), 4)\n\n        def test_capacity_zero(self):\n            with self.assertRaises(ValueError):\n                LRUCache(0)\n            with self.assertRaises(ValueError):\n                LRUCache(-1)\n\n        def test_thread_safety(self):\n            import threading\n            from concurrent.futures import ThreadPoolExecutor\n\n            def worker_put(i):\n                self.cache.put(i, i * 2)\n\n            def worker_get(i):\n                self.cache.get(i)\n\n            with ThreadPoolExecutor(max_workers=10) as executor:\n                threads = []\n                for i in range(100):\n                    threads.append(executor.submit(worker_put, i))\n\n                for i in range(50):\n                    threads.append(executor.submit(worker_get, i))\n\n                for thread in threads:\n                    thread.result()\n\n            self.assertEqual(self.cache.size(), self.cache.capacity)\n\n        def test_repr(self):\n            self.cache.put(1, 1)\n            self.cache.put(2, 2)\n            self.cache.put(3, 3)\n            repr_str = repr(self.cache)\n            self.assertIn(\"capacity=3\", repr_str)\n            self.assertIn(\"size=3\", repr_str)\n\n    unittest.main(argv=sys.argv[:1])\n",
+      "language": "python"
+    },
+    {
+      "path": "test_lru_cache.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"Test script for LRUCache implementation.\"\"\"\n\nfrom lru_cache import LRUCache\n\n\ndef test_basic_operations():\n    \"\"\"Test basic get and put operations.\"\"\"\n    cache = LRUCache(3)\n    assert cache.size() == 0, \"Initial size should be 0\"\n\n    cache.put(1, 1)\n    assert cache.size() == 1, \"Size should be 1 after put\"\n    assert cache.get(1) == 1, \"get(1) should return 1\"\n\n    cache.put(2, 2)\n    assert cache.size() == 2, \"Size should be 2 after second put\"\n\n    cache.put(3, 3)\n    assert cache.size() == 3, \"Size should be 3 after third put\"\n\n    assert cache.get(2) == 2, \"get(2) should return 2\"\n\n    cache.put(4, 4)\n    assert cache.size() == 3, \"Size should still be 3 (eviction happened)\"\n    assert cache.get(1) == -1, \"get(1) should return -1 (evicted)\"\n    assert cache.get(2) == 2, \"get(2) should return 2\"\n    assert cache.get(3) == -1, \"get(3) should return -1 (evicted)\"\n    assert cache.get(4) == 4, \"get(4) should return 4\"\n\n    print(\"\u2713 test_basic_operations passed\")\n\n\ndef test_update_existing_key():\n    \"\"\"Test updating an existing key.\"\"\"\n    cache = LRUCache(3)\n    cache.put(1, 1)\n    cache.put(2, 2)\n\n    cache.put(1, 10)\n    assert cache.get(1) == 10, \"Updated value should be returned\"\n    assert cache.get(2) == 2, \"Other key should not be affected\"\n\n    print(\"\u2713 test_update_existing_key passed\")\n\n\ndef test_update_moves_to_front():\n    \"\"\"Test that updating moves key to most recently used.\"\"\"\n    cache = LRUCache(3)\n    cache.put(1, 1)\n    cache.put(2, 2)\n    cache.put(3, 3)\n\n    cache.get(2)\n    cache.get(1)\n\n    cache.put(4, 4)\n    assert cache.get(1) == -1, \"Key 1 should be evicted\"\n    assert cache.get(2) == 2, \"Key 2 should still be present\"\n    assert cache.get(3) == 3, \"Key 3 should still be present\"\n    assert cache.get(4) == 4, \"Key 4 should be present\"\n\n    print(\"\u2713 test_update_moves_to_front passed\")\n\n\ndef test_capacity_validation():\n    \"\"\"Test that capacity must be positive.\"\"\"\n    try:\n        LRUCache(0)\n        assert False, \"Should raise ValueError for capacity 0\"\n    except ValueError:\n        pass\n\n    try:\n        LRUCache(-1)\n        assert False, \"Should raise ValueError for negative capacity\"\n    except ValueError:\n        pass\n\n    print(\"\u2713 test_capacity_validation passed\")\n\n\ndef test_thread_safety():\n    \"\"\"Test thread safety of the cache.\"\"\"\n    import threading\n    from concurrent.futures import ThreadPoolExecutor\n\n    cache = LRUCache(10)\n    cache_size = [0]\n\n    def worker_put(i):\n        cache.put(i, i * 2)\n\n    def worker_get(i):\n        cache.get(i)\n\n    with ThreadPoolExecutor(max_workers=20) as executor:\n        threads = []\n        for i in range(100):\n            threads.append(executor.submit(worker_put, i))\n\n        for i in range(50):\n            threads.append(executor.submit(worker_get, i))\n\n        for thread in threads:\n            thread.result()\n\n    assert cache.size() == 10, f\"Final size should be 10, got {cache.size()}\"\n\n    print(\"\u2713 test_thread_safety passed\")\n\n\ndef test_repr():\n    \"\"\"Test string representation.\"\"\"\n    cache = LRUCache(3)\n    cache.put(1, 1)\n    cache.put(2, 2)\n    cache.put(3, 3)\n\n    repr_str = repr(cache)\n    assert \"capacity=3\" in repr_str, f\"repr should contain capacity=3, got: {repr_str}\"\n    assert \"size=3\" in repr_str, f\"repr should contain size=3, got: {repr_str}\"\n\n    print(\"\u2713 test_repr passed\")\n\n\nif __name__ == \"__main__\":\n    test_basic_operations()\n    test_update_existing_key()\n    test_update_moves_to_front()\n    test_capacity_validation()\n    test_thread_safety()\n    test_repr()\n    print(\"\\n\u2705 All tests passed!\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3
+}

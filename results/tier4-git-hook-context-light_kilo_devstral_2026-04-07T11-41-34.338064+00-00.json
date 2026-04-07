@@ -1,0 +1,33 @@
+{
+  "task_id": "tier4-git-hook-context-light",
+  "model": "devstral",
+  "cli": "kilo",
+  "skill": "git-hook-context-light",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00554587494116,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T11:41:34.338064+00:00",
+  "prompt": "Create a file called pre-commit (no extension) that works as a git pre-commit hook following our internal repository conventions (documented in your skills).\n\nThe hook should check all staged files and reject the commit if any violations are found.\n\nThe hook should:\n- Enforce ALL rules from our internal repository conventions\n- Print a clear error message for each violation found, prefixed with 'ERROR:'\n- Exit 0 if all checks pass (allow commit)\n- Exit 1 if any check fails (reject commit)\n- Only check files that are staged (git diff --cached --name-only)\n- Be written in bash and be POSIX-compatible",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "context",
+  "skill_intensity": "light",
+  "skill_pair": "git-hook"
+}

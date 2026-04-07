@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-usd-shader-graph",
+  "model": "gemma-4-27b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00617412501015,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T11:28:47.156133+00:00",
+  "prompt": "Create a Python script called shader_graph.py that uses the pxr library to build a multi-material shader network. The script must create a file called materials.usda containing:\n\n1. Default prim /Materials\n2. /Materials/WoodMat \u2014 a UsdShade.Material containing:\n   - /Materials/WoodMat/Surface \u2014 a UsdPreviewSurface shader with diffuseColor input connected to a texture\n   - /Materials/WoodMat/WoodTex \u2014 a UsdUVTexture shader with file input set to \"wood_diffuse.png\" and outputs:rgb connected to Surface's diffuseColor\n   - /Materials/WoodMat/UVReader \u2014 a UsdPrimvarReader_float2 with varname \"st\", outputs:result connected to WoodTex's st input\n   - Surface roughness=0.7, metallic=0.0\n\n3. /Materials/MetalMat \u2014 a UsdShade.Material containing:\n   - /Materials/MetalMat/Surface \u2014 a UsdPreviewSurface shader with diffuseColor (0.8, 0.8, 0.85), roughness=0.2, metallic=1.0\n\n4. /Geometry/Table \u2014 a UsdGeom.Mesh (simple quad/cube)\n   - Create a UsdGeom.Subset \"top_face\" on the mesh and bind WoodMat to it\n   - Bind MetalMat to the overall mesh (the subset binding overrides for those faces)\n\nUse: from pxr import Usd, UsdGeom, UsdShade, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,40 @@
+{
+  "task_id": "tier2-houdini-sop",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 190.0049074999988,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T08:42:20.317823+00:00",
+  "prompt": "Create a Python file called build_sop_network.py that builds a Houdini SOP network using the hou module. The script should:\n\n1. Get a reference to /obj and create a Geometry container node: geo = hou.node('/obj').createNode('geo', 'my_geo')\n2. Inside the geo node, create a chain of SOP nodes:\n   - grid1 = geo.createNode('grid', 'base_grid')\n   - mountain1 = geo.createNode('mountain', 'terrain')\n   - color1 = geo.createNode('color', 'colorize')\n   - null1 = geo.createNode('null', 'OUT')\n3. Connect them in sequence: mountain1.setInput(0, grid1) \u2192 color1.setInput(0, mountain1) \u2192 null1.setInput(0, color1)\n4. Set parameters:\n   - grid1.parm('rows').set(50)\n   - grid1.parm('cols').set(50)\n   - grid1.parm('sizex').set(10.0)\n   - grid1.parm('sizey').set(10.0)\n   - mountain1.parm('height').set(2.5)\n   - mountain1.parm('freq').set(3.0)\n   - color1.parm('colorr').set(0.2)\n   - color1.parm('colorg').set(0.8)\n   - color1.parm('colorb').set(0.3)\n5. Set the display and render flags on the null node: null1.setDisplayFlag(True) and null1.setRenderFlag(True)\n6. Layout the nodes: geo.layoutChildren()\n\nThe hou module is provided in the template \u2014 import it with 'import hou'",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "hou/__init__.py",
+      "content": "\"\"\"Mock Houdini hou module for SOP network testing.\"\"\"\nfrom hou._mock import MockNode, _ROOT, _CALL_LOG\n\n\ndef node(path: str):\n    \"\"\"Get a node by path. Returns the root /obj node or traverses.\"\"\"\n    parts = [p for p in path.strip(\"/\").split(\"/\") if p]\n    current = _ROOT\n    for part in parts:\n        found = None\n        for child in current._children:\n            if child._name == part:\n                found = child\n                break\n        if found is None:\n            return None\n        current = found\n    _CALL_LOG.append((\"hou.node\", path))\n    return current\n\n\ndef _get_call_log():\n    \"\"\"Return the recorded call log for validation.\"\"\"\n    return list(_CALL_LOG)\n\n\ndef _get_all_nodes():\n    \"\"\"Return all nodes created during the session.\"\"\"\n    nodes = []\n    def _walk(n):\n        nodes.append(n)\n        for c in n._children:\n            _walk(c)\n    _walk(_ROOT)\n    return nodes\n",
+      "language": "python"
+    },
+    {
+      "path": "hou/_mock.py",
+      "content": "\"\"\"Internal mock implementation for hou module.\"\"\"\n\n_CALL_LOG = []\n\n\nclass MockParm:\n    \"\"\"Mock for hou.Parm \u2014 tracks parameter sets.\"\"\"\n\n    def __init__(self, name: str, node_path: str):\n        self._name = name\n        self._node_path = node_path\n        self._value = None\n\n    def set(self, value):\n        self._value = value\n        _CALL_LOG.append((\"parm.set\", self._node_path, self._name, value))\n\n    def eval(self):\n        return self._value\n\n\nclass MockParmTuple:\n    \"\"\"Mock for hou.ParmTuple.\"\"\"\n\n    def __init__(self, name: str, node_path: str, size: int = 3):\n        self._parms = [MockParm(f\"{name}{i}\", node_path) for i in range(size)]\n        self._name = name\n\n    def set(self, values):\n        for p, v in zip(self._parms, values):\n            p.set(v)\n\n    def __getitem__(self, idx):\n        return self._parms[idx]\n\n\nclass MockNode:\n    \"\"\"Mock for hou.Node \u2014 tracks creation, connections, flags.\"\"\"\n\n    def __init__(self, node_type: str, name: str, parent=None):\n        self._type = node_type\n        self._name = name\n        self._parent = parent\n        self._children = []\n        self._inputs = {}\n        self._parms = {}\n        self._display_flag = False\n        self._render_flag = False\n        self._path = self._compute_path()\n\n    def _compute_path(self):\n        if self._parent is None:\n            return \"/\"\n        parent_path = self._parent._path\n        if parent_path == \"/\":\n            return f\"/{self._name}\"\n        return f\"{parent_path}/{self._name}\"\n\n    def createNode(self, node_type: str, name: str = None):\n        if name is None:\n            name = node_type + \"1\"\n        child = MockNode(node_type, name, parent=self)\n        self._children.append(child)\n        _CALL_LOG.append((\"createNode\", self._path, node_type, name))\n        return child\n\n    def setInput(self, input_idx: int, source_node, output_idx: int = 0):\n        self._inputs[input_idx] = (source_node, output_idx)\n        _CALL_LOG.append((\"setInput\", self._path, input_idx, source_node._path))\n\n    def parm(self, name: str):\n        if name not in self._parms:\n            self._parms[name] = MockParm(name, self._path)\n        return self._parms[name]\n\n    def parmTuple(self, name: str):\n        if name not in self._parms:\n            self._parms[name] = MockParmTuple(name, self._path)\n        return self._parms[name]\n\n    def setDisplayFlag(self, val: bool):\n        self._display_flag = val\n        _CALL_LOG.append((\"setDisplayFlag\", self._path, val))\n\n    def setRenderFlag(self, val: bool):\n        self._render_flag = val\n        _CALL_LOG.append((\"setRenderFlag\", self._path, val))\n\n    def layoutChildren(self):\n        _CALL_LOG.append((\"layoutChildren\", self._path))\n\n    def path(self):\n        return self._path\n\n    def name(self):\n        return self._name\n\n    def type(self):\n        return type('NodeType', (), {'name': lambda s: self._type})()\n\n    def children(self):\n        return list(self._children)\n\n    def inputs(self):\n        return [self._inputs.get(i, (None, 0))[0] for i in range(max(self._inputs.keys()) + 1)] if self._inputs else []\n\n    def node(self, relative_path: str):\n        parts = [p for p in relative_path.strip(\"/\").split(\"/\") if p]\n        current = self\n        for part in parts:\n            found = None\n            for child in current._children:\n                if child._name == part:\n                    found = child\n                    break\n            if found is None:\n                return None\n            current = found\n        return current\n\n\n# Root of the node tree \u2014 /obj is pre-created\n_ROOT_ROOT = MockNode(\"root\", \"\")  # represents /\n_OBJ = MockNode(\"obj\", \"obj\", parent=_ROOT_ROOT)\n_ROOT_ROOT._children.append(_OBJ)\n_ROOT = _ROOT_ROOT\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2
+}

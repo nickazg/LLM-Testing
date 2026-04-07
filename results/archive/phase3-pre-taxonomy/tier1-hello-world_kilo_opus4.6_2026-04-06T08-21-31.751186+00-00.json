@@ -1,0 +1,35 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "opus4.6",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.463287541992031,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T08:21:31.751186+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775463690695,\"sessionID\":\"ses_29e1e13c4ffe4C5O6YZry2z7jB\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: openrouter/anthropic/claude-opus-4-6.\"}}}\n",
+  "conversation": [
+    {
+      "role": "error",
+      "content": "Model not found: openrouter/anthropic/claude-opus-4-6.",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 1
+}

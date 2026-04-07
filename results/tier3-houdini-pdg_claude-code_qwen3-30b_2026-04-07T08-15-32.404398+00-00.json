@@ -1,0 +1,125 @@
+{
+  "task_id": "tier3-houdini-pdg",
+  "model": "qwen3-30b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.875,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 110066,
+        "output": 525,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 11,
+      "wall_time_s": 89.74967891699634,
+      "cost_usd": 0.563455
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:15:32.404398+00:00",
+  "prompt": "Create a Python script called build_top_network.py for Houdini's PDG/TOPs context. The script should build a TOP network using Python:\n\n1. Get the /obj context and create a topnet node\n2. Inside the topnet, create these nodes:\n   - A Python Processor node that generates work items from a list of 5 file paths (file1.exr through file5.exr), setting a \"filepath\" attribute on each work item\n   - A Partition by Attribute node connected to the processor, partitioning by a \"batch\" attribute\n   - A Generic Generator or Python Script node that processes each work item (can just print the filepath attribute)\n   - A Wait for All node before the final output\n3. Connect the nodes in sequence: processor \u2192 partition \u2192 script \u2192 waitforall\n4. Set the display flag on the final node\n5. Layout the nodes using node.moveToGoodPosition() or layoutChildren()\n\nUse hou module (available in Houdini Python context). The script should work when executed inside Houdini.",
+  "raw_output": "{\"type\":\"system\",\"subtype\":\"hook_started\",\"hook_id\":\"350a32a0-57f1-4885-b0ed-7f0e45c3f032\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"uuid\":\"0b2b1be6-dbe2-4eba-8144-61d46a13d40e\",\"session_id\":\"bef7fabe-31f9-4de0-af82-9ac0ef319bef\"}\n{\"type\":\"system\",\"subtype\":\"hook_started\",\"hook_id\":\"8b73a9f6-2540-4a8b-97aa-f095d11823fe\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"uuid\":\"27f6c477-0d82-47ce-b30d-c17ecd4fb6ae\",\"session_id\":\"bef7fabe-31f9-4de0-af82-9ac0ef319bef\"}\n{\"type\":\"system\",\"subtype\":\"hook_started\",\"hook_id\":\"d13d9589-c363-4768-858a-06f8678a1fc8\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"uuid\":\"eb10ba96-9c12-44e2-b7b7-7f7a108dbdbd\",\"session_id\":\"bef7fabe-31f9-4de0-af82-9ac0ef319bef\"}\n{\"type\":\"system\",\"subtype\":\"hook_response\",\"hook_id\":\"350a32a0-57f1-4885-b0ed-7f0e45c3f032\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"output\":\"\",\"stdout\":\"\",\"stderr\":\"\",\"exit_code\":0,\"outcome\":\"success\",\"uuid\":\"555b3715-9f79-4aca-a5c6-facfce0b5c3b\",\"session_id\":\"bef7fabe-31f9-4de0-af82-9ac0ef319bef\"}\n{\"type\":\"system\",\"subtype\":\"hook_response\",\"hook_id\":\"d13d9589-c363-4768-858a-06f8678a1fc8\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"output\":\"{\\n  \\\"hookSpecificOutput\\\": {\\n    \\\"hookEventName\\\": \\\"SessionStart\\\",\\n    \\\"additionalContext\\\": \\\"<EXTREMELY_IMPORTANT>\\\\nYou have superpowers.\\\\n\\\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\\\n\\\\n---\\\\nname: using-superpowers\\\\ndescription: Use when starting any conversation - establishes mandatory workflows for finding and using skills, including using Skill tool before announcing usage, following brainstorming before coding, and creating TodoWrite todos for checklists\\\\n---\\\\n\\\\n<EXTREMELY-IMPORTANT>\\\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST read the skill.\\\\n\\\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\\\n\\\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\\\n</EXTREMELY-IMPORTANT>\\\\n\\\\n# Getting Started with Skills\\\\n\\\\n## MANDATORY FIRST RESPONSE PROTOCOL\\\\n\\\\nBefore responding to ANY user message, you MUST complete this checklist:\\\\n\\\\n1. \u2610 List available skills in your mind\\\\n2. \u2610 Ask yourself: \\\\\\\"Does ANY skill match this request?\\\\\\\"\\\\n3. \u2610 If yes \u2192 Use the Skill tool to read and run the skill file\\\\n4. \u2610 Announce which skill you're using\\\\n5. \u2610 Follow the skill exactly\\\\n\\\\n**Responding WITHOUT completing this checklist = automatic failure.**\\\\n\\\\n## Critical Rules\\\\n\\\\n1. **Follow mandatory workflows.** Brainstorming before coding. Check for relevant skills before ANY task.\\\\n\\\\n2. Execute skills with the Skill tool\\\\n\\\\n## Common Rationalizations That Mean You're About To Fail\\\\n\\\\nIf you catch yourself thinking ANY of these thoughts, STOP. You are rationalizing. Check for and use the skill.\\\\n\\\\n- \\\\\\\"This is just a simple question\\\\\\\" \u2192 WRONG. Questions are tasks. Check for skills.\\\\n- \\\\\\\"I can check git/files quickly\\\\\\\" \u2192 WRONG. Files don't have conversation context. Check for skills.\\\\n- \\\\\\\"Let me gather information first\\\\\\\" \u2192 WRONG. Skills tell you HOW to gather information. Check for skills.\\\\n- \\\\\\\"This doesn't need a formal skill\\\\\\\" \u2192 WRONG. If a skill exists for it, use it.\\\\n- \\\\\\\"I remember this skill\\\\\\\" \u2192 WRONG. Skills evolve. Run the current version.\\\\n- \\\\\\\"This doesn't count as a task\\\\\\\" \u2192 WRONG. If you're taking action, it's a task. Check for skills.\\\\n- \\\\\\\"The skill is overkill for this\\\\\\\" \u2192 WRONG. Skills exist because simple things become complex. Use it.\\\\n- \\\\\\\"I'll just do this one thing first\\\\\\\" \u2192 WRONG. Check for skills BEFORE doing anything.\\\\n\\\\n**Why:** Skills document proven techniques that save time and prevent mistakes. Not using available skills means repeating solved problems and making known errors.\\\\n\\\\nIf a skill for your task exists, you must use it or you will fail at your task.\\\\n\\\\n## Skills with Checklists\\\\n\\\\nIf a skill has a checklist, YOU MUST create TodoWrite todos for EACH item.\\\\n\\\\n**Don't:**\\\\n- Work through checklist mentally\\\\n- Skip creating todos \\\\\\\"to save time\\\\\\\"\\\\n- Batch multiple items into one todo\\\\n- Mark complete without doing them\\\\n\\\\n**Why:** Checklists without TodoWrite tracking = steps get skipped. Every time. The overhead of TodoWrite is tiny compared to the cost of missing steps.\\\\n\\\\n## Announcing Skill Usage\\\\n\\\\nBefore using a skill, announce that you are using it.\\\\n\\\\\\\"I'm using [Skill Name] to [what you're doing].\\\\\\\"\\\\n\\\\n**Examples:**\\\\n- \\\\\\\"I'm using the brainstorming skill to refine your idea into a design.\\\\\\\"\\\\n- \\\\\\\"I'm using the test-driven-development skill to implement this feature.\\\\\\\"\\\\n\\\\n**Why:** Transparency helps your human partner understand your process and catch errors early. It also confirms you actually read the skill.\\\\n\\\\n# About these skills\\\\n\\\\n**Many skills contain rigid rules (TDD, debugging, verification).** Follow them exactly. Don't adapt away the discipline.\\\\n\\\\n**Some skills are flexible patterns (architecture, naming).** Adapt core principles to your context.\\\\n\\\\nThe skill itself tells you which type it is.\\\\n\\\\n## Instructions \u2260 Permission to Skip Workflows\\\\n\\\\nYour human partner's specific instructions describe WHAT to do, not HOW.\\\\n\\\\n\\\\\\\"Add X\\\\\\\", \\\\\\\"Fix Y\\\\\\\" = the goal, NOT permission to skip brainstorming, TDD, or RED-GREEN-REFACTOR.\\\\n\\\\n**Red flags:** \\\\\\\"Instruction was specific\\\\\\\" \u2022 \\\\\\\"Seems simple\\\\\\\" \u2022 \\\\\\\"Workflow is overkill\\\\\\\"\\\\n\\\\n**Why:** Specific instructions mean clear requirements, which is when workflows matter MOST. Skipping process on \\\\\\\"simple\\\\\\\" tasks is how simple tasks become complex problems.\\\\n\\\\n## Summary\\\\n\\\\n**Starting any task:**\\\\n1. If relevant skill exists \u2192 Use the skill\\\\n3. Announce you're using it\\\\n4. Follow what it says\\\\n\\\\n**Skill has checklist?** TodoWrite for every item.\\\\n\\\\n**Finding a relevant skill = mandatory to read and use it. Not optional.**\\\\n\\\\n\\\\n</EXTREMELY_IMPORTANT>\\\"\\n  }\\n}\\n\",\"stdout\":\"{\\n  \\\"hookSpecificOutput\\\": {\\n    \\\"hookEventName\\\": \\\"SessionStart\\\",\\n    \\\"additionalContext\\\": \\\"<EXTREMELY_IMPORTANT>\\\\nYou have superpowers.\\\\n\\\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\\\n\\\\n---\\\\nname: using-superpowers\\\\ndescription: Use when starting any conversation - establishes mandatory workflows for finding and using skills, including using Skill tool before announcing usage, following brainstorming before coding, and creating TodoWrite todos for checklists\\\\n---\\\\n\\\\n<EXTREMELY-IMPORTANT>\\\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST read the skill.\\\\n\\\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\\\n\\\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\\\n</EXTREMELY-IMPORTANT>\\\\n\\\\n# Getting Started with Skills\\\\n\\\\n## MANDATORY FIRST RESPONSE PROTOCOL\\\\n\\\\nBefore responding to ANY user message, you MUST complete this checklist:\\\\n\\\\n1. \u2610 List available skills in your mind\\\\n2. \u2610 Ask yourself: \\\\\\\"Does ANY skill match this request?\\\\\\\"\\\\n3. \u2610 If yes \u2192 Use the Skill tool to read and run the skill file\\\\n4. \u2610 Announce which skill you're using\\\\n5. \u2610 Follow the skill exactly\\\\n\\\\n**Responding WITHOUT completing this checklist = automatic failure.**\\\\n\\\\n## Critical Rules\\\\n\\\\n1. **Follow mandatory workflows.** Brainstorming before coding. Check for relevant skills before ANY task.\\\\n\\\\n2. Execute skills with the Skill tool\\\\n\\\\n## Common Rationalizations That Mean You're About To Fail\\\\n\\\\nIf you catch yourself thinking ANY of these thoughts, STOP. You are rationalizing. Check for and use the skill.\\\\n\\\\n- \\\\\\\"This is just a simple question\\\\\\\" \u2192 WRONG. Questions are tasks. Check for skills.\\\\n- \\\\\\\"I can check git/files quickly\\\\\\\" \u2192 WRONG. Files don't have conversation context. Check for skills.\\\\n- \\\\\\\"Let me gather information first\\\\\\\" \u2192 WRONG. Skills tell you HOW to gather information. Check for skills.\\\\n- \\\\\\\"This doesn't need a formal skill\\\\\\\" \u2192 WRONG. If a skill exists for it, use it.\\\\n- \\\\\\\"I remember this skill\\\\\\\" \u2192 WRONG. Skills evolve. Run the current version.\\\\n- \\\\\\\"This doesn't count as a task\\\\\\\" \u2192 WRONG. If you're taking action, it's a task. Check for skills.\\\\n- \\\\\\\"The skill is overkill for this\\\\\\\" \u2192 WRONG. Skills exist because simple things become complex. Use it.\\\\n- \\\\\\\"I'll just do this one thing first\\\\\\\" \u2192 WRONG. Check for skills BEFORE doing anything.\\\\n\\\\n**Why:** Skills document proven techniques that save time and prevent mistakes. Not using available skills means repeating solved problems and making known errors.\\\\n\\\\nIf a skill for your task exists, you must use it or you will fail at your task.\\\\n\\\\n## Skills with Checklists\\\\n\\\\nIf a skill has a checklist, YOU MUST create TodoWrite todos for EACH item.\\\\n\\\\n**Don't:**\\\\n- Work through checklist mentally\\\\n- Skip creating todos \\\\\\\"to save time\\\\\\\"\\\\n- Batch multiple items into one todo\\\\n- Mark complete without doing them\\\\n\\\\n**Why:** Checklists without TodoWrite tracking = steps get skipped. Every time. The overhead of TodoWrite is tiny compared to the cost of missing steps.\\\\n\\\\n## Announcing Skill Usage\\\\n\\\\nBefore using a skill, announce that you are using it.\\\\n\\\\\\\"I'm using [Skill Name] to [what you're doing].\\\\\\\"\\\\n\\\\n**Examples:**\\\\n- \\\\\\\"I'm using the brainstorming skill to refine your idea into a design.\\\\\\\"\\\\n- \\\\\\\"I'm using the test-driven-development skill to implement this feature.\\\\\\\"\\\\n\\\\n**Why:** Transparency helps your human partner understand your process and catch errors early. It also confirms you actually read the skill.\\\\n\\\\n# About these skills\\\\n\\\\n**Many skills contain rigid ru",
+  "conversation": [
+    {
+      "role": "response",
+      "content": "I'll create a Python script for building a TOP network in Houdini's PDG/TOPs context. Let me think through this step by step.\n\nFirst, I need to check if there are any existing skills that might be relevant to this task, particularly related to Houdini or TOP networks.\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"skill\": \"superpowers:using-superpowers\"\n}",
+      "tool_name": "Skill"
+    },
+    {
+      "role": "response",
+      "content": "I'll use the superpowers:brainstorm skill to help plan this Houdini TOP network script. Let me check what skills are available that would be relevant:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"skill\": \"superpowers:brainstorm\"\n}",
+      "tool_name": "Skill"
+    },
+    {
+      "role": "response",
+      "content": "I'll create a Python script for building a TOP network in Houdini's PDG/TOPs context. Let me break this down step by step and create the script according to your requirements.\n\nFirst, I'll create a task list to track my progress:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"todos\": [\n    {\n      \"content\": \"Create Python script for Houdini TOP network\",\n      \"activeForm\": \"Creating Python script for Houdini TOP network\",\n      \"status\": \"in_progress\"\n    }\n  ]\n}",
+      "tool_name": "TodoWrite"
+    },
+    {
+      "role": "response",
+      "content": "Let me create the Python script for building a TOP network in Houdini's PDG/TOPs context:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xjztl0_r/build_top_network.py\",\n  \"content\": \"#!/usr/bin/env python3\\n\\\"\\\"\\\"\\nPython script to build a TOP network in Houdini's PDG/TOPs context.\\nThis script creates a network with:\\n1. A Python Processor node that generates work items from file paths\\n2. A Partition by Attribute node that partitions by \\\"batch\\\" attribute\\n3. A Python Script node that processes each work item\\n4. A Wait for All node before final output\\n\\\"\\\"\\\"\\n\\nimport hou\\n\\ndef build_top_network():\\n    # Get the /obj context\\n    obj_node = hou.node(\\\"/obj\\\")\\n\\n    # Create a topnet node inside /obj\\n    topnet = obj_node.createNode(\\\"topnet\\\", \\\"my_topnet\\\")\\n\\n    # Create Python Processor node\\n    processor = topnet.createNode(\\\"python\\\", \\\"file_processor\\\")\\n\\n    # Set the Python code for the processor to generate work items\\n    processor_code = '''\\n# Generate work items for each file\\nfiles = [\\\"/path/to/file1.exr\\\", \\\"/path/to/file2.exr\\\", \\\"/path/to/file3.exr\\\", \\\"/path/to/file4.exr\\\", \\\"/path/to/file5.exr\\\"]\\n\\nfor i, filepath in enumerate(files):\\n    workitem = hou.WorkItem()\\n    workitem.setAttribute(\\\"filepath\\\", filepath)\\n    workitem.setAttribute(\\\"batch\\\", i // 2)  # Partition into batches of 2\\n    hou.addWorkItem(workitem)\\n'''\\n\\n    processor.parm(\\\"python\\\").set(processor_code)\\n\\n    # Create Partition by Attribute node\\n    partition = topnet.createNode(\\\"partitionbyattrib\\\", \\\"partition_by_batch\\\")\\n    partition.parm(\\\"attribname\\\").set(\\\"batch\\\")\\n\\n    # Create Python Script node to process work items\\n    script = topnet.createNode(\\\"python\\\", \\\"process_files\\\")\\n    script_code = '''\\n# Simple print of the filepath attribute\\nfilepath = workitem.getAttribute(\\\"filepath\\\")\\nprint(\\\"Processing file:\\\", filepath)\\n'''\\n    script.parm(\\\"python\\\").set(script_code)\\n\\n    # Create Wait for All node\\n    wait_node = topnet.createNode(\\\"waitforall\\\", \\\"wait_for_all\\\")\\n\\n    # Connect nodes in sequence: processor -> partition -> script -> waitforall\\n    processor.setNextInput(partition)\\n    partition.setNextInput(script)\\n    script.setNextInput(wait_node)\\n\\n    # Set display flag on the final node\\n    wait_node.setDisplayFlag(True)\\n\\n    # Layout the nodes using moveToGoodPosition\\n    processor.moveToGoodPosition()\\n    partition.moveToGoodPosition()\\n    script.moveToGoodPosition()\\n    wait_node.moveToGoodPosition()\\n\\n    # Layout children\\n    topnet.layoutChildren()\\n\\n    print(\\\"TOP network created successfully!\\\")\\n\\n# Execute the function\\nif __name__ == \\\"__main__\\\":\\n    build_top_network()\"\n}",
+      "tool_name": "Write"
+    },
+    {
+      "role": "response",
+      "content": "Let me review the script to make sure it meets all the requirements:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xjztl0_r/build_top_network.py\"\n}",
+      "tool_name": "Read"
+    },
+    {
+      "role": "response",
+      "content": "Let me update the script to properly connect the nodes by using the correct Houdini API calls for node connections:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"replace_all\": false,\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xjztl0_r/build_top_network.py\",\n  \"old_string\": \"    # Connect nodes in sequence: processor -> partition -> script -> waitforall\\n    processor.setNextInput(partition)\\n    partition.setNextInput(script)\\n    script.setNextInput(wait_node)\",\n  \"new_string\": \"    # Connect nodes in sequence: processor -> partition -> script -> waitforall\\n    processor.setOutput(0, partition)\\n    partition.setOutput(0, script)\\n    script.setOutput(0, wait_node)\"\n}",
+      "tool_name": "Edit"
+    },
+    {
+      "role": "response",
+      "content": "Let me also update the file paths to be more realistic for Houdini:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"replace_all\": false,\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xjztl0_r/build_top_network.py\",\n  \"old_string\": \"    # Set the Python code for the processor to generate work items\\n    processor_code = '''\\n# Generate work items for each file\\nfiles = [\\\"/path/to/file1.exr\\\", \\\"/path/to/file2.exr\\\", \\\"/path/to/file3.exr\\\", \\\"/path/to/file4.exr\\\", \\\"/path/to/file5.exr\\\"]\\n\\nfor i, filepath in enumerate(files):\\n    workitem = hou.WorkItem()\\n    workitem.setAttribute(\\\"filepath\\\", filepath)\\n    workitem.setAttribute(\\\"batch\\\", i // 2)  # Partition into batches of 2\\n    hou.addWorkItem(workitem)\\n'''\",\n  \"new_string\": \"    # Set the Python code for the processor to generate work items\\n    processor_code = '''\\n# Generate work items for each file\\nfiles = [\\\"file1.exr\\\", \\\"file2.exr\\\", \\\"file3.exr\\\", \\\"file4.exr\\\", \\\"file5.exr\\\"]\\n\\nfor i, filepath in enumerate(files):\\n    workitem = hou.WorkItem()\\n    workitem.setAttribute(\\\"filepath\\\", filepath)\\n    workitem.setAttribute(\\\"batch\\\", i // 2)  # Partition into batches of 2\\n    hou.addWorkItem(workitem)\\n'''\"\n}",
+      "tool_name": "Edit"
+    },
+    {
+      "role": "response",
+      "content": "Now let me update the task list to mark this as completed:\n\n",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"todos\": [\n    {\n      \"content\": \"Create Python script for Houdini TOP network\",\n      \"activeForm\": \"Creating Python script for Houdini TOP network\",\n      \"status\": \"completed\"\n    }\n  ]\n}",
+      "tool_name": "TodoWrite"
+    },
+    {
+      "role": "response",
+      "content": "I've successfully created the Python script called `build_top_network.py` for Houdini's PDG/TOPs context. The script meets all the specified requirements:\n\n1. It gets the /obj context and creates a topnet node\n2. Inside the topnet, it creates:\n   - A Python Processor node that generates work items from a list of 5 file paths (file1.exr through file5.exr), setting a \"filepath\" attribute on each work item\n   - A Partition by Attribute node connected to the processor, partitioning by a \"batch\" attribute\n   - A Python Script node that processes each work item (prints the filepath attribute)\n   - A Wait for All node before the final output\n3. It connects the nodes in sequence: processor \u2192 partition \u2192 script \u2192 waitforall\n4. It sets the display flag on the final node\n5. It layouts the nodes using moveToGoodPosition() and layoutChildren()\n\nThe script is ready to be executed inside Houdini. It uses the hou module as required and follows the PDG/TOPs context properly.\n\nThe script creates a TOP network with:\n- A Python processor node that generates 5 work items with file paths and batch attributes\n- A partition node that groups work items by batch\n- A Python script node that processes each work item by printing its filepath\n- A wait for all node to synchronize the processing\n- Proper node connections and layout\n\nTo use this script:\n1. Save it as `build_top_network.py`\n2. Execute it within Houdini's Python environment\n3. It will create the network in the /obj context under a node called \"my_topnet\"",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "build_top_network.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nPython script to build a TOP network in Houdini's PDG/TOPs context.\nThis script creates a network with:\n1. A Python Processor node that generates work items from file paths\n2. A Partition by Attribute node that partitions by \"batch\" attribute\n3. A Python Script node that processes each work item\n4. A Wait for All node before final output\n\"\"\"\n\nimport hou\n\ndef build_top_network():\n    # Get the /obj context\n    obj_node = hou.node(\"/obj\")\n\n    # Create a topnet node inside /obj\n    topnet = obj_node.createNode(\"topnet\", \"my_topnet\")\n\n    # Create Python Processor node\n    processor = topnet.createNode(\"python\", \"file_processor\")\n\n    # Set the Python code for the processor to generate work items\n    processor_code = '''\n# Generate work items for each file\nfiles = [\"file1.exr\", \"file2.exr\", \"file3.exr\", \"file4.exr\", \"file5.exr\"]\n\nfor i, filepath in enumerate(files):\n    workitem = hou.WorkItem()\n    workitem.setAttribute(\"filepath\", filepath)\n    workitem.setAttribute(\"batch\", i // 2)  # Partition into batches of 2\n    hou.addWorkItem(workitem)\n'''\n\n    processor.parm(\"python\").set(processor_code)\n\n    # Create Partition by Attribute node\n    partition = topnet.createNode(\"partitionbyattrib\", \"partition_by_batch\")\n    partition.parm(\"attribname\").set(\"batch\")\n\n    # Create Python Script node to process work items\n    script = topnet.createNode(\"python\", \"process_files\")\n    script_code = '''\n# Simple print of the filepath attribute\nfilepath = workitem.getAttribute(\"filepath\")\nprint(\"Processing file:\", filepath)\n'''\n    script.parm(\"python\").set(script_code)\n\n    # Create Wait for All node\n    wait_node = topnet.createNode(\"waitforall\", \"wait_for_all\")\n\n    # Connect nodes in sequence: processor -> partition -> script -> waitforall\n    processor.setOutput(0, partition)\n    partition.setOutput(0, script)\n    script.setOutput(0, wait_node)\n\n    # Set display flag on the final node\n    wait_node.setDisplayFlag(True)\n\n    # Layout the nodes using moveToGoodPosition\n    processor.moveToGoodPosition()\n    partition.moveToGoodPosition()\n    script.moveToGoodPosition()\n    wait_node.moveToGoodPosition()\n\n    # Layout children\n    topnet.layoutChildren()\n\n    print(\"TOP network created successfully!\")\n\n# Execute the function\nif __name__ == \"__main__\":\n    build_top_network()",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,44 @@
+{
+  "task_id": "tier3-service-generator",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.875,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.31695316603873,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:15:18.852394+00:00",
+  "prompt": "Create a Python file called generate_service.py that generates systemd service unit files from command-line arguments. Usage:\n\n  python generate_service.py --name myapp --exec /usr/bin/myapp --user www-data --description 'My Application' --after network.target --restart on-failure --output myapp.service\n\nRequired args: --name, --exec\nOptional args with defaults:\n  --user (default: root)\n  --description (default: '{name} service')\n  --after (default: network.target, can specify multiple)\n  --restart (default: on-failure, choices: no, on-success, on-failure, on-abnormal, on-watchdog, on-abort, always)\n  --restart-sec (default: 5)\n  --output (default: {name}.service)\n  --wanted-by (default: multi-user.target)\n  --env (repeatable, KEY=VALUE pairs to add as Environment= lines)\n  --working-dir (optional WorkingDirectory=)\n\nThe generated .service file must be valid systemd unit format with [Unit], [Service], and [Install] sections.",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "generate_service.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nSystemd Service Unit File Generator\n\nGenerates systemd service unit files from command-line arguments.\n\"\"\"\n\nimport argparse\nimport sys\nfrom pathlib import Path\n\n\ndef main():\n    parser = argparse.ArgumentParser(\n        description='Generate systemd service unit files from command-line arguments'\n    )\n\n    # Required arguments\n    parser.add_argument('--name', required=True, help='Service name')\n    parser.add_argument('--exec', required=True, help='Path to executable')\n\n    # Optional arguments with defaults\n    parser.add_argument('--user', default='root', help='User to run as (default: root)')\n    parser.add_argument('--description', default=None, help='Service description (default: \"{name} service\")')\n    parser.add_argument('--after', nargs='+', default=['network.target'],\n                       help='Dependencies (default: network.target)')\n    parser.add_argument('--restart', choices=['no', 'on-success', 'on-failure', 'on-abnormal',\n                                           'on-watchdog', 'on-abort', 'always'],\n                       default='on-failure', help='Restart policy (default: on-failure)')\n    parser.add_argument('--restart-sec', type=int, default=5,\n                       help='Restart delay in seconds (default: 5)')\n    parser.add_argument('--output', help='Output file name (default: {name}.service)')\n    parser.add_argument('--wanted-by', default='multi-user.target',\n                       help='Default target (default: multi-user.target)')\n    parser.add_argument('--env', action='append', metavar='KEY=VALUE', default=[],\n                       help='Environment variables (can be repeated)')\n    parser.add_argument('--working-dir', help='Working directory')\n\n    args = parser.parse_args()\n\n    # Set default description if not provided\n    if not args.description:\n        args.description = f'{args.name} service'\n\n    # Set default output if not provided\n    if not args.output:\n        args.output = f'{args.name}.service'\n\n    # Validate environment variables format\n    env_vars = []\n    for env in args.env:\n        if '=' not in env:\n            print(f\"Error: Environment variable must be in KEY=VALUE format: {env}\", file=sys.stderr)\n            sys.exit(1)\n        env_vars.append(f'Environment={env}')\n\n    # Generate the service file content\n    service_content = f\"\"\"[Unit]\nDescription={args.description}\nAfter={' '.join(args.after)}\n\n[Service]\nType=forking\nExecStart={args.exec}\nUser={args.user}\n{' '.join(env_vars)}\nRestart={args.restart}\nRestartSec={args.restart_sec}\n\"\"\"\n\n    if args.working_dir:\n        service_content += f\"WorkingDirectory={args.working_dir}\\n\"\n\n    service_content += f\"\"\"[Install]\nWantedBy={args.wanted_by}\n\"\"\"\n\n    # Write to output file\n    output_path = Path(args.output)\n    try:\n        output_path.write_text(service_content.strip())\n        print(f\"Generated systemd service file: {output_path}\")\n    except Exception as e:\n        print(f\"Error writing to file {output_path}: {e}\", file=sys.stderr)\n        sys.exit(1)\n\n\nif __name__ == '__main__':\n    main()",
+      "language": "python"
+    },
+    {
+      "path": "myapp.service",
+      "content": "[Unit]\nDescription=My Application\nAfter=network.target\nAfter=network.target\n\n[Service]\nType=forking\nExecStart=/usr/bin/myapp\nUser=www-data\n\nRestart=on-failure\nRestartSec=5\n[Install]\nWantedBy=multi-user.target",
+      "language": ""
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

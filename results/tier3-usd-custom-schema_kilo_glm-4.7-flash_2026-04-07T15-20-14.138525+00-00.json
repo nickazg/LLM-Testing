@@ -1,0 +1,59 @@
+{
+  "task_id": "tier3-usd-custom-schema",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.125,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00755404203665,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T15:20:14.138525+00:00",
+  "prompt": "Create a Python script called custom_metadata.py that uses the pxr library to demonstrate USD's extensibility features. The script must create a file called pipeline.usda containing:\n\n1. Default prim /Project\n2. /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\"\n3. /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\"\n4. /Project/Hero \u2014 an Xform with purpose set to \"render\" (UsdGeom.Tokens.render)\n5. /Project/Hero/Proxy \u2014 an Xform with purpose set to \"proxy\" (UsdGeom.Tokens.proxy)\n6. /Project/Hero/Guide \u2014 an Xform with purpose set to \"guide\" (UsdGeom.Tokens.guide)\n7. /Project/Hero has custom properties:\n   - \"custom:shotName\" as a string property with value \"SH010\"\n   - \"custom:frameRange\" as a Int2 property with value (1001, 1100)\n8. /Project/Hero should have UsdGeom.ModelAPI applied with kind set to \"component\"\n\nUse: from pxr import Usd, UsdGeom, Sdf, Gf, Kind",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/12679180345907337036",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-fo_y1c6k\u0001\u0012custom_metadata.py\ufffd\ufffd&w\u0017\u001d^\ufffd\ufffd\ufffd\ufffd\u001e\ufffdh\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "custom_metadata.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nUSD Extensibility Demo Script\nCreates a pipeline.usda file with custom metadata, asset info, purpose, custom properties, and model kind.\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, Sdf, Gf, Kind\n\n\ndef create_pipeline_usda():\n    \"\"\"Create a USD file with custom metadata and extensibility features.\"\"\"\n\n    stage = Usd.Stage.CreateNew(\"pipeline.usda\")\n\n    defaultPrim = \"/Project\"\n    stage.SetDefaultPrim(defaultPrim)\n\n    project_prim = stage.DefinePrim(defaultPrim)\n\n    project_prim.SetCustomDataByKey(\"pipeline:version\", \"2.1\")\n    project_prim.SetCustomDataByKey(\"pipeline:department\", \"lighting\")\n\n    project_prim.SetAssetInfo(\n        {\"name\": \"hero_asset\", \"identifier\": \"assets/hero/v003/hero.usd\"}\n    )\n\n    hero_prim = stage.DefinePrim(f\"{defaultPrim}/Hero\")\n\n    xform_render = UsdGeom.Xform.Define(stage, f\"{defaultPrim}/Hero/Proxy\")\n    xform_proxy = UsdGeom.Xform.Define(stage, f\"{defaultPrim}/Hero/Guide\")\n    xform_guide = UsdGeom.Xform.Define(stage, f\"{defaultPrim}/Hero/Guide\")\n\n    xform_render.GetPrim().SetPurpose(UsdGeom.Tokens.render)\n    xform_proxy.GetPrim().SetPurpose(UsdGeom.Tokens.proxy)\n    xform_guide.GetPrim().SetPurpose(UsdGeom.Tokens.guide)\n\n    hero_prim.CreateCustomProperty(\n        \"custom:shotName\", Sdf.ValueTypeNames.String, \"SH010\"\n    )\n    hero_prim.CreateCustomProperty(\n        \"custom:frameRange\", Sdf.ValueTypeNames.Int2, Gf.Vec2i(1001, 1100)\n    )\n\n    UsdGeom.ModelAPI(hero_prim).SetKind(Kind.Tokens.component)\n\n    stage.GetRootLayer().Save()\n\n\nif __name__ == \"__main__\":\n    create_pipeline_usda()\n    print(\"Created pipeline.usda with custom metadata and USD extensibility features\")\n",
+      "language": "python"
+    },
+    {
+      "path": "pipeline.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

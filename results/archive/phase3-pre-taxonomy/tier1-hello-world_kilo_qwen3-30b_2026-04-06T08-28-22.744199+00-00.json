@@ -1,0 +1,35 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "qwen3-30b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 13283,
+        "output": 67,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 6.374513500020839,
+      "cost_usd": 0.0009479
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T08:28:22.744199+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775464101185,\"sessionID\":\"ses_29e17d9c9ffeKmUzg2BKEykSp3\",\"part\":{\"id\":\"prt_d61e8353f001B97tka1fS7VwkG\",\"sessionID\":\"ses_29e17d9c9ffeKmUzg2BKEykSp3\",\"messageID\":\"msg_d61e82c120011qO9XOdy1gDhdU\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775464101695,\"sessionID\":\"ses_29e17d9c9ffeKmUzg2BKEykSp3\",\"part\":{\"id\":\"prt_d61e83540001AEA0z81kT6Sa8L\",\"sessionID\":\"ses_29e17d9c9ffeKmUzg2BKEykSp3\",\"messageID\":\"msg_d61e82c120011qO9XOdy1gDhdU\",\"type\":\"text\",\"text\":\"write\\n{\\\"content\\\": \\\"print('Hello, World!')\\\", \\\"filePath\\\": \\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1n_n3w6c/hello.py\\\"}\",\"time\":{\"start\":1775464101694,\"end\":1775464101694}}}\n{\"type\":\"step_finish\",\"timestamp\":1775464101698,\"sessionID\":\"ses_29e17d9c9ffeKmUzg2BKEykSp3\",\"part\":{\"id\":\"prt_d61e83740001g3aIz1a9hzwt9I\",\"sessionID\":\"ses_29e17d9c9ffeKmUzg2BKEykSp3\",\"messageID\":\"msg_d61e82c120011qO9XOdy1gDhdU\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.0009479,\"tokens\":{\"total\":13350,\"input\":13283,\"output\":67,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "response",
+      "content": "write\n{\"content\": \"print('Hello, World!')\", \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1n_n3w6c/hello.py\"}",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 1
+}

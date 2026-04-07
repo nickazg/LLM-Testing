@@ -1,0 +1,85 @@
+{
+  "task_id": "tier2-csv-pipeline",
+  "model": "devstral",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 12772,
+        "output": 94,
+        "thinking": 0,
+        "cache_read": 1248
+      },
+      "tool_calls": 0,
+      "wall_time_s": 17.885189125081524,
+      "cost_usd": 0.01632856
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T10:07:31.324744+00:00",
+  "prompt": "Create a Python script called `pipeline.py` that reads `input.csv` (columns: name, department, salary, status), filters rows where status equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department,avg_salary,count`. Sort rows alphabetically by department name. Include a header row. Use only the Python standard library (csv module).",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775556446003,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d67694732001ePHn0dxW4XcBrX\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67691e60001XGmRx5VgPXKwWp\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775556446939,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d67694734001TaJU1xNJdPKu5L\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67691e60001XGmRx5VgPXKwWp\",\"type\":\"tool\",\"callID\":\"e4mdiItz1\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"#!/usr/bin/env python3\\nimport csv\\n\\n# Read input.csv and process data\\ndata = []\\nwith open('input.csv', mode='r') as file:\\n    reader = csv.DictReader(file)\\n    for row in reader:\\n        if row['status'] == 'active':\\n            data.append(row)\\n\\n# Group by department and compute statistics\\ndepartment_stats = {}\\nfor row in data:\\n    dept = row['department']\\n    salary = float(row['salary'])\\n    if dept not in department_stats:\\n        department_stats[dept] = {'total_salary': 0.0, 'count': 0}\\n    department_stats[dept]['total_salary'] += salary\\n    department_stats[dept]['count'] += 1\\n\\n# Prepare output data\\noutput_data = []\\nfor dept, stats in sorted(department_stats.items()):\\n    avg_salary = round(stats['total_salary'] / stats['count'], 2)\\n    output_data.append({\\n        'department': dept,\\n        'avg_salary': avg_salary,\\n        'count': stats['count']\\n    })\\n\\n# Write to output.csv\\nwith open('output.csv', mode='w', newline='') as file:\\n    fieldnames = ['department', 'avg_salary', 'count']\\n    writer = csv.DictWriter(file, fieldnames=fieldnames)\\n    writer.writeheader()\\n    writer.writerows(output_data)\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ssrow__v/pipeline.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ssrow__v/pipeline.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ssrow__v/pipeline.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ssrow__v/pipeline.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775556446008,\"end\":1775556446938}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775556446942,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d67694adc001x1yfs3Ah24pIGh\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67691e60001XGmRx5VgPXKwWp\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.0062348,\"tokens\":{\"total\":13987,\"input\":13587,\"output\":400,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775556448559,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d6769512e001yp1xXbej1KqplP\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67694ae00010GqyP7IaEc5Lyw\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775556448594,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d6769512f0016CVTPUq64QCvzY\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67694ae00010GqyP7IaEc5Lyw\",\"type\":\"tool\",\"callID\":\"whPMWUGpQ\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"chmod +x pipeline.py\",\"description\":\"Make pipeline.py executable\"},\"output\":\"\",\"title\":\"Make pipeline.py executable\",\"metadata\":{\"output\":\"\",\"exit\":0,\"description\":\"Make pipeline.py executable\",\"truncated\":false},\"time\":{\"start\":1775556448565,\"end\":1775556448594}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775556448595,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d67695152001vTQTYGqlZtMWP6\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67694ae00010GqyP7IaEc5Lyw\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.00474704,\"tokens\":{\"total\":14018,\"input\":11498,\"output\":24,\"reasoning\":0,\"cache\":{\"read\":2496,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775556449788,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d676955fa001iwlZnNMO0hYRuA\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67695156001gNplrEp2nmRpsZ\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775556450724,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d676955fb001byBWbnPusJzyor\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67695156001gNplrEp2nmRpsZ\",\"type\":\"text\",\"text\":\"The script `pipeline.py` has been created and made executable. It reads `input.csv`, filters rows where `status` equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department`, `avg_salary`, and `count`. The rows are sorted alphabetically by department name, and a header row is included.\",\"time\":{\"start\":1775556450723,\"end\":1775556450723}}}\n{\"type\":\"step_finish\",\"timestamp\":1775556450726,\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"part\":{\"id\":\"prt_d676959a50015j15ncqexJM1SV\",\"sessionID\":\"ses_29896e5dfffeZt10Niy8A3g0Qe\",\"messageID\":\"msg_d67695156001gNplrEp2nmRpsZ\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00534672,\"tokens\":{\"total\":14114,\"input\":12772,\"output\":94,\"reasoning\":0,\"cache\":{\"read\":1248,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"#!/usr/bin/env python3\\nimport csv\\n\\n# Read input.csv and process data\\ndata = []\\nwith open('input.csv', mode='r') as file:\\n    reader = csv.DictReader(file)\\n    for row in reader:\\n        if row['status'] == 'active':\\n            data.append(row)\\n\\n# Group by department and compute statistics\\ndepartment_stats = {}\\nfor row in data:\\n    dept = row['department']\\n    salary = float(row['salary'])\\n    if dept not in department_stats:\\n        department_stats[dept] = {'total_salary': 0.0, 'count': 0}\\n    department_stats[dept]['total_salary'] += salary\\n    department_stats[dept]['count'] += 1\\n\\n# Prepare output data\\noutput_data = []\\nfor dept, stats in sorted(department_stats.items()):\\n    avg_salary = round(stats['total_salary'] / stats['count'], 2)\\n    output_data.append({\\n        'department': dept,\\n        'avg_salary': avg_salary,\\n        'count': stats['count']\\n    })\\n\\n# Write to output.csv\\nwith open('output.csv', mode='w', newline='') as file:\\n    fieldnames = ['department', 'avg_salary', 'count']\\n    writer = csv.DictWriter(file, fieldnames=fieldnames)\\n    writer.writeheader()\\n    writer.writerows(output_data)\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ssrow__v/pipeline.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"chmod +x pipeline.py\",\n  \"description\": \"Make pipeline.py executable\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "response",
+      "content": "The script `pipeline.py` has been created and made executable. It reads `input.csv`, filters rows where `status` equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department`, `avg_salary`, and `count`. The rows are sorted alphabetically by department name, and a header row is included.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/16021535493661235171",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-ssrow__v\u0001\u000bpipeline.py\ufffd\ufffd\ufffdy\ufffd\ufffd\u0001\ufffd\ufffd\ufffd]Gig\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "input.csv",
+      "content": "name,department,salary,status\nAlice Johnson,Engineering,95000,active\nBob Smith,Marketing,72000,active\nCarol White,Engineering,88000,active\nDave Brown,Sales,65000,inactive\nEve Davis,Marketing,78000,active\nFrank Miller,Engineering,102000,active\nGrace Wilson,Sales,71000,active\nHenry Taylor,Marketing,69000,inactive\nIris Anderson,Engineering,91000,active\nJack Thomas,Sales,68000,active\nKaren Jackson,HR,82000,active\nLeo Harris,Engineering,97000,inactive\nMia Martin,HR,79000,active\nNathan Clark,Sales,73000,active\nOlivia Lewis,Marketing,85000,active\nPatrick Robinson,HR,76000,active\nQuinn Walker,Engineering,105000,active\nRachel Hall,Sales,62000,inactive\nSam Young,Marketing,71000,active\nTina King,HR,88000,active\n",
+      "language": ""
+    },
+    {
+      "path": "output.csv",
+      "content": "department,avg_salary,count\nEngineering,96200.0,5\nHR,81250.0,4\nMarketing,76500.0,4\nSales,70666.67,3\n",
+      "language": ""
+    },
+    {
+      "path": "pipeline.py",
+      "content": "#!/usr/bin/env python3\nimport csv\n\n# Read input.csv and process data\ndata = []\nwith open(\"input.csv\", mode=\"r\") as file:\n    reader = csv.DictReader(file)\n    for row in reader:\n        if row[\"status\"] == \"active\":\n            data.append(row)\n\n# Group by department and compute statistics\ndepartment_stats = {}\nfor row in data:\n    dept = row[\"department\"]\n    salary = float(row[\"salary\"])\n    if dept not in department_stats:\n        department_stats[dept] = {\"total_salary\": 0.0, \"count\": 0}\n    department_stats[dept][\"total_salary\"] += salary\n    department_stats[dept][\"count\"] += 1\n\n# Prepare output data\noutput_data = []\nfor dept, stats in sorted(department_stats.items()):\n    avg_salary = round(stats[\"total_salary\"] / stats[\"count\"], 2)\n    output_data.append(\n        {\"department\": dept, \"avg_salary\": avg_salary, \"count\": stats[\"count\"]}\n    )\n\n# Write to output.csv\nwith open(\"output.csv\", mode=\"w\", newline=\"\") as file:\n    fieldnames = [\"department\", \"avg_salary\", \"count\"]\n    writer = csv.DictWriter(file, fieldnames=fieldnames)\n    writer.writeheader()\n    writer.writerows(output_data)\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

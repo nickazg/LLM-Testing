@@ -1,0 +1,35 @@
+{
+  "task_id": "tier3-lru-cache",
+  "model": "qwen3-coder-next",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 3.3166400409536436,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T09:31:04.355096+00:00",
+  "prompt": "Create a Python file called lru_cache.py implementing an LRUCache class with the following requirements:\n\n1. Constructor: LRUCache(capacity: int) \u2014 maximum number of items\n2. get(key) \u2192 value or -1 if not found. Accessing moves item to most-recently-used\n3. put(key, value) \u2192 None. If at capacity, evict the least-recently-used item first\n4. Both get() and put() must be O(1) time complexity\n5. Do NOT use collections.OrderedDict \u2014 implement with a dict + doubly-linked list\n6. Must be thread-safe using threading.Lock\n7. Include a size() method returning current number of items",
+  "raw_output": "{\"type\":\"error\",\"timestamp\":1775467863313,\"sessionID\":\"ses_29dde67dafferV3VgwYP2Z3z5z\",\"error\":{\"name\":\"UnknownError\",\"data\":{\"message\":\"Model not found: openrouter/qwen/qwen3-coder-next.\"}}}\n",
+  "conversation": [
+    {
+      "role": "error",
+      "content": "Model not found: openrouter/qwen/qwen3-coder-next.",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 3
+}

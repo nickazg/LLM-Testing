@@ -1,0 +1,59 @@
+{
+  "task_id": "tier4-expression-parser-compiled-devstral",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": "recursive-descent-parser:compiled-devstral",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0070296250051,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:38:23.611347+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/777125023845917233",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-9exj9bi3\u0002\u000etest_parser.py\ufffd\ufffd\f_\ufffd\ufffd\ufffd\ufffd>\ufffd\ufffd\ufffd&h\ufffd\u0001\u0000\u0000\u0000\u0001\u000eexpr_parser.py\ufffd\ufffd\ufffdh\u001f\ufffdvl\ufffd\ufffd-p&h\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "expr_parser.py",
+      "content": "class ASTNode:\n    def __init__(\n        self,\n        node_type: str,\n        value: float | None = None,\n        op: str | None = None,\n        left: \"ASTNode | None\" = None,\n        right: \"ASTNode | None\" = None,\n        operand: \"ASTNode | None\" = None,\n    ):\n        self.type = node_type\n        self.value = value\n        self.op = op\n        self.left = left\n        self.right = right\n        self.operand = operand\n\n\ndef __repr__(self) -> str:\n    if self.type == \"number\":\n        return f\"ASTNode('number', value={self.value})\"\n    elif self.type == \"binop\":\n        return f\"ASTNode('binop', op='{self.op}', left={self.left}, right={self.right})\"\n    elif self.type == \"unary\":\n        return f\"ASTNode('unary', op='{self.op}', operand={self.operand})\"\n    return f\"ASTNode({self.type})\"\n\n\ndef parse(expression: str) -> ASTNode:\n    if not expression.strip():\n        raise ValueError(\"Empty expression\")\n\n    tokens = tokenize(expression)\n    if not tokens:\n        raise ValueError(\"No valid tokens found\")\n\n    return parse_expression(tokens, 0)[0]\n\n\ndef tokenize(expression: str) -> list[str]:\n    tokens = []\n    i = 0\n    n = len(expression)\n\n    while i < n:\n        c = expression[i]\n\n        if c.isspace():\n            i += 1\n            continue\n\n        if c in \"()+-*/\":\n            tokens.append(c)\n            i += 1\n        elif c.isdigit() or c == \".\":\n            num_str = c\n            i += 1\n            while i < n and (expression[i].isdigit() or expression[i] == \".\"):\n                num_str += expression[i]\n                i += 1\n            tokens.append(num_str)\n        else:\n            raise ValueError(f\"Invalid token: '{c}'\")\n\n    return tokens\n\n\ndef parse_expression(tokens: list[str], precedence: int) -> tuple[ASTNode, int]:\n    left, pos = parse_primary(tokens)\n\n    while pos < len(tokens):\n        op = tokens[pos]\n        if op not in \"+-*/\":\n            break\n\n        op_precedence = get_precedence(op)\n        if op_precedence < precedence:\n            break\n\n        pos += 1\n        right, new_pos = parse_expression(tokens, op_precedence + 1)\n\n        left = ASTNode(\"binop\", op=op, left=left, right=right)\n        pos = new_pos\n\n    return left, pos\n\n\ndef parse_primary(tokens: list[str]) -> tuple[ASTNode, int]:\n    if not tokens:\n        raise ValueError(\"Unexpected end of expression\")\n\n    token = tokens[0]\n\n    if token == \"(\":\n        pos = 1\n        node, pos = parse_expression(tokens[pos:], 0)\n        if pos >= len(tokens) or tokens[pos] != \")\":\n            raise ValueError(\"Unmatched parentheses\")\n        return node, pos + 1\n\n    elif token == \"-\":\n        pos = 1\n        operand, pos = parse_primary(tokens[pos:])\n        return ASTNode(\"unary\", op=\"-\", operand=operand), pos\n\n    elif token == \"+\":\n        pos = 1\n        operand, pos = parse_primary(tokens[pos:])\n        return operand, pos\n\n    elif token.replace(\".\", \"\", 1).isdigit():\n        try:\n            value = float(token)\n            return ASTNode(\"number\", value=value), 1\n        except ValueError:\n            raise ValueError(f\"Invalid number: '{token}'\")\n\n    else:\n        raise ValueError(f\"Unexpected token: '{token}'\")\n\n\ndef get_precedence(op: str) -> int:\n    if op in \"*/\":\n        return 2\n    elif op in \"+-\":\n        return 1\n    return 0\n\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == \"number\":\n        return float(node.value) if node.value is not None else 0.0\n\n    elif node.type == \"binop\":\n        left_val = evaluate(node.left) if node.left is not None else 0.0\n        right_val = evaluate(node.right) if node.right is not None else 0.0\n\n        if node.op == \"+\":\n            return left_val + right_val\n        elif node.op == \"-\":\n            return left_val - right_val\n        elif node.op == \"*\":\n            return left_val * right_val\n        elif node.op == \"/\":\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n\n    elif node.type == \"unary\":\n        operand_val = evaluate(node.operand) if node.operand is not None else 0.0\n        if node.op == \"-\":\n            return -operand_val\n\n    raise ValueError(f\"Unknown node type: {node.type}\")\n",
+      "language": "python"
+    },
+    {
+      "path": "test_parser.py",
+      "content": "#!/usr/bin/env python3\n\nfrom expr_parser import parse, evaluate\n\n\ndef test_parser():\n    # Test basic arithmetic\n    assert evaluate(parse(\"2 + 3\")) == 5.0\n    assert evaluate(parse(\"10 - 4\")) == 6.0\n    assert evaluate(parse(\"3 * 4\")) == 12.0\n    assert evaluate(parse(\"15 / 3\")) == 5.0\n\n    # Test operator precedence\n    assert evaluate(parse(\"2 + 3 * 4\")) == 14.0\n    assert evaluate(parse(\"(2 + 3) * 4\")) == 20.0\n    assert evaluate(parse(\"10 - 4 / 2\")) == 8.0\n\n    # Test unary minus\n    assert evaluate(parse(\"-5\")) == -5.0\n    assert evaluate(parse(\"-(3 + 2)\")) == -5.0\n    assert evaluate(parse(\"2 * -3\")) == -6.0\n\n    # Test parentheses\n    assert evaluate(parse(\"(2 + 3) * (4 - 1)\")) == 15.0\n    assert evaluate(parse(\"((2 + 3) * 4) - 1\")) == 19.0\n\n    # Test decimal numbers\n    assert evaluate(parse(\"2.5 + 3.5\")) == 6.0\n    assert evaluate(parse(\"1.5 * 2\")) == 3.0\n\n    print(\"All tests passed!\")\n\n\nif __name__ == \"__main__\":\n    test_parser()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "workflow",
+  "skill_intensity": "heavy",
+  "skill_pair": "expression-parser"
+}

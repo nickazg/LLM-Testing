@@ -1,0 +1,60 @@
+{
+  "task_id": "tier4-houdini-solaris-compiled-qwen3-coder-next",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": "houdini-solaris:compiled-qwen3-coder-next",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00653445802163,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T11:00:41.258084+00:00",
+  "prompt": "Create a Python file called solaris_lop.py that implements Houdini Solaris Python Script LOP code. This code runs inside Houdini's Solaris context where hou.pwd().editableStage() provides a USD stage to write to.\n\nThe script should:\n\n1. Get the stage: stage = hou.pwd().editableStage()\n2. Create a root Xform: /Scene (set as default prim)\n3. Create /Scene/Ground \u2014 a UsdGeom.Mesh ground plane (quad: 4 points, 1 face)\n4. Create /Scene/Hero \u2014 a UsdGeom.Xform with xformOp:translate at (0, 1, 0)\n5. Create /Scene/Hero/Body \u2014 a UsdGeom.Mesh (simple cube: 8 points, 6 faces)\n6. Create /Scene/Lighting/KeyLight \u2014 a UsdLux.DistantLight with intensity=50000 and xformOp:rotateXYZ at (-45, 30, 0)\n7. Create /Scene/Lighting/FillLight \u2014 a UsdLux.DomeLight with intensity=500\n8. Create /Scene/Materials/HeroMat \u2014 a UsdShade.Material with UsdPreviewSurface shader (diffuseColor=(0.8, 0.2, 0.1), roughness=0.4, metallic=0.0)\n9. Bind HeroMat to /Scene/Hero/Body using UsdShade.MaterialBindingAPI\n10. Apply UsdGeom.ModelAPI kind 'component' to /Scene/Hero\n\nUse: from pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf, Kind\nThe hou module is provided \u2014 import it with 'import hou'",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/15864175068094608234",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-rll2s3jb\u0001\u000esolaris_lop.py\ufffd3\u001e\\\u0007\ufffdgZ\ufffd\ufffd\t\ufffdsb\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "hou/__init__.py",
+      "content": "\"\"\"Mock Houdini hou module for Solaris/LOP testing.\n\nKey difference from SOP mock: pwd().editableStage() returns a real\nUsd.Stage.CreateInMemory() so validators can inspect actual USD content.\n\"\"\"\nfrom pxr import Usd\n\n_STAGE = Usd.Stage.CreateInMemory()\n_CALL_LOG = []\n\n\nclass _MockPwd:\n    \"\"\"Mock for the current node (hou.pwd()) in a Python Script LOP.\"\"\"\n\n    def editableStage(self):\n        _CALL_LOG.append((\"editableStage\",))\n        return _STAGE\n\n\n_PWD = _MockPwd()\n\n\ndef pwd():\n    \"\"\"Return the current node mock (provides editableStage()).\"\"\"\n    return _PWD\n\n\ndef _get_stage():\n    \"\"\"Return the USD stage for validation.\"\"\"\n    return _STAGE\n\n\ndef _get_call_log():\n    \"\"\"Return recorded call log.\"\"\"\n    return list(_CALL_LOG)\n",
+      "language": "python"
+    },
+    {
+      "path": "hou/_mock.py",
+      "content": "\"\"\"Solaris mock internals \u2014 minimal since the real work happens on the USD stage.\"\"\"\n# The Solaris mock is intentionally thin.\n# All state lives on the real Usd.Stage returned by editableStage().\n# This file exists for structural consistency with the SOP mock.\n",
+      "language": "python"
+    },
+    {
+      "path": "solaris_lop.py",
+      "content": "import hou\nfrom pxr import Usd, UsdGeom, UsdShade, UsdLux, Sdf, Gf, Kind\n\n\ndef run():\n    stage = hou.pwd().editableStage()\n\n    # 2. Create root Xform /Scene and set as default prim\n    scene_path = Sdf.Path(\"/Scene\")\n    scene_xform = UsdGeom.Xform.Define(stage, scene_path)\n    stage.SetDefaultPrim(scene_xform.GetPrim())\n\n    # 3. Create /Scene/Ground - quad mesh\n    ground_path = scene_path.AppendChild(\"Ground\")\n    ground_mesh = UsdGeom.Mesh.Define(stage, ground_path)\n\n    ground_pts = [\n        Gf.Vec3f(-1, 0, 1),\n        Gf.Vec3f(1, 0, 1),\n        Gf.Vec3f(1, 0, -1),\n        Gf.Vec3f(-1, 0, -1),\n    ]\n    ground_face_counts = [4]\n    ground_face_indices = [0, 1, 2, 3]\n\n    ground_mesh.CreatePointsAttr().Set(ground_pts)\n    ground_mesh.CreateFaceVertexCountsAttr().Set(ground_face_counts)\n    ground_mesh.CreateFaceVertexIndicesAttr().Set(ground_face_indices)\n\n    # 4. Create /Scene/Hero Xform\n    hero_path = scene_path.AppendChild(\"Hero\")\n    hero_xform = UsdGeom.Xform.Define(stage, hero_path)\n    hero_xform.AddTranslateOp().Set(Gf.Vec3f(0, 1, 0))\n\n    # 5. Create /Scene/Hero/Body - cube mesh\n    body_path = hero_path.AppendChild(\"Body\")\n    body_mesh = UsdGeom.Mesh.Define(stage, body_path)\n\n    cube_pts = [\n        Gf.Vec3f(-0.5, -0.5, -0.5),\n        Gf.Vec3f(0.5, -0.5, -0.5),\n        Gf.Vec3f(0.5, 0.5, -0.5),\n        Gf.Vec3f(-0.5, 0.5, -0.5),\n        Gf.Vec3f(-0.5, -0.5, 0.5),\n        Gf.Vec3f(0.5, -0.5, 0.5),\n        Gf.Vec3f(0.5, 0.5, 0.5),\n        Gf.Vec3f(-0.5, 0.5, 0.5),\n    ]\n    cube_face_counts = [4] * 6\n    cube_face_indices = [\n        0,\n        1,\n        2,\n        3,  # back\n        4,\n        5,\n        6,\n        7,  # front\n        0,\n        1,\n        5,\n        4,  # bottom\n        2,\n        3,\n        7,\n        6,  # top\n        0,\n        3,\n        7,\n        4,  # left\n        1,\n        2,\n        6,\n        5,  # right\n    ]\n\n    body_mesh.CreatePointsAttr().Set(cube_pts)\n    body_mesh.CreateFaceVertexCountsAttr().Set(cube_face_counts)\n    body_mesh.CreateFaceVertexIndicesAttr().Set(cube_face_indices)\n\n    # 6. Create /Scene/Lighting/KeyLight\n    lighting_path = scene_path.AppendChild(\"Lighting\")\n    key_light_path = lighting_path.AppendChild(\"KeyLight\")\n    key_light = UsdLux.DistantLight.Define(stage, key_light_path)\n    key_light.CreateIntensityAttr().Set(50000)\n    key_light.AddRotateXYZOp().Set(Gf.Vec3f(-45, 30, 0))\n\n    # 7. Create /Scene/Lighting/FillLight\n    fill_light_path = lighting_path.AppendChild(\"FillLight\")\n    fill_light = UsdLux.DomeLight.Define(stage, fill_light_path)\n    fill_light.CreateIntensityAttr().Set(500)\n\n    # 8. Create /Scene/Materials/HeroMat\n    materials_path = scene_path.AppendChild(\"Materials\")\n    mat_path = materials_path.AppendChild(\"HeroMat\")\n    material = UsdShade.Material.Define(stage, mat_path)\n\n    shader = UsdShade.Shader.Define(stage, mat_path.AppendChild(\"Shader\"))\n    shader.CreateIdAttr(\"UsdPreviewSurface\")\n    shader.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Color3f).Set(\n        Gf.Vec3f(0.8, 0.2, 0.1)\n    )\n    shader.CreateInput(\"roughness\", Sdf.ValueTypeNames.Float).Set(0.4)\n    shader.CreateInput(\"metallic\", Sdf.ValueTypeNames.Float).Set(0.0)\n\n    material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), \"surface\")\n\n    # 9. Bind HeroMat to /Scene/Hero/Body\n    body_prim = body_mesh.GetPrim()\n    UsdShade.MaterialBindingAPI.Apply(body_prim).Bind(material)\n\n    # 10. Apply UsdGeom.ModelAPI kind 'component' to /Scene/Hero\n    hero_prim = hero_xform.GetPrim()\n    UsdGeom.ModelAPI.Apply(hero_prim).SetKind(Kind.CreateComponent())\n\n\nif __name__ == \"__main__\":\n    run()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 4
+}

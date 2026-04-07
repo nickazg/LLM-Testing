@@ -1,0 +1,125 @@
+{
+  "task_id": "tier4-usd-custom-schema-compiled-qwen3-30b",
+  "model": "glm-5",
+  "cli": "claude-code",
+  "skill": "usd-custom-schema:compiled-qwen3-30b",
+  "scores": {
+    "correctness": 0.875,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 11539,
+        "output": 1889,
+        "thinking": 0,
+        "cache_read": 232640
+      },
+      "tool_calls": 8,
+      "wall_time_s": 87.59310824994463,
+      "cost_usd": 0.22124
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T14:06:32.482195+00:00",
+  "prompt": "Create a Python script called custom_metadata.py that uses the pxr library to demonstrate USD's extensibility features. The script must create a file called pipeline.usda containing:\n\n1. Default prim /Project\n2. /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\"\n3. /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\"\n4. /Project/Hero \u2014 an Xform with purpose set to \"render\" (UsdGeom.Tokens.render)\n5. /Project/Hero/Proxy \u2014 an Xform with purpose set to \"proxy\" (UsdGeom.Tokens.proxy)\n6. /Project/Hero/Guide \u2014 an Xform with purpose set to \"guide\" (UsdGeom.Tokens.guide)\n7. /Project/Hero has custom properties:\n   - \"custom:shotName\" as a string property with value \"SH010\"\n   - \"custom:frameRange\" as a Int2 property with value (1001, 1100)\n8. /Project/Hero should have UsdGeom.ModelAPI applied with kind set to \"component\"\n\nUse: from pxr import Usd, UsdGeom, Sdf, Gf, Kind",
+  "raw_output": "{\"type\":\"system\",\"subtype\":\"hook_started\",\"hook_id\":\"7c2bf117-1d1d-4d3c-aa7a-ae45a1643d3d\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"uuid\":\"58521fc8-9ecd-45a1-9647-d287a2faa7d6\",\"session_id\":\"e4f69aec-a3a1-4f4f-9dac-152728a27d3a\"}\n{\"type\":\"system\",\"subtype\":\"hook_started\",\"hook_id\":\"3a1de1b6-34b3-4ff8-b119-be883048898e\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"uuid\":\"94cdbd04-1046-4807-98f2-01dc936e1864\",\"session_id\":\"e4f69aec-a3a1-4f4f-9dac-152728a27d3a\"}\n{\"type\":\"system\",\"subtype\":\"hook_started\",\"hook_id\":\"8cadeece-9d1f-4d84-8f0d-424c1286fcea\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"uuid\":\"bc79ed9d-6aee-480d-abc7-c0c1f23173e4\",\"session_id\":\"e4f69aec-a3a1-4f4f-9dac-152728a27d3a\"}\n{\"type\":\"system\",\"subtype\":\"hook_response\",\"hook_id\":\"7c2bf117-1d1d-4d3c-aa7a-ae45a1643d3d\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"output\":\"\",\"stdout\":\"\",\"stderr\":\"\",\"exit_code\":0,\"outcome\":\"success\",\"uuid\":\"4a807e00-201b-42c3-a5aa-5732bca921d8\",\"session_id\":\"e4f69aec-a3a1-4f4f-9dac-152728a27d3a\"}\n{\"type\":\"system\",\"subtype\":\"hook_response\",\"hook_id\":\"3a1de1b6-34b3-4ff8-b119-be883048898e\",\"hook_name\":\"SessionStart:startup\",\"hook_event\":\"SessionStart\",\"output\":\"{\\n  \\\"hookSpecificOutput\\\": {\\n    \\\"hookEventName\\\": \\\"SessionStart\\\",\\n    \\\"additionalContext\\\": \\\"<EXTREMELY_IMPORTANT>\\\\nYou have superpowers.\\\\n\\\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\\\n\\\\n---\\\\nname: using-superpowers\\\\ndescription: Use when starting any conversation - establishes mandatory workflows for finding and using skills, including using Skill tool before announcing usage, following brainstorming before coding, and creating TodoWrite todos for checklists\\\\n---\\\\n\\\\n<EXTREMELY-IMPORTANT>\\\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST read the skill.\\\\n\\\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\\\n\\\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\\\n</EXTREMELY-IMPORTANT>\\\\n\\\\n# Getting Started with Skills\\\\n\\\\n## MANDATORY FIRST RESPONSE PROTOCOL\\\\n\\\\nBefore responding to ANY user message, you MUST complete this checklist:\\\\n\\\\n1. \u2610 List available skills in your mind\\\\n2. \u2610 Ask yourself: \\\\\\\"Does ANY skill match this request?\\\\\\\"\\\\n3. \u2610 If yes \u2192 Use the Skill tool to read and run the skill file\\\\n4. \u2610 Announce which skill you're using\\\\n5. \u2610 Follow the skill exactly\\\\n\\\\n**Responding WITHOUT completing this checklist = automatic failure.**\\\\n\\\\n## Critical Rules\\\\n\\\\n1. **Follow mandatory workflows.** Brainstorming before coding. Check for relevant skills before ANY task.\\\\n\\\\n2. Execute skills with the Skill tool\\\\n\\\\n## Common Rationalizations That Mean You're About To Fail\\\\n\\\\nIf you catch yourself thinking ANY of these thoughts, STOP. You are rationalizing. Check for and use the skill.\\\\n\\\\n- \\\\\\\"This is just a simple question\\\\\\\" \u2192 WRONG. Questions are tasks. Check for skills.\\\\n- \\\\\\\"I can check git/files quickly\\\\\\\" \u2192 WRONG. Files don't have conversation context. Check for skills.\\\\n- \\\\\\\"Let me gather information first\\\\\\\" \u2192 WRONG. Skills tell you HOW to gather information. Check for skills.\\\\n- \\\\\\\"This doesn't need a formal skill\\\\\\\" \u2192 WRONG. If a skill exists for it, use it.\\\\n- \\\\\\\"I remember this skill\\\\\\\" \u2192 WRONG. Skills evolve. Run the current version.\\\\n- \\\\\\\"This doesn't count as a task\\\\\\\" \u2192 WRONG. If you're taking action, it's a task. Check for skills.\\\\n- \\\\\\\"The skill is overkill for this\\\\\\\" \u2192 WRONG. Skills exist because simple things become complex. Use it.\\\\n- \\\\\\\"I'll just do this one thing first\\\\\\\" \u2192 WRONG. Check for skills BEFORE doing anything.\\\\n\\\\n**Why:** Skills document proven techniques that save time and prevent mistakes. Not using available skills means repeating solved problems and making known errors.\\\\n\\\\nIf a skill for your task exists, you must use it or you will fail at your task.\\\\n\\\\n## Skills with Checklists\\\\n\\\\nIf a skill has a checklist, YOU MUST create TodoWrite todos for EACH item.\\\\n\\\\n**Don't:**\\\\n- Work through checklist mentally\\\\n- Skip creating todos \\\\\\\"to save time\\\\\\\"\\\\n- Batch multiple items into one todo\\\\n- Mark complete without doing them\\\\n\\\\n**Why:** Checklists without TodoWrite tracking = steps get skipped. Every time. The overhead of TodoWrite is tiny compared to the cost of missing steps.\\\\n\\\\n## Announcing Skill Usage\\\\n\\\\nBefore using a skill, announce that you are using it.\\\\n\\\\\\\"I'm using [Skill Name] to [what you're doing].\\\\\\\"\\\\n\\\\n**Examples:**\\\\n- \\\\\\\"I'm using the brainstorming skill to refine your idea into a design.\\\\\\\"\\\\n- \\\\\\\"I'm using the test-driven-development skill to implement this feature.\\\\\\\"\\\\n\\\\n**Why:** Transparency helps your human partner understand your process and catch errors early. It also confirms you actually read the skill.\\\\n\\\\n# About these skills\\\\n\\\\n**Many skills contain rigid rules (TDD, debugging, verification).** Follow them exactly. Don't adapt away the discipline.\\\\n\\\\n**Some skills are flexible patterns (architecture, naming).** Adapt core principles to your context.\\\\n\\\\nThe skill itself tells you which type it is.\\\\n\\\\n## Instructions \u2260 Permission to Skip Workflows\\\\n\\\\nYour human partner's specific instructions describe WHAT to do, not HOW.\\\\n\\\\n\\\\\\\"Add X\\\\\\\", \\\\\\\"Fix Y\\\\\\\" = the goal, NOT permission to skip brainstorming, TDD, or RED-GREEN-REFACTOR.\\\\n\\\\n**Red flags:** \\\\\\\"Instruction was specific\\\\\\\" \u2022 \\\\\\\"Seems simple\\\\\\\" \u2022 \\\\\\\"Workflow is overkill\\\\\\\"\\\\n\\\\n**Why:** Specific instructions mean clear requirements, which is when workflows matter MOST. Skipping process on \\\\\\\"simple\\\\\\\" tasks is how simple tasks become complex problems.\\\\n\\\\n## Summary\\\\n\\\\n**Starting any task:**\\\\n1. If relevant skill exists \u2192 Use the skill\\\\n3. Announce you're using it\\\\n4. Follow what it says\\\\n\\\\n**Skill has checklist?** TodoWrite for every item.\\\\n\\\\n**Finding a relevant skill = mandatory to read and use it. Not optional.**\\\\n\\\\n\\\\n</EXTREMELY_IMPORTANT>\\\"\\n  }\\n}\\n\",\"stdout\":\"{\\n  \\\"hookSpecificOutput\\\": {\\n    \\\"hookEventName\\\": \\\"SessionStart\\\",\\n    \\\"additionalContext\\\": \\\"<EXTREMELY_IMPORTANT>\\\\nYou have superpowers.\\\\n\\\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\\\n\\\\n---\\\\nname: using-superpowers\\\\ndescription: Use when starting any conversation - establishes mandatory workflows for finding and using skills, including using Skill tool before announcing usage, following brainstorming before coding, and creating TodoWrite todos for checklists\\\\n---\\\\n\\\\n<EXTREMELY-IMPORTANT>\\\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST read the skill.\\\\n\\\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\\\n\\\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\\\n</EXTREMELY-IMPORTANT>\\\\n\\\\n# Getting Started with Skills\\\\n\\\\n## MANDATORY FIRST RESPONSE PROTOCOL\\\\n\\\\nBefore responding to ANY user message, you MUST complete this checklist:\\\\n\\\\n1. \u2610 List available skills in your mind\\\\n2. \u2610 Ask yourself: \\\\\\\"Does ANY skill match this request?\\\\\\\"\\\\n3. \u2610 If yes \u2192 Use the Skill tool to read and run the skill file\\\\n4. \u2610 Announce which skill you're using\\\\n5. \u2610 Follow the skill exactly\\\\n\\\\n**Responding WITHOUT completing this checklist = automatic failure.**\\\\n\\\\n## Critical Rules\\\\n\\\\n1. **Follow mandatory workflows.** Brainstorming before coding. Check for relevant skills before ANY task.\\\\n\\\\n2. Execute skills with the Skill tool\\\\n\\\\n## Common Rationalizations That Mean You're About To Fail\\\\n\\\\nIf you catch yourself thinking ANY of these thoughts, STOP. You are rationalizing. Check for and use the skill.\\\\n\\\\n- \\\\\\\"This is just a simple question\\\\\\\" \u2192 WRONG. Questions are tasks. Check for skills.\\\\n- \\\\\\\"I can check git/files quickly\\\\\\\" \u2192 WRONG. Files don't have conversation context. Check for skills.\\\\n- \\\\\\\"Let me gather information first\\\\\\\" \u2192 WRONG. Skills tell you HOW to gather information. Check for skills.\\\\n- \\\\\\\"This doesn't need a formal skill\\\\\\\" \u2192 WRONG. If a skill exists for it, use it.\\\\n- \\\\\\\"I remember this skill\\\\\\\" \u2192 WRONG. Skills evolve. Run the current version.\\\\n- \\\\\\\"This doesn't count as a task\\\\\\\" \u2192 WRONG. If you're taking action, it's a task. Check for skills.\\\\n- \\\\\\\"The skill is overkill for this\\\\\\\" \u2192 WRONG. Skills exist because simple things become complex. Use it.\\\\n- \\\\\\\"I'll just do this one thing first\\\\\\\" \u2192 WRONG. Check for skills BEFORE doing anything.\\\\n\\\\n**Why:** Skills document proven techniques that save time and prevent mistakes. Not using available skills means repeating solved problems and making known errors.\\\\n\\\\nIf a skill for your task exists, you must use it or you will fail at your task.\\\\n\\\\n## Skills with Checklists\\\\n\\\\nIf a skill has a checklist, YOU MUST create TodoWrite todos for EACH item.\\\\n\\\\n**Don't:**\\\\n- Work through checklist mentally\\\\n- Skip creating todos \\\\\\\"to save time\\\\\\\"\\\\n- Batch multiple items into one todo\\\\n- Mark complete without doing them\\\\n\\\\n**Why:** Checklists without TodoWrite tracking = steps get skipped. Every time. The overhead of TodoWrite is tiny compared to the cost of missing steps.\\\\n\\\\n## Announcing Skill Usage\\\\n\\\\nBefore using a skill, announce that you are using it.\\\\n\\\\\\\"I'm using [Skill Name] to [what you're doing].\\\\\\\"\\\\n\\\\n**Examples:**\\\\n- \\\\\\\"I'm using the brainstorming skill to refine your idea into a design.\\\\\\\"\\\\n- \\\\\\\"I'm using the test-driven-development skill to implement this feature.\\\\\\\"\\\\n\\\\n**Why:** Transparency helps your human partner understand your process and catch errors early. It also confirms you actually read the skill.\\\\n\\\\n# About these skills\\\\n\\\\n**Many skills contain rigid ru",
+  "conversation": [
+    {
+      "role": "thinking",
+      "content": "The user wants me to create a Python script that demonstrates USD's extensibility features using the pxr library. Let me break down what needs to be created:\n\n1. A Python script called `custom_metadata.py`\n2. It should create a USD file called `pipeline.usda`\n3. The file should contain:\n   - Default prim `/Project`\n   - `/Project` with custom metadata via SetCustomDataByKey\n   - `/Project` with assetInfo\n   - `/Project/Hero` - Xform with purpose \"render\"\n   - `/Project/Hero/Proxy` - Xform with purpose \"proxy\"\n   - `/Project/Hero/Guide` - Xform with purpose \"guide\"\n   - `/Project/Hero` with custom properties\n   - `/Project/Hero` with UsdGeom.ModelAPI applied and kind set to \"component\"\n\nLet me first check if there are any relevant skills for this task. Looking at the available skills:\n- `usd-custom-schema` - This seems relevant! It mentions \"Tokens: UsdGeom.Tokens...\" which is part of what we need.\n\nLet me use this skill first.",
+      "tool_name": ""
+    },
+    {
+      "role": "response",
+      "content": "I'm using the `usd-custom-schema` skill to ensure I follow the correct patterns for USD metadata and extensibility features.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"skill\": \"usd-custom-schema\"\n}",
+      "tool_name": "Skill"
+    },
+    {
+      "role": "thinking",
+      "content": "The skill has provided me with the exact patterns I need to use. Now I can create the script based on these patterns. Let me create the custom_metadata.py script that meets all the requirements:\n\n1. Default prim /Project\n2. /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\"\n3. /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\"\n4. /Project/Hero \u2014 an Xform with purpose set to \"render\"\n5. /Project/Hero/Proxy \u2014 an Xform with purpose set to \"proxy\"\n6. /Project/Hero/Guide \u2014 an Xform with purpose set to \"guide\"\n7. /Project/Hero has custom properties:\n   - \"custom:shotName\" as a string property with value \"SH010\"\n   - \"custom:frameRange\" as a Int2 property with value (1001, 1100)\n8. /Project/Hero should have UsdGeom.ModelAPI applied with kind set to \"component\"\n\nLet me write this script now.",
+      "tool_name": ""
+    },
+    {
+      "role": "response",
+      "content": "Now I'll create the script using the patterns from the skill.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-v7u2v_ae/custom_metadata.py\",\n  \"content\": \"from pxr import Usd, UsdGeom, Sdf, Gf, Kind\\n\\n\\ndef create_pipeline_usd():\\n    \\\"\\\"\\\"Create a USD file demonstrating extensibility features.\\\"\\\"\\\"\\n    # Create the stage\\n    stage = Usd.Stage.CreateNew(\\\"pipeline.usda\\\")\\n\\n    # Set default prim\\n    stage.SetDefaultPrim(stage.DefinePrim(\\\"/Project\\\", \\\"Xform\\\"))\\n\\n    # Get the Project prim and add custom metadata\\n    project_prim = stage.GetPrimAtPath(\\\"/Project\\\")\\n    project_prim.SetCustomDataByKey(\\\"pipeline:version\\\", \\\"2.1\\\")\\n    project_prim.SetCustomDataByKey(\\\"pipeline:department\\\", \\\"lighting\\\")\\n\\n    # Add asset info to Project\\n    model_api = Usd.ModelAPI(project_prim)\\n    model_api.SetAssetInfoByKey(\\\"name\\\", \\\"hero_asset\\\")\\n    model_api.SetAssetInfoByKey(\\\"identifier\\\", Sdf.AssetPath(\\\"assets/hero/v003/hero.usd\\\"))\\n\\n    # Create /Project/Hero with purpose \\\"render\\\"\\n    hero_xform = UsdGeom.Xform.Define(stage, \\\"/Project/Hero\\\")\\n    hero_prim = hero_xform.GetPrim()\\n    UsdGeom.Imageable(hero_prim).GetPurposeAttr().Set(UsdGeom.Tokens.render)\\n\\n    # Add custom properties to Hero\\n    hero_prim.CreateAttribute(\\\"custom:shotName\\\", Sdf.ValueTypeNames.String).Set(\\\"SH010\\\")\\n    hero_prim.CreateAttribute(\\\"custom:frameRange\\\", Sdf.ValueTypeNames.Int2).Set(Gf.Vec2i(1001, 1100))\\n\\n    # Apply ModelAPI and set kind to component\\n    Usd.ModelAPI(hero_prim).SetKind(Kind.Tokens.component)\\n\\n    # Create /Project/Hero/Proxy with purpose \\\"proxy\\\"\\n    proxy_xform = UsdGeom.Xform.Define(stage, \\\"/Project/Hero/Proxy\\\")\\n    UsdGeom.Imageable(proxy_xform.GetPrim()).GetPurposeAttr().Set(UsdGeom.Tokens.proxy)\\n\\n    # Create /Project/Hero/Guide with purpose \\\"guide\\\"\\n    guide_xform = UsdGeom.Xform.Define(stage, \\\"/Project/Hero/Guide\\\")\\n    UsdGeom.Imageable(guide_xform.GetPrim()).GetPurposeAttr().Set(UsdGeom.Tokens.guide)\\n\\n    # Save the stage\\n    stage.GetRootLayer().Save()\\n    print(\\\"Created pipeline.usda successfully\\\")\\n\\n\\nif __name__ == \\\"__main__\\\":\\n    create_pipeline_usd()\\n\"\n}",
+      "tool_name": "Write"
+    },
+    {
+      "role": "thinking",
+      "content": "The script has been created. Let me verify it works by running it.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python custom_metadata.py\",\n  \"description\": \"Run the USD script to generate pipeline.usda\"\n}",
+      "tool_name": "Bash"
+    },
+    {
+      "role": "thinking",
+      "content": "I see - the ModelAPI uses SetAssetInfo, not SetAssetInfoByKey. Let me fix this.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"replace_all\": false,\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-v7u2v_ae/custom_metadata.py\",\n  \"old_string\": \"    # Add asset info to Project\\n    model_api = Usd.ModelAPI(project_prim)\\n    model_api.SetAssetInfoByKey(\\\"name\\\", \\\"hero_asset\\\")\\n    model_api.SetAssetInfoByKey(\\\"identifier\\\", Sdf.AssetPath(\\\"assets/hero/v003/hero.usd\\\"))\",\n  \"new_string\": \"    # Add asset info to Project\\n    model_api = Usd.ModelAPI(project_prim)\\n    model_api.SetAssetInfo({\\\"name\\\": \\\"hero_asset\\\", \\\"identifier\\\": Sdf.AssetPath(\\\"assets/hero/v003/hero.usd\\\")})\"\n}",
+      "tool_name": "Edit"
+    },
+    {
+      "role": "thinking",
+      "content": "Good, let me run the script again to verify it works.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python custom_metadata.py\",\n  \"description\": \"Run the updated USD script\"\n}",
+      "tool_name": "Bash"
+    },
+    {
+      "role": "thinking",
+      "content": "The script ran successfully. Now let me verify the output file contains all the required elements by reading it.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"file_path\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-v7u2v_ae/pipeline.usda\"\n}",
+      "tool_name": "Read"
+    },
+    {
+      "role": "thinking",
+      "content": "The output file contains all the required elements:\n\n1. \u2705 Default prim /Project (line 3)\n2. \u2705 /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\" (lines 11-15)\n3. \u2705 /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\" (lines 7-10)\n4. \u2705 /Project/Hero \u2014 an Xform with purpose set to \"render\" (line 25)\n5. \u2705 /Project/Hero/Proxy \u2014 an Xform with purpose set to \"proxy\" (line 29)\n6. \u2705 /Project/Hero/Guide \u2014 an Xform with purpose set to \"guide\" (line 34)\n7. \u2705 /Project/Hero has custom properties: \"custom:shotName\" as a string with value \"SH010\" and \"custom:frameRange\" as Int2 with value (1001, 1100) (lines 23-24)\n8. \u2705 /Project/Hero has UsdGeom.ModelAPI applied with kind set to \"component\" (line 20)\n\nAll requirements are met!",
+      "tool_name": ""
+    },
+    {
+      "role": "response",
+      "content": "Done. Created `custom_metadata.py` that generates `pipeline.usda` with all required elements:\n\n- **Default prim**: `/Project`\n- **Custom metadata** on `/Project`: `pipeline:version = \"2.1\"`, `pipeline:department = \"lighting\"`\n- **Asset info** on `/Project`: `name = \"hero_asset\"`, `identifier = \"assets/hero/v003/hero.usd\"`\n- **Purpose hierarchy**:\n  - `/Project/Hero` \u2192 `render`\n  - `/Project/Hero/Proxy` \u2192 `proxy`\n  - `/Project/Hero/Guide` \u2192 `guide`\n- **Custom properties** on Hero: `custom:shotName = \"SH010\"`, `custom:frameRange = (1001, 1100)`\n- **Model kind** on Hero: `component`",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "custom_metadata.py",
+      "content": "from pxr import Usd, UsdGeom, Sdf, Gf, Kind\n\n\ndef create_pipeline_usd():\n    \"\"\"Create a USD file demonstrating extensibility features.\"\"\"\n    # Create the stage\n    stage = Usd.Stage.CreateNew(\"pipeline.usda\")\n\n    # Set default prim\n    stage.SetDefaultPrim(stage.DefinePrim(\"/Project\", \"Xform\"))\n\n    # Get the Project prim and add custom metadata\n    project_prim = stage.GetPrimAtPath(\"/Project\")\n    project_prim.SetCustomDataByKey(\"pipeline:version\", \"2.1\")\n    project_prim.SetCustomDataByKey(\"pipeline:department\", \"lighting\")\n\n    # Add asset info to Project\n    model_api = Usd.ModelAPI(project_prim)\n    model_api.SetAssetInfo({\"name\": \"hero_asset\", \"identifier\": Sdf.AssetPath(\"assets/hero/v003/hero.usd\")})\n\n    # Create /Project/Hero with purpose \"render\"\n    hero_xform = UsdGeom.Xform.Define(stage, \"/Project/Hero\")\n    hero_prim = hero_xform.GetPrim()\n    UsdGeom.Imageable(hero_prim).GetPurposeAttr().Set(UsdGeom.Tokens.render)\n\n    # Add custom properties to Hero\n    hero_prim.CreateAttribute(\"custom:shotName\", Sdf.ValueTypeNames.String).Set(\"SH010\")\n    hero_prim.CreateAttribute(\"custom:frameRange\", Sdf.ValueTypeNames.Int2).Set(Gf.Vec2i(1001, 1100))\n\n    # Apply ModelAPI and set kind to component\n    Usd.ModelAPI(hero_prim).SetKind(Kind.Tokens.component)\n\n    # Create /Project/Hero/Proxy with purpose \"proxy\"\n    proxy_xform = UsdGeom.Xform.Define(stage, \"/Project/Hero/Proxy\")\n    UsdGeom.Imageable(proxy_xform.GetPrim()).GetPurposeAttr().Set(UsdGeom.Tokens.proxy)\n\n    # Create /Project/Hero/Guide with purpose \"guide\"\n    guide_xform = UsdGeom.Xform.Define(stage, \"/Project/Hero/Guide\")\n    UsdGeom.Imageable(guide_xform.GetPrim()).GetPurposeAttr().Set(UsdGeom.Tokens.guide)\n\n    # Save the stage\n    stage.GetRootLayer().Save()\n    print(\"Created pipeline.usda successfully\")\n\n\nif __name__ == \"__main__\":\n    create_pipeline_usd()\n",
+      "language": "python"
+    },
+    {
+      "path": "pipeline.usda",
+      "content": "#usda 1.0\n(\n    defaultPrim = \"Project\"\n)\n\ndef Xform \"Project\" (\n    assetInfo = {\n        asset identifier = @assets/hero/v003/hero.usd@\n        string name = \"hero_asset\"\n    }\n    customData = {\n        dictionary pipeline = {\n            string department = \"lighting\"\n            string version = \"2.1\"\n        }\n    }\n)\n{\n    def Xform \"Hero\" (\n        kind = \"component\"\n    )\n    {\n        custom int2 custom:frameRange = (1001, 1100)\n        custom string custom:shotName = \"SH010\"\n        uniform token purpose = \"render\"\n\n        def Xform \"Proxy\"\n        {\n            uniform token purpose = \"proxy\"\n        }\n\n        def Xform \"Guide\"\n        {\n            uniform token purpose = \"guide\"\n        }\n    }\n}\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "novel",
+  "skill_intensity": "heavy",
+  "skill_pair": "usd-custom-schema"
+}

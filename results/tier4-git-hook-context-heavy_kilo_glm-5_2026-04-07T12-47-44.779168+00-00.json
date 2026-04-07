@@ -1,0 +1,130 @@
+{
+  "task_id": "tier4-git-hook-context-heavy",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": "git-hook-context-heavy",
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 121,
+        "output": 201,
+        "thinking": 0,
+        "cache_read": 15680
+      },
+      "tool_calls": 0,
+      "wall_time_s": 82.64357737498358,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:47:44.779168+00:00",
+  "prompt": "Create a file called pre-commit (no extension) that works as a git pre-commit hook following our internal repository conventions (documented in your skills).\n\nThe hook should check all staged files and reject the commit if any violations are found.\n\nThe hook should:\n- Enforce ALL rules from our internal repository conventions\n- Print a clear error message for each violation found, prefixed with 'ERROR:'\n- Exit 0 if all checks pass (allow commit)\n- Exit 1 if any check fails (reject commit)\n- Only check files that are staged (git diff --cached --name-only)\n- Be written in bash and be POSIX-compatible",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775565984522,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fad308001Ep75xzCcUEo4Qp\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fac986001D6Q5sGqqKbL4VS\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775565989793,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fae75b001WJa0bbzCu5yqOh\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fac986001D6Q5sGqqKbL4VS\",\"type\":\"tool\",\"callID\":\"call_ed5ae18270ff49e98c1a9938\",\"tool\":\"glob\",\"state\":{\"status\":\"completed\",\"input\":{\"pattern\":\"**/*convention*\"},\"output\":\"No files found\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f\",\"metadata\":{\"count\":0,\"truncated\":false},\"time\":{\"start\":1775565989730,\"end\":1775565989792}}}}\n{\"type\":\"tool_use\",\"timestamp\":1775565990045,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fae86b001s6asihdem6mGha\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fac986001D6Q5sGqqKbL4VS\",\"type\":\"tool\",\"callID\":\"call_70a73406c0e34a2781b0de94\",\"tool\":\"glob\",\"state\":{\"status\":\"completed\",\"input\":{\"pattern\":\"**/*pre-commit*\"},\"output\":\"No files found\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f\",\"metadata\":{\"count\":0,\"truncated\":false},\"time\":{\"start\":1775565989996,\"end\":1775565990045}}}}\n{\"type\":\"tool_use\",\"timestamp\":1775565990416,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fae9db0019xbqmkKJyRhuMj\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fac986001D6Q5sGqqKbL4VS\",\"type\":\"tool\",\"callID\":\"call_fe710aa48897412dba16c49f\",\"tool\":\"glob\",\"state\":{\"status\":\"completed\",\"input\":{\"pattern\":\".kilo/**/*.md\"},\"output\":\"No files found\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f\",\"metadata\":{\"count\":0,\"truncated\":false},\"time\":{\"start\":1775565990364,\"end\":1775565990415}}}}\n{\"type\":\"tool_use\",\"timestamp\":1775565991216,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67faecf7001FZIWUgs16kLuOw\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fac986001D6Q5sGqqKbL4VS\",\"type\":\"tool\",\"callID\":\"call_2919eab3eb7d4bca8202a20c\",\"tool\":\"grep\",\"state\":{\"status\":\"completed\",\"input\":{\"pattern\":\"convention|pre-commit|hook\",\"include\":\"*.md\"},\"output\":\"Found 2 matches\\n/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md:\\n  Line 3: These are our organization's mandatory repository standards. All pre-commit hooks must enforce these rules.\\n  Line 16: - Note: pre-commit hooks cannot validate commit messages (that's commit-msg hook), but the hook should validate all other rules\",\"title\":\"convention|pre-commit|hook\",\"metadata\":{\"matches\":2,\"truncated\":false},\"time\":{\"start\":1775565991162,\"end\":1775565991215}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775565991251,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67faed51001JrvXA78b28OdA3\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fac986001D6Q5sGqqKbL4VS\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13439,\"input\":12707,\"output\":220,\"reasoning\":0,\"cache\":{\"read\":512,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775565994663,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fafaa6001KtHjrBnAXf96PR\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67faed55001KnwMimHPT9LylA\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775565998647,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fb0a30001oWpFOkVpz8Kj3e\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67faed55001KnwMimHPT9LylA\",\"type\":\"tool\",\"callID\":\"call_5288cb5d36a34449a1e8cde5\",\"tool\":\"read\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md\"},\"output\":\"<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md</path>\\n<type>file</type>\\n<content>1: # Internal Repository Conventions \u2014 Pre-commit Hook\\n2: \\n3: These are our organization's mandatory repository standards. All pre-commit hooks must enforce these rules.\\n4: \\n5: ## File Size\\n6: - Maximum staged file size: **2MB** (2097152 bytes), not the typical 5MB\\n7: \\n8: ## Python Quality\\n9: - All staged Python files must pass `ruff check --select=E,F,W` (not just syntax checking)\\n10: - No `import *` (wildcard imports) allowed in any staged Python file\\n11: - Debug `print()` calls must still be caught (lines with bare `print(` not in comments)\\n12: \\n13: ## Commit Message Format\\n14: - Commit messages must match: `^(feat|fix|chore|docs|refactor): [A-Z].+`\\n15: - The type prefix is required, followed by colon-space, then a capitalized description\\n16: - Note: pre-commit hooks cannot validate commit messages (that's commit-msg hook), but the hook should validate all other rules\\n17: \\n18: ## Forbidden Files\\n19: - Hard block on: `.env`, `.credentials`, `*.pem`, `*.key` files\\n20: - These must NEVER be committed regardless of content\\n21: \\n22: ## Binary Files\\n23: - Staged binary files must be located under `assets/bin/` directory\\n24: - Each binary file must have a corresponding `.meta` file (same name + `.meta` extension)\\n25: \\n26: ## Trailing Whitespace\\n27: - No trailing whitespace on any line in any staged file\\n\\n(End of file - total 27 lines)\\n</content>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md\",\"metadata\":{\"preview\":\"# Internal Repository Conventions \u2014 Pre-commit Hook\\n\\nThese are our organization's mandatory repository standards. All pre-commit hooks must enforce these rules.\\n\\n## File Size\\n- Maximum staged file size: **2MB** (2097152 bytes), not the typical 5MB\\n\\n## Python Quality\\n- All staged Python files must pass `ruff check --select=E,F,W` (not just syntax checking)\\n- No `import *` (wildcard imports) allowed in any staged Python file\\n- Debug `print()` calls must still be caught (lines with bare `print(` not in comments)\\n\\n## Commit Message Format\\n- Commit messages must match: `^(feat|fix|chore|docs|refactor): [A-Z].+`\\n- The type prefix is required, followed by colon-space, then a capitalized description\\n- Note: pre-commit hooks cannot validate commit messages (that's commit-msg hook), but the hook should validate all other rules\\n\\n## Forbidden Files\\n- Hard block on: `.env`, `.credentials`, `*.pem`, `*.key` files\\n- These must NEVER be committed regardless of content\",\"truncated\":false,\"loaded\":[]},\"time\":{\"start\":1775565998642,\"end\":1775565998647}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775565998692,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fb0a62001CSk20QqmDm9EGJ\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67faed55001KnwMimHPT9LylA\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13653,\"input\":384,\"output\":85,\"reasoning\":0,\"cache\":{\"read\":13184,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775566003165,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fb1bdc0011bhpzj4EcDna1J\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fb0a67001lxmmtOMlRpdu8U\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775566038102,\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"part\":{\"id\":\"prt_d67fba44d001o378pc9pPjKHmE\",\"sessionID\":\"ses_29805389fffeiqzvPCkvOFeL6c\",\"messageID\":\"msg_d67fb0a67001lxmmtOMlRpdu8U\",\"type\":\"tool\",\"callID\":\"call_f94e166fda1c4e1e874e7a91\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/pre-commit\",\"content\":\"#!/bin/bash\\n# Pre-commit hook enforcing internal repository conventions\\n\\nset -e\\n\\nERRORS=0\\n\\nget_staged_files() {\\n    git diff --cached --name-only\\n}\\n\\nis_binary() {\\n    local file=\\\"$1\\\"\\n    if [ ! -f \\\"$file\\\" ]; then\\n        return 1\\n    fi\\n    case \\\"$(file -b --mime-type \\\"$file\\\" 2>/dev/null)\\\" in\\n        application/*|image/*|audio/*|video/*)\\n            return 0\\n            ;;\\n        *)\\n            if grep -qI . \\\"$file\\\" 2>/dev/null; then\\n                return 1\\n            else\\n                return 0\\n            fi\\n            ;;\\n    esac\\n}\\n\\ncheck_file_size() {\\n    local file=\\\"$1\\\"\\n    local max_size=2097152\\n    if [ -f \\\"$file\\\" ]; then\\n        local size\\n        size=$(stat -f%z \\\"$file\\\" 2>/dev/null || stat -c%s \\\"$file\\\" 2>/dev/null)\\n        if [ \\\"$size\\\" -gt \\\"$max_size\\\" ]; then\\n            echo \\\"ERROR: File exceeds 2MB limit: $file (${size} bytes)\\\" >&2\\n            ERRORS=$((ERRORS + 1))\\n        fi\\n    fi\\n}\\n\\ncheck_forbidden_files() {\\n    local file=\\\"$1\\\"\\n    local basename\\n    basename=$(basename \\\"$file\\\")\\n    case \\\"$basename\\\" in\\n        .env|.credentials)\\n            echo \\\"ERROR: Forbidden file detected: $file\\\" >&2\\n            ERRORS=$((ERRORS + 1))\\n            ;;\\n        *.pem|*.key)\\n            echo \\\"ERROR: Forbidden file detected: $file\\\" >&2\\n            ERRORS=$((ERRORS + 1))\\n            ;;\\n    esac\\n}\\n\\ncheck_python_quality() {\\n    local file=\\\"$1\\\"\\n    if [ ! -f \\\"$file\\\" ]; then\\n        return\\n    fi\\n    if ! command -v ruff >/dev/null 2>&1; then\\n        echo \\\"ERROR: ruff is not installed, cannot check Python quality\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n        return\\n    fi\\n    if ! ruff check --select=E,F,W \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERROR: Python linting failed: $file\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n    fi\\n    if grep -qE '^[^#]*from\\\\s+\\\\S+\\\\s+import\\\\s+\\\\*' \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERROR: Wildcard import found in: $file\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n    fi\\n    if grep -qE '^[^#]*print\\\\s*\\\\(' \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERRO",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"pattern\": \"**/*convention*\"\n}",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_result",
+      "content": "No files found",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"pattern\": \"**/*pre-commit*\"\n}",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_result",
+      "content": "No files found",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"pattern\": \".kilo/**/*.md\"\n}",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_result",
+      "content": "No files found",
+      "tool_name": "glob"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"pattern\": \"convention|pre-commit|hook\",\n  \"include\": \"*.md\"\n}",
+      "tool_name": "grep"
+    },
+    {
+      "role": "tool_result",
+      "content": "Found 2 matches\n/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md:\n  Line 3: These are our organization's mandatory repository standards. All pre-commit hooks must enforce these rules.\n  Line 16: - Note: pre-commit hooks cannot validate commit messages (that's commit-msg hook), but the hook should validate all other rules",
+      "tool_name": "grep"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/.claude/skills/git-hook-context-heavy/SKILL.md</path>\n<type>file</type>\n<content>1: # Internal Repository Conventions \u2014 Pre-commit Hook\n2: \n3: These are our organization's mandatory repository standards. All pre-commit hooks must enforce these rules.\n4: \n5: ## File Size\n6: - Maximum staged file size: **2MB** (2097152 bytes), not the typical 5MB\n7: \n8: ## Python Quality\n9: - All staged Python files must pass `ruff check --select=E,F,W` (not just syntax checking)\n10: - No `import *` (wildcard imports) allowed in any staged Python file\n11: - Debug `print()` calls must still be caught (lines with bare `print(` not in comments)\n12: \n13: ## Commit Message Format\n14: - Commit messages must match: `^(feat|fix|chore|docs|refactor): [A-Z].+`\n15: - The type prefix is required, followed by colon-space, then a capitalized description\n16: - Note: pre-commit hooks cannot validate commit messages (that's commit-msg hook), but the hook should validate all other rules\n17: \n18: ## Forbidden Files\n19: - Hard block on: `.env`, `.credentials`, `*.pem`, `*.key` files\n20: - These must NEVER be committed regardless of content\n21: \n22: ## Binary Files\n23: - Staged binary files must be located under `assets/bin/` directory\n24: - Each binary file must have a corresponding `.meta` file (same name + `.meta` extension)\n25: \n26: ## Trailing Whitespace\n27: - No trailing whitespace on any line in any staged file\n\n(End of file - total 27 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-jtu0773f/pre-commit\",\n  \"content\": \"#!/bin/bash\\n# Pre-commit hook enforcing internal repository conventions\\n\\nset -e\\n\\nERRORS=0\\n\\nget_staged_files() {\\n    git diff --cached --name-only\\n}\\n\\nis_binary() {\\n    local file=\\\"$1\\\"\\n    if [ ! -f \\\"$file\\\" ]; then\\n        return 1\\n    fi\\n    case \\\"$(file -b --mime-type \\\"$file\\\" 2>/dev/null)\\\" in\\n        application/*|image/*|audio/*|video/*)\\n            return 0\\n            ;;\\n        *)\\n            if grep -qI . \\\"$file\\\" 2>/dev/null; then\\n                return 1\\n            else\\n                return 0\\n            fi\\n            ;;\\n    esac\\n}\\n\\ncheck_file_size() {\\n    local file=\\\"$1\\\"\\n    local max_size=2097152\\n    if [ -f \\\"$file\\\" ]; then\\n        local size\\n        size=$(stat -f%z \\\"$file\\\" 2>/dev/null || stat -c%s \\\"$file\\\" 2>/dev/null)\\n        if [ \\\"$size\\\" -gt \\\"$max_size\\\" ]; then\\n            echo \\\"ERROR: File exceeds 2MB limit: $file (${size} bytes)\\\" >&2\\n            ERRORS=$((ERRORS + 1))\\n        fi\\n    fi\\n}\\n\\ncheck_forbidden_files() {\\n    local file=\\\"$1\\\"\\n    local basename\\n    basename=$(basename \\\"$file\\\")\\n    case \\\"$basename\\\" in\\n        .env|.credentials)\\n            echo \\\"ERROR: Forbidden file detected: $file\\\" >&2\\n            ERRORS=$((ERRORS + 1))\\n            ;;\\n        *.pem|*.key)\\n            echo \\\"ERROR: Forbidden file detected: $file\\\" >&2\\n            ERRORS=$((ERRORS + 1))\\n            ;;\\n    esac\\n}\\n\\ncheck_python_quality() {\\n    local file=\\\"$1\\\"\\n    if [ ! -f \\\"$file\\\" ]; then\\n        return\\n    fi\\n    if ! command -v ruff >/dev/null 2>&1; then\\n        echo \\\"ERROR: ruff is not installed, cannot check Python quality\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n        return\\n    fi\\n    if ! ruff check --select=E,F,W \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERROR: Python linting failed: $file\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n    fi\\n    if grep -qE '^[^#]*from\\\\s+\\\\S+\\\\s+import\\\\s+\\\\*' \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERROR: Wildcard import found in: $file\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n    fi\\n    if grep -qE '^[^#]*print\\\\s*\\\\(' \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERROR: Debug print() call found in: $file\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n    fi\\n}\\n\\ncheck_binary_files() {\\n    local file=\\\"$1\\\"\\n    if [ ! -f \\\"$file\\\" ]; then\\n        return\\n    fi\\n    if is_binary \\\"$file\\\"; then\\n        case \\\"$file\\\" in\\n            assets/bin/*)\\n                local meta_file=\\\"${file}.meta\\\"\\n                if [ ! -f \\\"$meta_file\\\" ]; then\\n                    echo \\\"ERROR: Binary file missing .meta file: $file (expected: $meta_file)\\\" >&2\\n                    ERRORS=$((ERRORS + 1))\\n                fi\\n                ;;\\n            *)\\n                echo \\\"ERROR: Binary file must be in assets/bin/: $file\\\" >&2\\n                ERRORS=$((ERRORS + 1))\\n                ;;\\n        esac\\n    fi\\n}\\n\\ncheck_trailing_whitespace() {\\n    local file=\\\"$1\\\"\\n    if [ ! -f \\\"$file\\\" ]; then\\n        return\\n    fi\\n    if is_binary \\\"$file\\\"; then\\n        return\\n    fi\\n    if grep -qE '[[:space:]]$' \\\"$file\\\" 2>/dev/null; then\\n        echo \\\"ERROR: Trailing whitespace found in: $file\\\" >&2\\n        ERRORS=$((ERRORS + 1))\\n    fi\\n}\\n\\nSTAGED_FILES=$(get_staged_files)\\n\\nif [ -z \\\"$STAGED_FILES\\\" ]; then\\n    exit 0\\nfi\\n\\nfor file in $STAGED_FILES; do\\n    if [ ! -f \\\"$file\\\" ]; then\\n        continue\\n    fi\\n    check_file_size \\\"$file\\\"\\n    check_forbidden_files \\\"$file\\\"\\n    case \\\"$file\\\" in\\n        *.py)\\n            check_python_quality \\\"$file\\\"\\n            ;;\\n    esac\\n    check_binary_files \\\"$file\\\"\\n    check_trailing_whitespace \\\"$file\\\"\\ndone\\n\\nif [ \\\"$ERRORS\\\" -gt 0 ]; then\\n    echo \\\"\\\" >&2\\n    echo \\\"ERROR: Pre-commit checks failed with $ERRORS error(s)\\\" >&2\\n    exit 1\\nfi\\n\\nexit 0\\n\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"chmod +x pre-commit\",\n  \"description\": \"Make pre-commit hook executable\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"head -20 pre-commit && echo \\\"...\\\" && tail -20 pre-commit\",\n  \"description\": \"Verify pre-commit file contents\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "#!/bin/bash\n# Pre-commit hook enforcing internal repository conventions\n\nset -e\n\nERRORS=0\n\nget_staged_files() {\n    git diff --cached --name-only\n}\n\nis_binary() {\n    local file=\"$1\"\n    if [ ! -f \"$file\" ]; then\n        return 1\n    fi\n    case \"$(file -b --mime-type \"$file\" 2>/dev/null)\" in\n        application/*|image/*|audio/*|video/*)\n            return 0\n            ;;\n...\n        continue\n    fi\n    check_file_size \"$file\"\n    check_forbidden_files \"$file\"\n    case \"$file\" in\n        *.py)\n            check_python_quality \"$file\"\n            ;;\n    esac\n    check_binary_files \"$file\"\n    check_trailing_whitespace \"$file\"\ndone\n\nif [ \"$ERRORS\" -gt 0 ]; then\n    echo \"\" >&2\n    echo \"ERROR: Pre-commit checks failed with $ERRORS error(s)\" >&2\n    exit 1\nfi\n\nexit 0\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"ls -la pre-commit\",\n  \"description\": \"Verify pre-commit is executable\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "-rwxr-xr-x@ 1 nickgrobler  staff  3559  8 Apr 00:47 pre-commit\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "response",
+      "content": "Created `pre-commit` hook enforcing all internal conventions:\n- File size limit: 2MB max\n- Python quality: ruff linting, no wildcard imports, no debug print()\n- Forbidden files: .env, .credentials, *.pem, *.key\n- Binary files: must be in assets/bin/ with .meta file\n- No trailing whitespace\n\nExits 0 on pass, 1 on failure with \"ERROR:\" prefixed messages.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "pre-commit",
+      "content": "#!/bin/bash\n# Pre-commit hook enforcing internal repository conventions\n\nset -e\n\nERRORS=0\n\nget_staged_files() {\n    git diff --cached --name-only\n}\n\nis_binary() {\n    local file=\"$1\"\n    if [ ! -f \"$file\" ]; then\n        return 1\n    fi\n    case \"$(file -b --mime-type \"$file\" 2>/dev/null)\" in\n        application/*|image/*|audio/*|video/*)\n            return 0\n            ;;\n        *)\n            if grep -qI . \"$file\" 2>/dev/null; then\n                return 1\n            else\n                return 0\n            fi\n            ;;\n    esac\n}\n\ncheck_file_size() {\n    local file=\"$1\"\n    local max_size=2097152\n    if [ -f \"$file\" ]; then\n        local size\n        size=$(stat -f%z \"$file\" 2>/dev/null || stat -c%s \"$file\" 2>/dev/null)\n        if [ \"$size\" -gt \"$max_size\" ]; then\n            echo \"ERROR: File exceeds 2MB limit: $file (${size} bytes)\" >&2\n            ERRORS=$((ERRORS + 1))\n        fi\n    fi\n}\n\ncheck_forbidden_files() {\n    local file=\"$1\"\n    local basename\n    basename=$(basename \"$file\")\n    case \"$basename\" in\n        .env|.credentials)\n            echo \"ERROR: Forbidden file detected: $file\" >&2\n            ERRORS=$((ERRORS + 1))\n            ;;\n        *.pem|*.key)\n            echo \"ERROR: Forbidden file detected: $file\" >&2\n            ERRORS=$((ERRORS + 1))\n            ;;\n    esac\n}\n\ncheck_python_quality() {\n    local file=\"$1\"\n    if [ ! -f \"$file\" ]; then\n        return\n    fi\n    if ! command -v ruff >/dev/null 2>&1; then\n        echo \"ERROR: ruff is not installed, cannot check Python quality\" >&2\n        ERRORS=$((ERRORS + 1))\n        return\n    fi\n    if ! ruff check --select=E,F,W \"$file\" 2>/dev/null; then\n        echo \"ERROR: Python linting failed: $file\" >&2\n        ERRORS=$((ERRORS + 1))\n    fi\n    if grep -qE '^[^#]*from\\s+\\S+\\s+import\\s+\\*' \"$file\" 2>/dev/null; then\n        echo \"ERROR: Wildcard import found in: $file\" >&2\n        ERRORS=$((ERRORS + 1))\n    fi\n    if grep -qE '^[^#]*print\\s*\\(' \"$file\" 2>/dev/null; then\n        echo \"ERROR: Debug print() call found in: $file\" >&2\n        ERRORS=$((ERRORS + 1))\n    fi\n}\n\ncheck_binary_files() {\n    local file=\"$1\"\n    if [ ! -f \"$file\" ]; then\n        return\n    fi\n    if is_binary \"$file\"; then\n        case \"$file\" in\n            assets/bin/*)\n                local meta_file=\"${file}.meta\"\n                if [ ! -f \"$meta_file\" ]; then\n                    echo \"ERROR: Binary file missing .meta file: $file (expected: $meta_file)\" >&2\n                    ERRORS=$((ERRORS + 1))\n                fi\n                ;;\n            *)\n                echo \"ERROR: Binary file must be in assets/bin/: $file\" >&2\n                ERRORS=$((ERRORS + 1))\n                ;;\n        esac\n    fi\n}\n\ncheck_trailing_whitespace() {\n    local file=\"$1\"\n    if [ ! -f \"$file\" ]; then\n        return\n    fi\n    if is_binary \"$file\"; then\n        return\n    fi\n    if grep -qE '[[:space:]]$' \"$file\" 2>/dev/null; then\n        echo \"ERROR: Trailing whitespace found in: $file\" >&2\n        ERRORS=$((ERRORS + 1))\n    fi\n}\n\nSTAGED_FILES=$(get_staged_files)\n\nif [ -z \"$STAGED_FILES\" ]; then\n    exit 0\nfi\n\nfor file in $STAGED_FILES; do\n    if [ ! -f \"$file\" ]; then\n        continue\n    fi\n    check_file_size \"$file\"\n    check_forbidden_files \"$file\"\n    case \"$file\" in\n        *.py)\n            check_python_quality \"$file\"\n            ;;\n    esac\n    check_binary_files \"$file\"\n    check_trailing_whitespace \"$file\"\ndone\n\nif [ \"$ERRORS\" -gt 0 ]; then\n    echo \"\" >&2\n    echo \"ERROR: Pre-commit checks failed with $ERRORS error(s)\" >&2\n    exit 1\nfi\n\nexit 0\n",
+      "language": ""
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "context",
+  "skill_intensity": "heavy",
+  "skill_pair": "git-hook"
+}

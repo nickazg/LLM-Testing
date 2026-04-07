@@ -1,0 +1,35 @@
+{
+  "task_id": "tier3-expression-parser",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00382995803375,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T09:14:35.038955+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "expr_parser.py`",
+      "content": "from dataclasses import dataclass\nfrom typing import Union, Optional\nimport re\n\n@dataclass\nclass ASTNode:\n    type: str  # 'number', 'binop', 'unary'\n    value: Optional[float] = None\n    op: Optional[str] = None\n    left: Optional['ASTNode'] = None\n    right: Optional['ASTNode'] = None\n    operand: Optional['ASTNode'] = None\n\nclass Parser:\n    def __init__(self, text):\n        self.text = text\n        self.pos = 0\n        self.tokens = self._tokenize(text)\n        self.current_token_idx = 0\n\n    def _tokenize(self, text):\n        tokens = []\n        pattern = re.compile(r'\\d+(\\.\\d+)?|[+\\-*/()]')\n        for match in pattern.finditer(text):\n            tokens.append(match.group())\n        \n        # Check for invalid tokens by comparing reconstructed string\n        reconstructed = \"\".join(tokens)\n        # Simple check for unexpected characters; remove whitespace first\n        stripped_text = \"\".join(text.split())\n        if len(reconstructed) != len(stripped_text):\n             # This is a basic check; more robust logic would track indices\n             pass \n        \n        # Validation for invalid tokens not caught by regex\n        # We verify that the tokens found actually cover the non-whitespace input\n        cleaned_text = re.sub(r'\\s+', '', text)\n        if not cleaned_text:\n            raise ValueError(\"Empty input\")\n        \n        # To ensure no invalid tokens exist, we check if tokens joined match cleaned text\n        if \"\".join(tokens) != cleaned_text:\n            raise ValueError(\"Invalid tokens in expression\")\n            \n        return tokens\n\n    def _peek(self):\n        if self.current_token_idx << len len(self.tokens):\n            return self.tokens[self.current_token_idx]\n        return None\n\n    def _consume(self):\n        token = self._peek()\n        self.current_token_idx += 1\n        return token\n\n    def parse(self):\n        node = self._expr()\n        if self.current_token_idx << len len(self.tokens):\n            raise ValueError(\"Unexpected tokens at end of expression\")\n        return node\n\n    def _expr(self):\n        node = self._term()\n        while self._peek() in ('+', '-'):\n            op = self._consume()\n            right = self._term()\n            node = ASTNode(type='binop', op=op, left=node, right=right)\n        return node\n\n    def _term(self):\n        node = self._unary()\n        while self._peek() in ('*', '/'):\n            op = self._consume()\n            right = self._unary()\n            node = ASTNode(type='binop', op=op, left=node, right=right)\n        return node\n\n    def _unary(self):\n        if self._peek() == '-':\n            self._consume()\n            operand = self._unary()\n            return ASTNode(type='unary', op='-', operand=operand)\n        return self._primary()\n\n    def _primary(self):\n        token = self._consume()\n        if token == '(':\n            node = self._expr()\n            if self._consume() != ')':\n                raise ValueError(\"Unmatched parenthesis\")\n            return node\n        try:\n            return ASTNode(type='number', value=float(token))\n        except (TypeError, ValueError):\n            raise ValueError(f\"Invalid token: {token}\")\n\ndef parse(expression: str) -> ASTNode:\n    return Parser(expression).parse()\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == 'number':\n        return node.value\n    if node.type == 'unary':\n        return -evaluate(node.operand)\n    if node.type == 'binop':\n        left = evaluate(node.left)\n        right = evaluate(node.right)\n        if node.op == '+': return left + right\n        if node.op == '-': return left - right\n        if node.op == '*': return left * right\n        if node.op == '/':\n            if right == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left / right\n    raise ValueError(\"Unknown AST node type\")\n",
+      "language": ""
+    }
+  ],
+  "tier": 3
+}

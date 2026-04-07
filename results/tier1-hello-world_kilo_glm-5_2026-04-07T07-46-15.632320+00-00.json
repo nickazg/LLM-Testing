@@ -1,0 +1,70 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 194,
+        "output": 72,
+        "thinking": 0,
+        "cache_read": 13056
+      },
+      "tool_calls": 0,
+      "wall_time_s": 14.418361166026443,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T07:46:15.632320+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775547966029,\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"part\":{\"id\":\"prt_d66e7e24b001O11B1jPak6RasG\",\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"messageID\":\"msg_d66e7d513001gFHv43yEptXAKQ\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775547970766,\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"part\":{\"id\":\"prt_d66e7f21e001fYBnkP30A4y6Ax\",\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"messageID\":\"msg_d66e7d513001gFHv43yEptXAKQ\",\"type\":\"tool\",\"callID\":\"call_09a3733a046c4138a7ccb808\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"print('Hello, World!')\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-bz4f74sw/hello.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-bz4f74sw/hello.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-bz4f74sw/hello.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-bz4f74sw/hello.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775547970083,\"end\":1775547970764}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775547970768,\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"part\":{\"id\":\"prt_d66e7f4ce001VXxSh2dP9qatyH\",\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"messageID\":\"msg_d66e7d513001gFHv43yEptXAKQ\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13241,\"input\":12603,\"output\":126,\"reasoning\":0,\"cache\":{\"read\":512,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775547973360,\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"part\":{\"id\":\"prt_d66e7feef001H5kNpjoOSYwNYg\",\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"messageID\":\"msg_d66e7f4d2001iNCQfBKJzZpK8k\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775547975043,\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"part\":{\"id\":\"prt_d66e803f20018NCkW81NJoa1Ac\",\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"messageID\":\"msg_d66e7f4d2001iNCQfBKJzZpK8k\",\"type\":\"text\",\"text\":\"Created `hello.py` that prints 'Hello, World!' to stdout.\",\"time\":{\"start\":1775547975043,\"end\":1775547975043}}}\n{\"type\":\"step_finish\",\"timestamp\":1775547975045,\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"part\":{\"id\":\"prt_d66e80583001YCs2W1NwWAgJ0j\",\"sessionID\":\"ses_299182cffffezr5WpFimNy1TkK\",\"messageID\":\"msg_d66e7f4d2001iNCQfBKJzZpK8k\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0,\"tokens\":{\"total\":13322,\"input\":194,\"output\":72,\"reasoning\":0,\"cache\":{\"read\":13056,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"print('Hello, World!')\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-bz4f74sw/hello.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "Created `hello.py` that prints 'Hello, World!' to stdout.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/9836958273057246351",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-bz4f74sw\u0001\bhello.py\ufffd@\ufffdU\ufffd\u000e\u0017\ufffd\ufffd\ufffd@\ufffd\ufffdf\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "hello.py",
+      "content": "print(\"Hello, World!\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 1,
+  "difficulty": 1,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

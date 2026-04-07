@@ -1,0 +1,85 @@
+{
+  "task_id": "tier2-csv-pipeline",
+  "model": "qwen3-30b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 13789,
+        "output": 127,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 12.109981790999882,
+      "cost_usd": 0.00204074
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:07:23.435010+00:00",
+  "prompt": "Create a Python script called `pipeline.py` that reads `input.csv` (columns: name, department, salary, status), filters rows where status equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department,avg_salary,count`. Sort rows alphabetically by department name. Include a header row. Use only the Python standard library (csv module).",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775549235697,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb41ef001Zu9CaXoz1v11yJ\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb38b10019fZx52uvK7NCyk\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775549239237,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb41f0001EvZZJ1D0CKciMt\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb38b10019fZx52uvK7NCyk\",\"type\":\"text\",\"text\":\"I'll create a Python script that processes the CSV file according to your requirements. Let me break this down step by step:\\n\\n1. Read input.csv with csv module\\n2. Filter for 'active' status\\n3. Group by department\\n4. Calculate average salary and count per department\\n5. Write results to output.csv with proper formatting\\n6. Sort by department name\\n\\nLet me implement this solution:\",\"time\":{\"start\":1775549239237,\"end\":1775549239237}}}\n{\"type\":\"tool_use\",\"timestamp\":1775549240105,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb453f0018K4cRdHV4A9bZp\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb38b10019fZx52uvK7NCyk\",\"type\":\"tool\",\"callID\":\"call_64f92eaa50f84d8a959e49e3\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"import csv\\nfrom collections import defaultdict\\n\\n# Read input.csv and process data\\nemployees = []\\nwith open('input.csv', 'r', newline='', encoding='utf-8') as infile:\\n    reader = csv.DictReader(infile)\\n    for row in reader:\\n        if row['status'] == 'active':\\n            employees.append(row)\\n\\n# Group by department and calculate statistics\\ndept_data = defaultdict(list)\\nfor emp in employees:\\n    dept_data[emp['department']].append(float(emp['salary']))\\n\\n# Calculate average salary and count per department\\nresults = []\\nfor dept, salaries in dept_data.items():\\n    avg_salary = round(sum(salaries) / len(salaries), 2)\\n    count = len(salaries)\\n    results.append({'department': dept, 'avg_salary': avg_salary, 'count': count})\\n\\n# Sort by department name\\nresults.sort(key=lambda x: x['department'])\\n\\n# Write to output.csv\\nwith open('output.csv', 'w', newline='', encoding='utf-8') as outfile:\\n    fieldnames = ['department', 'avg_salary', 'count']\\n    writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n    \\n    # Write header\\n    writer.writeheader()\\n    \\n    # Write data rows\\n    for row in results:\\n        writer.writerow(row)\",\"filePath\":\"pipeline.py\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-42d3a2i3/pipeline.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-42d3a2i3/pipeline.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-42d3a2i3/pipeline.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775549239232,\"end\":1775549240104}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775549240107,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb53290010cpDkF61ohHLax\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb38b10019fZx52uvK7NCyk\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.00104122,\"tokens\":{\"total\":13786,\"input\":13405,\"output\":381,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775549242068,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb5ad4001RukJ4ta6shVIpk\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb532d001H7WM1MXu56lNrM\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775549242847,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb5ad4002gmqNVl4tBj1roy\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb532d001H7WM1MXu56lNrM\",\"type\":\"text\",\"text\":\"I've created the Python script `pipeline.py` that:\\n\\n1. Reads `input.csv` with the csv module\\n2. Filters rows where status equals 'active'\\n3. Groups employees by department\\n4. Calculates average salary (rounded to 2 decimal places) and count per department\\n5. Sorts results alphabetically by department name\\n6. Writes the output to `output.csv` with the required columns and header\\n\\nThe script uses only Python's standard library (csv module and defaultdict) as requested. The implementation handles all specified requirements including proper CSV reading/writing, floating-point averaging with rounding, and alphabetical sorting.\",\"time\":{\"start\":1775549242846,\"end\":1775549242846}}}\n{\"type\":\"step_finish\",\"timestamp\":1775549242849,\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"part\":{\"id\":\"prt_d66fb5ddf001Vxtqlg3ahpu7rF\",\"sessionID\":\"ses_29904cb98ffesCV6gA566SJ5Es\",\"messageID\":\"msg_d66fb532d001H7WM1MXu56lNrM\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00099952,\"tokens\":{\"total\":13916,\"input\":13789,\"output\":127,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "response",
+      "content": "I'll create a Python script that processes the CSV file according to your requirements. Let me break this down step by step:\n\n1. Read input.csv with csv module\n2. Filter for 'active' status\n3. Group by department\n4. Calculate average salary and count per department\n5. Write results to output.csv with proper formatting\n6. Sort by department name\n\nLet me implement this solution:",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"import csv\\nfrom collections import defaultdict\\n\\n# Read input.csv and process data\\nemployees = []\\nwith open('input.csv', 'r', newline='', encoding='utf-8') as infile:\\n    reader = csv.DictReader(infile)\\n    for row in reader:\\n        if row['status'] == 'active':\\n            employees.append(row)\\n\\n# Group by department and calculate statistics\\ndept_data = defaultdict(list)\\nfor emp in employees:\\n    dept_data[emp['department']].append(float(emp['salary']))\\n\\n# Calculate average salary and count per department\\nresults = []\\nfor dept, salaries in dept_data.items():\\n    avg_salary = round(sum(salaries) / len(salaries), 2)\\n    count = len(salaries)\\n    results.append({'department': dept, 'avg_salary': avg_salary, 'count': count})\\n\\n# Sort by department name\\nresults.sort(key=lambda x: x['department'])\\n\\n# Write to output.csv\\nwith open('output.csv', 'w', newline='', encoding='utf-8') as outfile:\\n    fieldnames = ['department', 'avg_salary', 'count']\\n    writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n    \\n    # Write header\\n    writer.writeheader()\\n    \\n    # Write data rows\\n    for row in results:\\n        writer.writerow(row)\",\n  \"filePath\": \"pipeline.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "I've created the Python script `pipeline.py` that:\n\n1. Reads `input.csv` with the csv module\n2. Filters rows where status equals 'active'\n3. Groups employees by department\n4. Calculates average salary (rounded to 2 decimal places) and count per department\n5. Sorts results alphabetically by department name\n6. Writes the output to `output.csv` with the required columns and header\n\nThe script uses only Python's standard library (csv module and defaultdict) as requested. The implementation handles all specified requirements including proper CSV reading/writing, floating-point averaging with rounding, and alphabetical sorting.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/2292221359964750343",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-42d3a2i3\u0001\u000bpipeline.py\ufffd\ufffdf.:\u0016\ufffdA\ufffd\ufffd\ufffdO\ufffdf\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "input.csv",
+      "content": "name,department,salary,status\nAlice Johnson,Engineering,95000,active\nBob Smith,Marketing,72000,active\nCarol White,Engineering,88000,active\nDave Brown,Sales,65000,inactive\nEve Davis,Marketing,78000,active\nFrank Miller,Engineering,102000,active\nGrace Wilson,Sales,71000,active\nHenry Taylor,Marketing,69000,inactive\nIris Anderson,Engineering,91000,active\nJack Thomas,Sales,68000,active\nKaren Jackson,HR,82000,active\nLeo Harris,Engineering,97000,inactive\nMia Martin,HR,79000,active\nNathan Clark,Sales,73000,active\nOlivia Lewis,Marketing,85000,active\nPatrick Robinson,HR,76000,active\nQuinn Walker,Engineering,105000,active\nRachel Hall,Sales,62000,inactive\nSam Young,Marketing,71000,active\nTina King,HR,88000,active\n",
+      "language": ""
+    },
+    {
+      "path": "output.csv",
+      "content": "department,avg_salary,count\nEngineering,96200.0,5\nHR,81250.0,4\nMarketing,76500.0,4\nSales,70666.67,3\n",
+      "language": ""
+    },
+    {
+      "path": "pipeline.py",
+      "content": "import csv\nfrom collections import defaultdict\n\n# Read input.csv and process data\nemployees = []\nwith open(\"input.csv\", \"r\", newline=\"\", encoding=\"utf-8\") as infile:\n    reader = csv.DictReader(infile)\n    for row in reader:\n        if row[\"status\"] == \"active\":\n            employees.append(row)\n\n# Group by department and calculate statistics\ndept_data = defaultdict(list)\nfor emp in employees:\n    dept_data[emp[\"department\"]].append(float(emp[\"salary\"]))\n\n# Calculate average salary and count per department\nresults = []\nfor dept, salaries in dept_data.items():\n    avg_salary = round(sum(salaries) / len(salaries), 2)\n    count = len(salaries)\n    results.append({\"department\": dept, \"avg_salary\": avg_salary, \"count\": count})\n\n# Sort by department name\nresults.sort(key=lambda x: x[\"department\"])\n\n# Write to output.csv\nwith open(\"output.csv\", \"w\", newline=\"\", encoding=\"utf-8\") as outfile:\n    fieldnames = [\"department\", \"avg_salary\", \"count\"]\n    writer = csv.DictWriter(outfile, fieldnames=fieldnames)\n\n    # Write header\n    writer.writeheader()\n\n    # Write data rows\n    for row in results:\n        writer.writerow(row)\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

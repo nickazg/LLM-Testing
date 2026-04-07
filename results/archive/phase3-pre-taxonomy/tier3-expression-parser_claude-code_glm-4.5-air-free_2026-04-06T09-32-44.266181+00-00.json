@@ -1,0 +1,35 @@
+{
+  "task_id": "tier3-expression-parser",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.1,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2373907499714,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T09:32:44.266181+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "expr_parser.py",
+      "content": "from dataclasses import dataclass\nfrom typing import Union\n\n\n@dataclass\nclass ASTNode:\n    type: str\n    value: Union[float, None] = None\n    op: Union[str, None] = None\n    left: Union['ASTNode', None] = None\n    right: Union['ASTNode', None] = None\n    operand: Union['ASTNode', None] = None\n\n\ndef tokenize(expression: str) -> list:\n    \"\"\"Tokenize the expression into numbers, operators, and parentheses.\"\"\"\n    tokens = []\n    i = 0\n    n = len(expression)\n\n    while i < n:\n        c = expression[i]\n\n        if c.isspace():\n            i += 1\n            continue\n\n        if c.isdigit() or c == '.':\n            # Parse number\n            num_str = c\n            i += 1\n            while i < n and (expression[i].isdigit() or expression[i] == '.'):\n                num_str += expression[i]\n                i += 1\n            try:\n                tokens.append(('number', float(num_str)))\n            except ValueError:\n                raise ValueError(f\"Invalid number format: {num_str}\")\n        elif c in '+-*/()':\n            tokens.append(('operator', c))\n            i += 1\n        else:\n            raise ValueError(f\"Invalid character: {c}\")\n\n    return tokens\n\n\ndef parse(tokens: list) -> ASTNode:\n    \"\"\"Parse tokens into an AST using recursive descent parsing.\"\"\"\n    if not tokens:\n        raise ValueError(\"Empty expression\")\n\n    # Index to track current position\n    current = [0]\n\n    def peek(offset=0):\n        if current[0] + offset < len(tokens):\n            return tokens[current[0] + offset]\n        return None\n\n    def consume():\n        token = peek()\n        current[0] += 1\n        return token\n\n    def parse_expression():\n        return parse_additive()\n\n    def parse_additive():\n        node = parse_multiplicative()\n\n        while peek() and peek()[1] in ('+', '-'):\n            op_token = consume()\n            right = parse_multiplicative()\n            node = ASTNode(type='binop', op=op_token[1], left=node, right=right)\n\n        return node\n\n    def parse_multiplicative():\n        node = parse_unary()\n\n        while peek() and peek()[1] in ('*', '/'):\n            op_token = consume()\n            right = parse_unary()\n            node = ASTNode(type='binop', op=op_token[1], left=node, right=right)\n\n        return node\n\n    def parse_unary():\n        # Check for unary minus\n        if peek() and peek()[1] == '-':\n            op_token = consume()\n            operand = parse_primary()\n            return ASTNode(type='unary', op=op_token[1], operand=operand)\n\n        return parse_primary()\n\n    def parse_primary():\n        token = consume()\n\n        if token[0] == 'number':\n            return ASTNode(type='number', value=token[1])\n        elif token[1] == '(':\n            node = parse_expression()\n            if not peek() or peek()[1] != ')':\n                raise ValueError(\"Unmatched parentheses\")\n            consume()  # consume ')'\n            return node\n        else:\n            raise ValueError(f\"Unexpected token: {token[1]}\")\n\n    return parse_expression()\n\n\ndef parse(expression: str) -> ASTNode:\n    \"\"\"Parse a string expression into an AST.\"\"\"\n    tokens = tokenize(expression)\n    try:\n        return parse(tokens)\n    except Exception as e:\n        if isinstance(e, ValueError):\n            raise\n        raise ValueError(f\"Parse error: {str(e)}\")\n\n\ndef evaluate(node: ASTNode) -> float:\n    \"\"\"Evaluate an AST node to a numeric result.\"\"\"\n    if node.type == 'number':\n        return node.value\n    elif node.type == 'binop':\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n\n        if node.op == '+':\n            return left_val + right_val\n        elif node.op == '-':\n            return left_val - right_val\n        elif node.op == '*':\n            return left_val * right_val\n        elif node.op == '/':\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n    elif node.type == 'unary':\n        operand_val = evaluate(node.operand)\n        if node.op == '-':\n            return -operand_val\n    else:\n        raise ValueError(f\"Unknown node type: {node.type}\")\n\n\n# Test cases\nif __name__ == \"__main__\":\n    test_cases = [\n        \"5\",\n        \"2 + 3\",\n        \"2 * 3 + 4\",\n        \"2 + 3 * 4\",\n        \"(2 + 3) * 4\",\n        \"-5\",\n        \"-(3 + 2)\",\n        \"10 / 2\",\n        \"10 / 0\",\n        \"2 * (3 + 4) - 5 / 2\",\n        \"   \",\n        \"2 +\",\n        \"(2 + 3\",\n        \"2 + abc\"\n    ]\n\n    for expr in test_cases:\n        print(f\"\\nTesting: {expr}\")\n        try:\n            ast = parse(expr)\n            result = evaluate(ast)\n            print(f\"  Result: {result}\")\n            print(f\"  AST: {ast}\")\n        except ValueError as e:\n            print(f\"  Error: {e}\")\n        except ZeroDivisionError as e:\n            print(f\"  Error: {e}\")",
+      "language": "python"
+    }
+  ],
+  "tier": 3
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": "tier3-usd-custom-schema",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2403884159867,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:20:19.864598+00:00",
+  "prompt": "Create a Python script called custom_metadata.py that uses the pxr library to demonstrate USD's extensibility features. The script must create a file called pipeline.usda containing:\n\n1. Default prim /Project\n2. /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\"\n3. /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\"\n4. /Project/Hero \u2014 an Xform with purpose set to \"render\" (UsdGeom.Tokens.render)\n5. /Project/Hero/Proxy \u2014 an Xform with purpose set to \"proxy\" (UsdGeom.Tokens.proxy)\n6. /Project/Hero/Guide \u2014 an Xform with purpose set to \"guide\" (UsdGeom.Tokens.guide)\n7. /Project/Hero has custom properties:\n   - \"custom:shotName\" as a string property with value \"SH010\"\n   - \"custom:frameRange\" as a Int2 property with value (1001, 1100)\n8. /Project/Hero should have UsdGeom.ModelAPI applied with kind set to \"component\"\n\nUse: from pxr import Usd, UsdGeom, Sdf, Gf, Kind",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "custom_metadata.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nScript to demonstrate USD extensibility features with custom metadata and properties.\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, Sdf, Gf, Kind\n\ndef create_pipeline_usd():\n    \"\"\"Create a USD file with custom metadata and extensibility features.\"\"\"\n\n    # Create a new USD stage\n    stage = Usd.Stage.CreateInMemory()\n\n    # 1. Create default root prim /Project\n    project_prim = stage.DefinePrim(\"/Project\", \"Xform\")\n\n    # 2. Set custom metadata on /Project\n    project_prim.SetCustomDataByKey(\"pipeline:version\", \"2.1\")\n    project_prim.SetCustomDataByKey(\"pipeline:department\", \"lighting\")\n\n    # 3. Set assetInfo on /Project\n    asset_info = {\n        'name': 'hero_asset',\n        'identifier': 'assets/hero/v003/hero.usd'\n    }\n    project_prim.SetCustomDataByKey('assetInfo', asset_info)\n\n    # 4-6. Create hierarchy with different purposes\n    # /Project/Hero with purpose \"render\"\n    hero_prim = stage.DefinePrim(\"/Project/Hero\", \"Xform\")\n    hero_imageable = UsdGeom.Imageable(hero_prim)\n    hero_imageable.CreatePurposeAttr().Set(UsdGeom.Tokens.render)\n\n    # /Project/Hero/Proxy with purpose \"proxy\"\n    proxy_prim = stage.DefinePrim(\"/Project/Hero/Proxy\", \"Xform\")\n    proxy_imageable = UsdGeom.Imageable(proxy_prim)\n    proxy_imageable.CreatePurposeAttr().Set(UsdGeom.Tokens.proxy)\n\n    # /Project/Hero/Guide with purpose \"guide\"\n    guide_prim = stage.DefinePrim(\"/Project/Hero/Guide\", \"Xform\")\n    guide_imageable = UsdGeom.Imageable(guide_prim)\n    guide_imageable.CreatePurposeAttr().Set(UsdGeom.Tokens.guide)\n\n    # 7. Add custom properties to /Project/Hero\n    # String property for shotName\n    shot_name_attr = hero_prim.CreateAttribute(\"custom:shotName\", Sdf.ValueTypeNames.String)\n    shot_name_attr.Set(\"SH010\")\n\n    # Int2 property for frameRange\n    frame_range_attr = hero_prim.CreateAttribute(\"custom:frameRange\", Sdf.ValueTypeNames.Int2)\n    frame_range_attr.Set(Gf.Vec2i(1001, 1100))\n\n    # 8. Apply ModelAPI and set kind\n    model_api = UsdGeom.ModelAPI(hero_prim)\n    model_api.SetKind(Kind.Tokens.component)\n\n    # Export to file\n    usda_content = stage.GetRootLayer().ExportToString()\n\n    with open(\"pipeline.usda\", \"w\") as f:\n        f.write(usda_content)\n\n    print(\"Successfully created pipeline.usda with all required features\")\n\n    # Print summary of what was created\n    print(\"\\nUSD file contents summary:\")\n    print(\"- /Project prim with custom metadata\")\n    print(\"  - pipeline:version = 2.1\")\n    print(\"  - pipeline:department = lighting\")\n    print(\"  - assetInfo with name and identifier\")\n    print(\"- /Project/Hero hierarchy with different purposes:\")\n    print(\"  - Hero (render purpose)\")\n    print(\"  - Proxy (proxy purpose)\")\n    print(\"  - Guide (guide purpose)\")\n    print(\"- Custom properties on Hero:\")\n    print(\"  - custom:shotName = SH010\")\n    print(\"  - custom:frameRange = (1001, 1100)\")\n    print(\"- Hero prim has ModelAPI applied with kind = component\")\n\nif __name__ == \"__main__\":\n    create_pipeline_usd()",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-usd-stage-layers",
+  "model": "gemma-4-31b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2594867909793,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T09:27:53.371691+00:00",
+  "prompt": "Create a Python script called layer_opinions.py that uses the pxr library to demonstrate USD's layer opinion system. The script must create THREE .usda files and a composed result:\n\n1. base_layer.usda \u2014 contains:\n   - Default prim /Scene\n   - /Scene/Character \u2014 an Xform with xformOp:translate at (0, 0, 0)\n   - /Scene/Character/Body \u2014 a Mesh (simple cube)\n\n2. anim_layer.usda \u2014 a STRONGER layer that overrides:\n   - /Scene/Character xformOp:translate with time-sampled values: frame 1 at (0,0,0), frame 24 at (5,0,0)\n\n3. look_layer.usda \u2014 the STRONGEST layer that adds:\n   - /Scene/Character/Body gets a Material binding to /Scene/Looks/HeroMat\n   - /Scene/Looks/HeroMat \u2014 a UsdShade.Material with a UsdPreviewSurface shader, diffuseColor (0.9, 0.1, 0.1)\n\n4. The script should print the composed translate value at frame 12 to stdout as verification\n\nLayer stack order (strongest to weakest): look_layer.usda, anim_layer.usda, base_layer.usda\n\nUse: from pxr import Usd, UsdGeom, UsdShade, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

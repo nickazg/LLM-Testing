@@ -1,0 +1,55 @@
+{
+  "task_id": "tier3-expression-parser",
+  "model": "glm-4.7-flash",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.2,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00462916702963,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T09:46:29.507793+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/2411575248100338137",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1f_8pu3l\u0002\u0013test_expr_parser.py\ufffd\ufffd\u0002e{\u0011:\ufffd\u0012\ufffd\t\ufffd+b\ufffd\u0001\u0000\u0000\u0000\u0001\u000eexpr_parser.py\ufffdq\u0011\ufffd\u067c\ufffd\ufffd_\ufffd\ufffd\ufffd.b\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "expr_parser.py",
+      "content": "class ASTNode:\n    def __init__(\n        self, node_type, value=None, op=None, left=None, right=None, operand=None\n    ):\n        self.type = node_type\n        self.value = value\n        self.op = op\n        self.left = left\n        self.right = right\n        self.operand = operand\n\n    def __repr__(self):\n        if self.type == \"number\":\n            return f\"Number({self.value})\"\n        elif self.type == \"binop\":\n            return f\"BinOp({self.left}, {self.op}, {self.right})\"\n        elif self.type == \"unary\":\n            return f\"UnaryOp({self.op}, {self.operand})\"\n        return f\"ASTNode({self.type})\"\n\n\nclass ExprParser:\n    def __init__(self):\n        self.pos = 0\n        self.expr = \"\"\n\n    def skip_whitespace(self):\n        while self.pos < len(self.expr) and self.expr[self.pos].isspace():\n            self.pos += 1\n\n    def parse(self, expression: str) -> ASTNode:\n        if not expression or not expression.strip():\n            raise ValueError(\"Empty expression\")\n\n        self.expr = expression.strip()\n        self.pos = 0\n\n        try:\n            self.skip_whitespace()\n            node = self.parse_expression()\n            self.skip_whitespace()\n            if self.pos < len(self.expr):\n                raise ValueError(\n                    f\"Unexpected character at position {self.pos}: '{self.expr[self.pos]}'\"\n                )\n            return node\n        except IndexError:\n            raise ValueError(\"Unexpected end of expression\")\n\n    def parse_expression(self) -> ASTNode:\n        left = self.parse_term()\n\n        while self.pos < len(self.expr):\n            if self.expr[self.pos] in (\"+\", \"-\"):\n                op = self.expr[self.pos]\n                self.pos += 1\n                right = self.parse_term()\n                left = ASTNode(\"binop\", op=op, left=left, right=right)\n            else:\n                break\n\n        return left\n\n    def parse_term(self) -> ASTNode:\n        left = self.parse_factor()\n\n        while self.pos < len(self.expr):\n            if self.expr[self.pos] in (\"*\", \"/\"):\n                op = self.expr[self.pos]\n                self.pos += 1\n                right = self.parse_factor()\n                left = ASTNode(\"binop\", op=op, left=left, right=right)\n            else:\n                break\n\n        return left\n\n    def parse_factor(self) -> ASTNode:\n        if self.pos >= len(self.expr):\n            raise ValueError(\"Unexpected end of expression\")\n\n        self.skip_whitespace()\n        if self.expr[self.pos] == \"(\":\n            self.pos += 1\n            node = self.parse_expression()\n            self.skip_whitespace()\n            if self.pos >= len(self.expr) or self.expr[self.pos] != \")\":\n                raise ValueError(\"Unmatched closing parenthesis\")\n            self.pos += 1\n            return node\n        elif self.expr[self.pos] == \"-\":\n            self.pos += 1\n            while self.pos < len(self.expr) and self.expr[self.pos] == \"-\":\n                self.pos += 1\n            self.skip_whitespace()\n            if self.pos >= len(self.expr) or not self.expr[self.pos].isdigit():\n                raise ValueError(\"Invalid unary minus\")\n            operand = self.parse_number()\n            return ASTNode(\"unary\", operand=operand, op=\"-\")\n        else:\n            return self.parse_number()\n\n    def parse_number(self) -> ASTNode:\n        self.skip_whitespace()\n        if self.pos >= len(self.expr) or not self.expr[self.pos].isdigit():\n            raise ValueError(\n                f\"Expected number at position {self.pos}: '{self.expr[self.pos]}'\"\n            )\n\n        start = self.pos\n        while self.pos < len(self.expr) and self.expr[self.pos].isdigit():\n            self.pos += 1\n\n        if self.pos < len(self.expr) and self.expr[self.pos] == \".\":\n            self.pos += 1\n            while self.pos < len(self.expr) and self.expr[self.pos].isdigit():\n                self.pos += 1\n\n        number_str = self.expr[start : self.pos]\n        try:\n            return ASTNode(\"number\", value=float(number_str))\n        except ValueError:\n            raise ValueError(f\"Invalid number: {number_str}\")\n\n\ndef parse(expression: str) -> ASTNode:\n    parser = ExprParser()\n    return parser.parse(expression)\n\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == \"number\":\n        return node.value\n    elif node.type == \"binop\":\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n\n        if node.op == \"+\":\n            return left_val + right_val\n        elif node.op == \"-\":\n            return left_val - right_val\n        elif node.op == \"*\":\n            return left_val * right_val\n        elif node.op == \"/\":\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n        else:\n            raise ValueError(f\"Unknown operator: {node.op}\")\n    elif node.type == \"unary\":\n        operand_val = evaluate(node.operand)\n        if node.op == \"-\":\n            return -operand_val\n        else:\n            raise ValueError(f\"Unknown unary operator: {node.op}\")\n    else:\n        raise ValueError(f\"Unknown node type: {node.type}\")\n",
+      "language": "python"
+    },
+    {
+      "path": "test_expr_parser.py",
+      "content": "import unittest\nfrom expr_parser import parse, evaluate, ASTNode\n\n\nclass TestExprParser(unittest.TestCase):\n    def test_simple_numbers(self):\n        node = parse(\"5\")\n        self.assertEqual(node.type, \"number\")\n        self.assertEqual(node.value, 5.0)\n        self.assertEqual(evaluate(node), 5.0)\n\n    def test_addition(self):\n        node = parse(\"3 + 4\")\n        self.assertEqual(evaluate(node), 7.0)\n\n    def test_subtraction(self):\n        node = parse(\"10 - 3\")\n        self.assertEqual(evaluate(node), 7.0)\n\n    def test_multiplication(self):\n        node = parse(\"3 * 4\")\n        self.assertEqual(evaluate(node), 12.0)\n\n    def test_division(self):\n        node = parse(\"10 / 2\")\n        self.assertEqual(evaluate(node), 5.0)\n\n    def test_precedence_multiplication_and_division(self):\n        node = parse(\"2 + 3 * 4\")\n        result = evaluate(node)\n        self.assertEqual(result, 14.0)\n\n    def test_precedence_standard(self):\n        node = parse(\"10 / 2 + 3 * 4\")\n        result = evaluate(node)\n        self.assertEqual(result, 5.0 + 12.0)\n\n    def test_unary_minus_number(self):\n        node = parse(\"-5\")\n        self.assertEqual(node.type, \"unary\")\n        self.assertEqual(evaluate(node), -5.0)\n\n    def test_unary_minus_expression(self):\n        node = parse(\"-(3 + 2)\")\n        self.assertEqual(evaluate(node), -5.0)\n\n    def test_parentheses(self):\n        node = parse(\"(3 + 4) * 2\")\n        self.assertEqual(evaluate(node), 14.0)\n\n    def test_complex_expression(self):\n        node = parse(\"(10 / 2) + (3 * (4 - 1))\")\n        result = evaluate(node)\n        self.assertEqual(result, 5.0 + 9.0)\n\n    def test_multiple_unary_minus(self):\n        node = parse(\"--5\")\n        self.assertEqual(evaluate(node), 5.0)\n\n    def test_empty_input(self):\n        with self.assertRaises(ValueError):\n            parse(\"\")\n\n    def test_whitespace_only(self):\n        with self.assertRaises(ValueError):\n            parse(\"   \")\n\n    def test_unmatched_opening_paren(self):\n        with self.assertRaises(ValueError):\n            parse(\"(3 + 4\")\n\n    def test_unmatched_closing_paren(self):\n        with self.assertRaises(ValueError):\n            parse(\"3 + 4)\")\n\n    def test_invalid_token(self):\n        with self.assertRaises(ValueError):\n            parse(\"3 + @\")\n\n    def test_invalid_number(self):\n        with self.assertRaises(ValueError):\n            parse(\"3 + abc\")\n\n    def test_division_by_zero(self):\n        node = parse(\"5 / 0\")\n        with self.assertRaises(ZeroDivisionError):\n            evaluate(node)\n\n    def test_negative_numbers(self):\n        node = parse(\"-3 + 5\")\n        self.assertEqual(evaluate(node), 2.0)\n\n    def test_nested_parentheses(self):\n        node = parse(\"((1 + 2) * 3)\")\n        self.assertEqual(evaluate(node), 9.0)\n\n    def test_expression_with_multiple_spaces(self):\n        node = parse(\"  10    +   20  \")\n        self.assertEqual(evaluate(node), 30.0)\n\n\nif __name__ == \"__main__\":\n    unittest.main(verbosity=2)\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3
+}

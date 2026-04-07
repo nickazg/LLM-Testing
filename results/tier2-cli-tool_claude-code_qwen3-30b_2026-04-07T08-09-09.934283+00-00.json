@@ -1,0 +1,54 @@
+{
+  "task_id": "tier2-cli-tool",
+  "model": "qwen3-30b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 120.24953008396551,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:09:09.934283+00:00",
+  "prompt": "Create a Python script called `wordcount.py` that works like a simplified `wc` command. It should accept one or more file paths as positional arguments and optional flags: `--lines` (or `-l`), `--words` (or `-w`), `--chars` (or `-c`). If no flags are given, show all three counts. For each file, print a line with the requested counts followed by the filename, separated by tabs. If multiple files are given, also print a 'total' line summing all counts. Use `argparse` for argument parsing. Exit with code 0 on success, 1 if any file is not found.",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "sample1.txt",
+      "content": "The quick brown fox jumps over the lazy dog.\nPython is a versatile programming language.\nIt supports multiple paradigms including procedural and object-oriented.\nMany developers choose Python for data science and automation.\nThis sample file is used for testing a word count tool.\nEach line contains a different number of words.\n",
+      "language": "text"
+    },
+    {
+      "path": "sample2.txt",
+      "content": "Short lines here.\nAnother brief line of text.\nThe third line is slightly longer than the others.\nDone.\n",
+      "language": "text"
+    },
+    {
+      "path": "test.txt",
+      "content": "This is line 1\nThis is line 2 with more words\nThis is line 3",
+      "language": "text"
+    },
+    {
+      "path": "wordcount.py",
+      "content": "#!/usr/bin/env python3\n\nimport argparse\nimport sys\n\ndef count_file(filename):\n    \"\"\"Count lines, words, and characters in a file.\"\"\"\n    try:\n        with open(filename, 'r') as f:\n            lines = 0\n            words = 0\n            chars = 0\n            for line in f:\n                lines += 1\n                words += len(line.split())\n                chars += len(line)\n            return lines, words, chars\n    except FileNotFoundError:\n        return None  # File not found\n    except Exception:\n        return None  # Other error\n\ndef count_stdin():\n    \"\"\"Count lines, words, and characters from stdin.\"\"\"\n    lines = 0\n    words = 0\n    chars = 0\n    for line in sys.stdin:\n        lines += 1\n        words += len(line.split())\n        chars += len(line)\n    return lines, words, chars\n\ndef main():\n    \"\"\"Main function to parse arguments and process files.\"\"\"\n    parser = argparse.ArgumentParser(description='Count lines, words, and characters in files')\n    parser.add_argument('files', metavar='FILE', nargs='*', help='Files to process')\n    parser.add_argument('-l', '--lines', action='store_true', help='Count lines')\n    parser.add_argument('-w', '--words', action='store_true', help='Count words')\n    parser.add_argument('-c', '--chars', action='store_true', help='Count characters')\n\n    args = parser.parse_args()\n\n    # If no flags given, show all counts\n    if not (args.lines or args.words or args.chars):\n        args.lines = args.words = args.chars = True\n\n    # Process files\n    if not args.files:\n        # Process stdin if no files given\n        lines, words, chars = count_stdin()\n        if args.lines and args.words and args.chars:\n            print(f\"{lines}\\t{words}\\t{chars}\\tstdin\")\n        elif args.lines:\n            print(f\"{lines}\\tstdin\")\n        elif args.words:\n            print(f\"{words}\\tstdin\")\n        elif args.chars:\n            print(f\"{chars}\\tstdin\")\n    else:\n        total_lines = 0\n        total_words = 0\n        total_chars = 0\n        all_files_valid = True\n\n        for filename in args.files:\n            counts = count_file(filename)\n            if counts is None:\n                print(f\"wordcount.py: {filename}: No such file or directory\", file=sys.stderr)\n                all_files_valid = False\n                continue\n\n            lines, words, chars = counts\n            if args.lines and args.words and args.chars:\n                print(f\"{lines}\\t{words}\\t{chars}\\t{filename}\")\n            elif args.lines:\n                print(f\"{lines}\\t{filename}\")\n            elif args.words:\n                print(f\"{words}\\t{filename}\")\n            elif args.chars:\n                print(f\"{chars}\\t{filename}\")\n\n            # Accumulate totals\n            total_lines += lines\n            total_words += words\n            total_chars += chars\n\n        # Print total line if multiple files\n        if len(args.files) > 1:\n            if args.lines and args.words and args.chars:\n                print(f\"{total_lines}\\t{total_words}\\t{total_chars}\\ttotal\")\n            elif args.lines:\n                print(f\"{total_lines}\\ttotal\")\n            elif args.words:\n                print(f\"{total_words}\\ttotal\")\n            elif args.chars:\n                print(f\"{total_chars}\\ttotal\")\n\n        # Exit with error code 1 if any file not found\n        if not all_files_valid:\n            sys.exit(1)\n\nif __name__ == \"__main__\":\n    main()",
+      "language": "python"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

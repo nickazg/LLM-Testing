@@ -1,0 +1,165 @@
+{
+  "task_id": "tier4-usd-custom-schema-novel-light",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": "usd-custom-schema-light",
+  "scores": {
+    "correctness": 0.875,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 457,
+        "output": 276,
+        "thinking": 0,
+        "cache_read": 17408
+      },
+      "tool_calls": 0,
+      "wall_time_s": 80.62181566702202,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:41:25.596546+00:00",
+  "prompt": "Create a Python script called custom_metadata.py that uses the pxr library to demonstrate USD's extensibility features. The script must create a file called pipeline.usda containing:\n\n1. Default prim /Project\n2. /Project has custom metadata via SetCustomDataByKey: \"pipeline:version\" = \"2.1\", \"pipeline:department\" = \"lighting\"\n3. /Project has assetInfo with name=\"hero_asset\" and identifier=\"assets/hero/v003/hero.usd\"\n4. /Project/Hero \u2014 an Xform with purpose set to \"render\" (UsdGeom.Tokens.render)\n5. /Project/Hero/Proxy \u2014 an Xform with purpose set to \"proxy\" (UsdGeom.Tokens.proxy)\n6. /Project/Hero/Guide \u2014 an Xform with purpose set to \"guide\" (UsdGeom.Tokens.guide)\n7. /Project/Hero has custom properties:\n   - \"custom:shotName\" as a string property with value \"SH010\"\n   - \"custom:frameRange\" as a Int2 property with value (1001, 1100)\n8. /Project/Hero should have UsdGeom.ModelAPI applied with kind set to \"component\"\n\nUse: from pxr import Usd, UsdGeom, Sdf, Gf, Kind",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775569209831,\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"part\":{\"id\":\"prt_d682c09e50015aDGZRed6FyKAu\",\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"messageID\":\"msg_d682bfc72001Pcjf7mPnBwv4j5\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775569222950,\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"part\":{\"id\":\"prt_d682c39d7001hclnZx2Ro4FZsR\",\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"messageID\":\"msg_d682bfc72001Pcjf7mPnBwv4j5\",\"type\":\"tool\",\"callID\":\"call_e0b831335cf94940a998aa60\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"from pxr import Usd, UsdGeom, Sdf, Gf, Kind\\n\\nstage = Usd.Stage.CreateNew(\\\"pipeline.usda\\\")\\nstage.SetDefaultPrim(stage.DefinePrim(\\\"/Project\\\", \\\"Xform\\\"))\\n\\nproject_prim = stage.GetPrimAtPath(\\\"/Project\\\")\\n\\nproject_prim.SetCustomDataByKey(\\\"pipeline:version\\\", \\\"2.1\\\")\\nproject_prim.SetCustomDataByKey(\\\"pipeline:department\\\", \\\"lighting\\\")\\n\\nmodel_api = UsdGeom.ModelAPI(project_prim)\\nmodel_api.SetAssetName(\\\"hero_asset\\\")\\nmodel_api.SetAssetIdentifier(\\\"assets/hero/v003/hero.usd\\\")\\n\\nhero_prim = stage.DefinePrim(\\\"/Project/Hero\\\", \\\"Xform\\\")\\nhero_xform = UsdGeom.Xform(hero_prim)\\nhero_xform.GetPurposeAttr().Set(UsdGeom.Tokens.render)\\n\\nshot_name_prop = hero_prim.CreateAttribute(\\\"custom:shotName\\\", Sdf.ValueTypeNames.String)\\nshot_name_prop.Set(\\\"SH010\\\")\\n\\nframe_range_prop = hero_prim.CreateAttribute(\\\"custom:frameRange\\\", Sdf.ValueTypeNames.Int2)\\nframe_range_prop.Set(Gf.Vec2i(1001, 1100))\\n\\nhero_model_api = UsdGeom.ModelAPI(hero_prim)\\nhero_model_api.SetKind(Kind.Tokens.component)\\n\\nproxy_prim = stage.DefinePrim(\\\"/Project/Hero/Proxy\\\", \\\"Xform\\\")\\nproxy_xform = UsdGeom.Xform(proxy_prim)\\nproxy_xform.GetPurposeAttr().Set(UsdGeom.Tokens.proxy)\\n\\nguide_prim = stage.DefinePrim(\\\"/Project/Hero/Guide\\\", \\\"Xform\\\")\\nguide_xform = UsdGeom.Xform(guide_prim)\\nguide_xform.GetPurposeAttr().Set(UsdGeom.Tokens.guide)\\n\\nstage.GetRootLayer().Save()\\nprint(\\\"Created pipeline.usda successfully\\\")\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\"},\"output\":\"Wrote file successfully.\\n\\nLSP errors detected in this file, please fix:\\n<diagnostics file=\\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\\\">\\nERROR [3:13] \\\"Stage\\\" is not a known attribute of module \\\"pxr.Usd\\\"\\nERROR [11:21] \\\"ModelAPI\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [16:22] \\\"Xform\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [17:41] \\\"Tokens\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [19:67] \\\"ValueTypeNames\\\" is not a known attribute of module \\\"pxr.Sdf\\\"\\nERROR [23:30] \\\"ValueTypeNames\\\" is not a known attribute of module \\\"pxr.Sdf\\\"\\nERROR [25:25] \\\"Vec2i\\\" is not a known attribute of module \\\"pxr.Gf\\\"\\nERROR [27:26] \\\"ModelAPI\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [28:29] \\\"Tokens\\\" is not a known attribute of module \\\"pxr.Kind\\\"\\nERROR [31:23] \\\"Xform\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [32:42] \\\"Tokens\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [35:23] \\\"Xform\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\nERROR [36:42] \\\"Tokens\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\\n</diagnostics>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\":[{\"range\":{\"start\":{\"line\":2,\"character\":12},\"end\":{\"line\":2,\"character\":17}},\"message\":\"\\\"Stage\\\" is not a known attribute of module \\\"pxr.Usd\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":10,\"character\":20},\"end\":{\"line\":10,\"character\":28}},\"message\":\"\\\"ModelAPI\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":15,\"character\":21},\"end\":{\"line\":15,\"character\":26}},\"message\":\"\\\"Xform\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":16,\"character\":40},\"end\":{\"line\":16,\"character\":46}},\"message\":\"\\\"Tokens\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":18,\"character\":66},\"end\":{\"line\":18,\"character\":80}},\"message\":\"\\\"ValueTypeNames\\\" is not a known attribute of module \\\"pxr.Sdf\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":22,\"character\":29},\"end\":{\"line\":22,\"character\":43}},\"message\":\"\\\"ValueTypeNames\\\" is not a known attribute of module \\\"pxr.Sdf\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":24,\"character\":24},\"end\":{\"line\":24,\"character\":29}},\"message\":\"\\\"Vec2i\\\" is not a known attribute of module \\\"pxr.Gf\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":26,\"character\":25},\"end\":{\"line\":26,\"character\":33}},\"message\":\"\\\"ModelAPI\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":27,\"character\":28},\"end\":{\"line\":27,\"character\":34}},\"message\":\"\\\"Tokens\\\" is not a known attribute of module \\\"pxr.Kind\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":30,\"character\":22},\"end\":{\"line\":30,\"character\":27}},\"message\":\"\\\"Xform\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":31,\"character\":41},\"end\":{\"line\":31,\"character\":47}},\"message\":\"\\\"Tokens\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":34,\"character\":22},\"end\":{\"line\":34,\"character\":27}},\"message\":\"\\\"Xform\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}},{\"range\":{\"start\":{\"line\":35,\"character\":41},\"end\":{\"line\":35,\"character\":47}},\"message\":\"\\\"Tokens\\\" is not a known attribute of module \\\"pxr.UsdGeom\\\"\",\"severity\":1,\"code\":\"reportAttributeAccessIssue\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportAttributeAccessIssue\"}}]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775569222109,\"end\":1775569222948}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775569222954,\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"part\":{\"id\":\"prt_d682c3d27001HcZmM3Qy12aA1J\",\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"messageID\":\"msg_d682bfc72001Pcjf7mPnBwv4j5\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13897,\"input\":12857,\"output\":528,\"reasoning\":0,\"cache\":{\"read\":512,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775569225850,\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"part\":{\"id\":\"prt_d682c4879001itQ3WJMp1aEj9d\",\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"messageID\":\"msg_d682c3d2c001LL1r8ARYTNn8J3\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775569228590,\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"part\":{\"id\":\"prt_d682c51a1001uWhjplW797HFmd\",\"sessionID\":\"ses_297d407ccffeAm3yJv44JTqTqx\",\"messageID\":\"msg_d682c3d2c001LL1r8ARYTNn8J3\",\"type\":\"tool\",\"callID\":\"call_90b4fd6a2e1e4f619310d702\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"python custom_metadata.py\",\"description\":\"Run the USD script to create pipeline.usda\"},\"output\":\"Traceback (most recent call last):\\n  File \\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\\\", line 12, in <module>\\n    model_api.SetAssetName(\\\"hero_asset\\\")\\n    ^^^^^^^^^^^^^^^^^^^^^^\\nAttributeError: 'ModelAPI' object has no attribute 'SetAssetName'\\n\",\"title\":\"Run the USD script to create pipeline.usda\",\"metadata\":{\"output\":\"Traceback (most recent call last):\\n  File \\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\\\", line 12, in <module>\\n    model_api.SetAssetName(\\\"hero_asset\\\")\\n    ^^^^^^^^^^^^^^^^^^^^^^\\nAttributeError: 'ModelAPI' object",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"from pxr import Usd, UsdGeom, Sdf, Gf, Kind\\n\\nstage = Usd.Stage.CreateNew(\\\"pipeline.usda\\\")\\nstage.SetDefaultPrim(stage.DefinePrim(\\\"/Project\\\", \\\"Xform\\\"))\\n\\nproject_prim = stage.GetPrimAtPath(\\\"/Project\\\")\\n\\nproject_prim.SetCustomDataByKey(\\\"pipeline:version\\\", \\\"2.1\\\")\\nproject_prim.SetCustomDataByKey(\\\"pipeline:department\\\", \\\"lighting\\\")\\n\\nmodel_api = UsdGeom.ModelAPI(project_prim)\\nmodel_api.SetAssetName(\\\"hero_asset\\\")\\nmodel_api.SetAssetIdentifier(\\\"assets/hero/v003/hero.usd\\\")\\n\\nhero_prim = stage.DefinePrim(\\\"/Project/Hero\\\", \\\"Xform\\\")\\nhero_xform = UsdGeom.Xform(hero_prim)\\nhero_xform.GetPurposeAttr().Set(UsdGeom.Tokens.render)\\n\\nshot_name_prop = hero_prim.CreateAttribute(\\\"custom:shotName\\\", Sdf.ValueTypeNames.String)\\nshot_name_prop.Set(\\\"SH010\\\")\\n\\nframe_range_prop = hero_prim.CreateAttribute(\\\"custom:frameRange\\\", Sdf.ValueTypeNames.Int2)\\nframe_range_prop.Set(Gf.Vec2i(1001, 1100))\\n\\nhero_model_api = UsdGeom.ModelAPI(hero_prim)\\nhero_model_api.SetKind(Kind.Tokens.component)\\n\\nproxy_prim = stage.DefinePrim(\\\"/Project/Hero/Proxy\\\", \\\"Xform\\\")\\nproxy_xform = UsdGeom.Xform(proxy_prim)\\nproxy_xform.GetPurposeAttr().Set(UsdGeom.Tokens.proxy)\\n\\nguide_prim = stage.DefinePrim(\\\"/Project/Hero/Guide\\\", \\\"Xform\\\")\\nguide_xform = UsdGeom.Xform(guide_prim)\\nguide_xform.GetPurposeAttr().Set(UsdGeom.Tokens.guide)\\n\\nstage.GetRootLayer().Save()\\nprint(\\\"Created pipeline.usda successfully\\\")\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\">\nERROR [3:13] \"Stage\" is not a known attribute of module \"pxr.Usd\"\nERROR [11:21] \"ModelAPI\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [16:22] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [17:41] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [19:67] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [23:30] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [25:25] \"Vec2i\" is not a known attribute of module \"pxr.Gf\"\nERROR [27:26] \"ModelAPI\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [28:29] \"Tokens\" is not a known attribute of module \"pxr.Kind\"\nERROR [31:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [32:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [35:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [36:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\n</diagnostics>",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python custom_metadata.py\",\n  \"description\": \"Run the USD script to create pipeline.usda\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "Traceback (most recent call last):\n  File \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\", line 12, in <module>\n    model_api.SetAssetName(\"hero_asset\")\n    ^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ModelAPI' object has no attribute 'SetAssetName'\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py</path>\n<type>file</type>\n<content>1: from pxr import Usd, UsdGeom, Sdf, Gf, Kind\n2: \n3: stage = Usd.Stage.CreateNew(\"pipeline.usda\")\n4: stage.SetDefaultPrim(stage.DefinePrim(\"/Project\", \"Xform\"))\n5: \n6: project_prim = stage.GetPrimAtPath(\"/Project\")\n7: \n8: project_prim.SetCustomDataByKey(\"pipeline:version\", \"2.1\")\n9: project_prim.SetCustomDataByKey(\"pipeline:department\", \"lighting\")\n10: \n11: model_api = UsdGeom.ModelAPI(project_prim)\n12: model_api.SetAssetName(\"hero_asset\")\n13: model_api.SetAssetIdentifier(\"assets/hero/v003/hero.usd\")\n14: \n15: hero_prim = stage.DefinePrim(\"/Project/Hero\", \"Xform\")\n16: hero_xform = UsdGeom.Xform(hero_prim)\n17: hero_xform.GetPurposeAttr().Set(UsdGeom.Tokens.render)\n18: \n19: shot_name_prop = hero_prim.CreateAttribute(\"custom:shotName\", Sdf.ValueTypeNames.String)\n20: shot_name_prop.Set(\"SH010\")\n21: \n22: frame_range_prop = hero_prim.CreateAttribute(\n23:     \"custom:frameRange\", Sdf.ValueTypeNames.Int2\n24: )\n25: frame_range_prop.Set(Gf.Vec2i(1001, 1100))\n26: \n27: hero_model_api = UsdGeom.ModelAPI(hero_prim)\n28: hero_model_api.SetKind(Kind.Tokens.component)\n29: \n30: proxy_prim = stage.DefinePrim(\"/Project/Hero/Proxy\", \"Xform\")\n31: proxy_xform = UsdGeom.Xform(proxy_prim)\n32: proxy_xform.GetPurposeAttr().Set(UsdGeom.Tokens.proxy)\n33: \n34: guide_prim = stage.DefinePrim(\"/Project/Hero/Guide\", \"Xform\")\n35: guide_xform = UsdGeom.Xform(guide_prim)\n36: guide_xform.GetPurposeAttr().Set(UsdGeom.Tokens.guide)\n37: \n38: stage.GetRootLayer().Save()\n39: print(\"Created pipeline.usda successfully\")\n\n(End of file - total 39 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\",\n  \"oldString\": \"model_api = UsdGeom.ModelAPI(project_prim)\\nmodel_api.SetAssetName(\\\"hero_asset\\\")\\nmodel_api.SetAssetIdentifier(\\\"assets/hero/v003/hero.usd\\\")\",\n  \"newString\": \"project_prim.SetAssetInfoByKey(\\\"name\\\", \\\"hero_asset\\\")\\nproject_prim.SetAssetInfoByKey(\\\"identifier\\\", \\\"assets/hero/v003/hero.usd\\\")\"\n}",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_result",
+      "content": "Edit applied successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\">\nERROR [3:13] \"Stage\" is not a known attribute of module \"pxr.Usd\"\nERROR [15:22] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [16:41] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [18:67] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [22:30] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [24:25] \"Vec2i\" is not a known attribute of module \"pxr.Gf\"\nERROR [26:26] \"ModelAPI\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [27:29] \"Tokens\" is not a known attribute of module \"pxr.Kind\"\nERROR [30:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [31:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [34:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [35:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\n</diagnostics>",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python custom_metadata.py\",\n  \"description\": \"Run the USD script to create pipeline.usda\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "Traceback (most recent call last):\n  File \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\", line 27, in <module>\n    hero_model_api.SetKind(Kind.Tokens.component)\n    ^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ModelAPI' object has no attribute 'SetKind'\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\",\n  \"oldString\": \"from pxr import Usd, UsdGeom, Sdf, Gf, Kind\",\n  \"newString\": \"from pxr import Usd, UsdGeom, Sdf, Gf, Kind, UsdModelAPI\"\n}",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_result",
+      "content": "Edit applied successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\">\nERROR [1:46] \"UsdModelAPI\" is unknown import symbol\nERROR [3:13] \"Stage\" is not a known attribute of module \"pxr.Usd\"\nERROR [15:22] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [16:41] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [18:67] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [22:30] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [24:25] \"Vec2i\" is not a known attribute of module \"pxr.Gf\"\nERROR [26:26] \"ModelAPI\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [27:29] \"Tokens\" is not a known attribute of module \"pxr.Kind\"\nERROR [30:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [31:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [34:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [35:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\n</diagnostics>",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\",\n  \"newString\": \"from pxr import Usd, UsdGeom, Sdf, Gf, Kind\",\n  \"oldString\": \"from pxr import Usd, UsdGeom, Sdf, Gf, Kind, UsdModelAPI\"\n}",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_result",
+      "content": "Edit applied successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\">\nERROR [3:13] \"Stage\" is not a known attribute of module \"pxr.Usd\"\nERROR [15:22] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [16:41] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [18:67] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [22:30] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [24:25] \"Vec2i\" is not a known attribute of module \"pxr.Gf\"\nERROR [26:26] \"ModelAPI\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [27:29] \"Tokens\" is not a known attribute of module \"pxr.Kind\"\nERROR [30:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [31:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [34:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [35:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\n</diagnostics>",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\",\n  \"newString\": \"hero_model_api = Usd.ModelAPI(hero_prim)\\nhero_model_api.SetKind(Kind.Tokens.component)\",\n  \"oldString\": \"hero_model_api = UsdGeom.ModelAPI(hero_prim)\\nhero_model_api.SetKind(Kind.Tokens.component)\"\n}",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_result",
+      "content": "Edit applied successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/custom_metadata.py\">\nERROR [3:13] \"Stage\" is not a known attribute of module \"pxr.Usd\"\nERROR [15:22] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [16:41] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [18:67] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [22:30] \"ValueTypeNames\" is not a known attribute of module \"pxr.Sdf\"\nERROR [24:25] \"Vec2i\" is not a known attribute of module \"pxr.Gf\"\nERROR [26:22] \"ModelAPI\" is not a known attribute of module \"pxr.Usd\"\nERROR [27:29] \"Tokens\" is not a known attribute of module \"pxr.Kind\"\nERROR [30:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [31:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [34:23] \"Xform\" is not a known attribute of module \"pxr.UsdGeom\"\nERROR [35:42] \"Tokens\" is not a known attribute of module \"pxr.UsdGeom\"\n</diagnostics>",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python custom_metadata.py\",\n  \"description\": \"Run the USD script to create pipeline.usda\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "Created pipeline.usda successfully\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/pipeline.usda\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h/pipeline.usda</path>\n<type>file</type>\n<content>1: #usda 1.0\n2: (\n3:     defaultPrim = \"Project\"\n4: )\n5: \n6: def Xform \"Project\" (\n7:     assetInfo = {\n8:         string identifier = \"assets/hero/v003/hero.usd\"\n9:         string name = \"hero_asset\"\n10:     }\n11:     customData = {\n12:         dictionary pipeline = {\n13:             string department = \"lighting\"\n14:             string version = \"2.1\"\n15:         }\n16:     }\n17: )\n18: {\n19:     def Xform \"Hero\" (\n20:         kind = \"component\"\n21:     )\n22:     {\n23:         custom int2 custom:frameRange = (1001, 1100)\n24:         custom string custom:shotName = \"SH010\"\n25:         uniform token purpose = \"render\"\n26: \n27:         def Xform \"Proxy\"\n28:         {\n29:             uniform token purpose = \"proxy\"\n30:         }\n31: \n32:         def Xform \"Guide\"\n33:         {\n34:             uniform token purpose = \"guide\"\n35:         }\n36:     }\n37: }\n38: \n\n(End of file - total 38 lines)\n</content>",
+      "tool_name": "read"
+    },
+    {
+      "role": "response",
+      "content": "Created `custom_metadata.py` and `pipeline.usda`. The script generates all required USD elements including custom metadata, assetInfo, purpose attributes, custom properties, and model kind.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/13757810107160284438",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1fiaje3h\u0001\u0012custom_metadata.py\ufffd\ufffd[<=i=\ufffdM\ufffd\ufffd\ufffd,h\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "custom_metadata.py",
+      "content": "from pxr import Usd, UsdGeom, Sdf, Gf, Kind\n\nstage = Usd.Stage.CreateNew(\"pipeline.usda\")\nstage.SetDefaultPrim(stage.DefinePrim(\"/Project\", \"Xform\"))\n\nproject_prim = stage.GetPrimAtPath(\"/Project\")\n\nproject_prim.SetCustomDataByKey(\"pipeline:version\", \"2.1\")\nproject_prim.SetCustomDataByKey(\"pipeline:department\", \"lighting\")\n\nproject_prim.SetAssetInfoByKey(\"name\", \"hero_asset\")\nproject_prim.SetAssetInfoByKey(\"identifier\", \"assets/hero/v003/hero.usd\")\n\nhero_prim = stage.DefinePrim(\"/Project/Hero\", \"Xform\")\nhero_xform = UsdGeom.Xform(hero_prim)\nhero_xform.GetPurposeAttr().Set(UsdGeom.Tokens.render)\n\nshot_name_prop = hero_prim.CreateAttribute(\"custom:shotName\", Sdf.ValueTypeNames.String)\nshot_name_prop.Set(\"SH010\")\n\nframe_range_prop = hero_prim.CreateAttribute(\n    \"custom:frameRange\", Sdf.ValueTypeNames.Int2\n)\nframe_range_prop.Set(Gf.Vec2i(1001, 1100))\n\nhero_model_api = Usd.ModelAPI(hero_prim)\nhero_model_api.SetKind(Kind.Tokens.component)\n\nproxy_prim = stage.DefinePrim(\"/Project/Hero/Proxy\", \"Xform\")\nproxy_xform = UsdGeom.Xform(proxy_prim)\nproxy_xform.GetPurposeAttr().Set(UsdGeom.Tokens.proxy)\n\nguide_prim = stage.DefinePrim(\"/Project/Hero/Guide\", \"Xform\")\nguide_xform = UsdGeom.Xform(guide_prim)\nguide_xform.GetPurposeAttr().Set(UsdGeom.Tokens.guide)\n\nstage.GetRootLayer().Save()\nprint(\"Created pipeline.usda successfully\")\n",
+      "language": "python"
+    },
+    {
+      "path": "pipeline.usda",
+      "content": "#usda 1.0\n(\n    defaultPrim = \"Project\"\n)\n\ndef Xform \"Project\" (\n    assetInfo = {\n        string identifier = \"assets/hero/v003/hero.usd\"\n        string name = \"hero_asset\"\n    }\n    customData = {\n        dictionary pipeline = {\n            string department = \"lighting\"\n            string version = \"2.1\"\n        }\n    }\n)\n{\n    def Xform \"Hero\" (\n        kind = \"component\"\n    )\n    {\n        custom int2 custom:frameRange = (1001, 1100)\n        custom string custom:shotName = \"SH010\"\n        uniform token purpose = \"render\"\n\n        def Xform \"Proxy\"\n        {\n            uniform token purpose = \"proxy\"\n        }\n\n        def Xform \"Guide\"\n        {\n            uniform token purpose = \"guide\"\n        }\n    }\n}\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "novel",
+  "skill_intensity": "light",
+  "skill_pair": "usd-custom-schema"
+}

@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-houdini-solaris-instancing",
+  "model": "minimax-m2.7",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0079747081036,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T15:10:28.416318+00:00",
+  "prompt": "Create a Python script called solaris_instancing.py for Houdini Solaris (LOPs context). Using the editableStage from a Python Script LOP, the script should:\n\n1. Get the stage: stage = hou.pwd().editableStage()\n2. Create /Scene as default prim (UsdGeom.Xform)\n3. Create /Scene/Ground \u2014 a UsdGeom.Mesh ground plane (4-point quad, 10x10 units)\n4. Create 3 prototype tree prims under /Scene/Prototypes/:\n   - /Scene/Prototypes/TreeA \u2014 Xform with a child Mesh (simple cylinder trunk)\n   - /Scene/Prototypes/TreeB \u2014 Xform with a child Mesh (taller cylinder)\n   - /Scene/Prototypes/TreeC \u2014 Xform with a child Mesh (wider cylinder)\n5. Create /Scene/TreeInstances \u2014 a UsdGeom.PointInstancer:\n   - Set prototypes relationship to the 3 tree prims\n   - Set protoIndices for 9 instances (cycling through 0,1,2)\n   - Set positions for 9 instances in a 3x3 grid pattern (spacing of 3 units)\n   - Set orientations (identity quaternions for all)\n6. Create a UsdCollectionAPI on /Scene called \"vegetation\" that includes /Scene/TreeInstances and all prototypes\n\nUse: from pxr import Usd, UsdGeom, Sdf, Gf, Vt",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

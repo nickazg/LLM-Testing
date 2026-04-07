@@ -1,0 +1,125 @@
+{
+  "task_id": "tier2-csv-pipeline",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 10,
+        "output": 126,
+        "thinking": 0,
+        "cache_read": 14807
+      },
+      "tool_calls": 0,
+      "wall_time_s": 77.48520075005945,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:50:06.203217+00:00",
+  "prompt": "Create a Python script called `pipeline.py` that reads `input.csv` (columns: name, department, salary, status), filters rows where status equals 'active', groups by department, computes the average salary per department (rounded to 2 decimal places), counts employees per department, and writes the results to `output.csv` with columns `department,avg_salary,count`. Sort rows alphabetically by department name. Include a header row. Use only the Python standard library (csv module).",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775566136396,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd244a001OTGrIfo3nNPJPk\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd0d970012WA3qhe6etxhtp\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775566147979,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd2466001wr3cfPQ5jGSyoG\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd0d970012WA3qhe6etxhtp\",\"type\":\"text\",\"text\":\"\\nI'll create a Python script called `pipeline.py` that processes the CSV data as specified. Let me start by creating the script.\",\"time\":{\"start\":1775566147978,\"end\":1775566147978}}}\n{\"type\":\"tool_use\",\"timestamp\":1775566148848,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd5155001SvH645k1mki3G5\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd0d970012WA3qhe6etxhtp\",\"type\":\"tool\",\"callID\":\"call_94deaada8dfe42939d9aea72\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"import csv\\nfrom collections import defaultdict\\n\\ndef process_pipeline():\\n    # Read input.csv and filter active employees\\n    active_employees = []\\n    try:\\n        with open('input.csv', mode='r', newline='', encoding='utf-8') as infile:\\n            reader = csv.DictReader(infile)\\n            for row in reader:\\n                if row['status'].lower() == 'active':\\n                    active_employees.append(row)\\n    except FileNotFoundError:\\n        print(\\\"Error: input.csv not found\\\")\\n        return\\n    except Exception as e:\\n        print(f\\\"Error reading input.csv: {e}\\\")\\n        return\\n    \\n    # Group by department and calculate statistics\\n    dept_stats = defaultdict(lambda: {'total_salary': 0, 'count': 0})\\n    \\n    for employee in active_employees:\\n        dept = employee['department']\\n        salary = float(employee['salary'])\\n        dept_stats[dept]['total_salary'] += salary\\n        dept_stats[dept]['count'] += 1\\n    \\n    # Calculate average salary and prepare output data\\n    output_data = []\\n    for dept, stats in dept_stats.items():\\n        avg_salary = round(stats['total_salary'] / stats['count'], 2)\\n        output_data.append({\\n            'department': dept,\\n            'avg_salary': avg_salary,\\n            'count': stats['count']\\n        })\\n    \\n    # Sort by department name\\n    output_data.sort(key=lambda x: x['department'])\\n    \\n    # Write to output.csv\\n    try:\\n        with open('output.csv', mode='w', newline='', encoding='utf-8') as outfile:\\n            fieldnames = ['department', 'avg_salary', 'count']\\n            writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n            \\n            writer.writeheader()\\n            writer.writerows(output_data)\\n        \\n        print(\\\"Processing completed successfully. Results written to output.csv\\\")\\n    except Exception as e:\\n        print(f\\\"Error writing output.csv: {e}\\\")\\n\\nif __name__ == '__main__':\\n    process_pipeline()\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\"},\"output\":\"Wrote file successfully.\\n\\nLSP errors detected in this file, please fix:\\n<diagnostics file=\\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\\\">\\nERROR [27:9] Argument of type \\\"float\\\" cannot be assigned to parameter \\\"value\\\" of type \\\"int\\\" in function \\\"__setitem__\\\"\\n\u00a0\u00a0\\\"float\\\" is not assignable to \\\"int\\\"\\n</diagnostics>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\":[{\"range\":{\"start\":{\"line\":26,\"character\":8},\"end\":{\"line\":26,\"character\":40}},\"message\":\"Argument of type \\\"float\\\" cannot be assigned to parameter \\\"value\\\" of type \\\"int\\\" in function \\\"__setitem__\\\"\\n\u00a0\u00a0\\\"float\\\" is not assignable to \\\"int\\\"\",\"severity\":1,\"code\":\"reportArgumentType\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportArgumentType\"}}]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775566147932,\"end\":1775566148846}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775566148852,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd54f1001cVQI3eNE6GfVKI\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd0d970012WA3qhe6etxhtp\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13698,\"input\":12641,\"output\":501,\"reasoning\":0,\"cache\":{\"read\":556,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775566149649,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd58100017CQiQ5149AXUPY\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd54f7001W4uZx7tXraXPmU\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775566151770,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd60540014rGVA9SAIwKbd3\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd54f7001W4uZx7tXraXPmU\",\"type\":\"tool\",\"callID\":\"call_f3bfe71646ba47888051f77b\",\"tool\":\"edit\",\"state\":{\"status\":\"error\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\",\"oldString\":\"# Group by department and calculate statistics\\n    dept_stats = defaultdict(lambda: {'total_salary': 0, 'count': 0})\",\"newString\":\"# Group by department and calculate statistics\\n    dept_stats = defaultdict(lambda: {'total_salary': 0.0, 'count': 0})\"},\"error\":\"Error: Could not find oldString in the file. It must match exactly, including whitespace, indentation, and line endings.\",\"time\":{\"start\":1775566151766,\"end\":1775566151769}}}}\n{\"type\":\"text\",\"timestamp\":1775566151785,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd5842001z4ACu18pJlVlzO\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd54f7001W4uZx7tXraXPmU\",\"type\":\"text\",\"text\":\"\\nI need to fix the LSP error. The issue is that we're trying to add a float to an integer in the defaultdict. Let me fix this:\",\"time\":{\"start\":1775566151784,\"end\":1775566151784}}}\n{\"type\":\"step_finish\",\"timestamp\":1775566151786,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd60690013wU29Na28yAqu5\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd54f7001W4uZx7tXraXPmU\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13975,\"input\":116,\"output\":162,\"reasoning\":0,\"cache\":{\"read\":13697,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775566154260,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd6a13001p4Mi7aHKEeIilh\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd606c0019PEslHg6FpValV\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775566155349,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd6ab4001m5C5sKzZ1L42Kj\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd606c0019PEslHg6FpValV\",\"type\":\"text\",\"text\":\"\\nLet me read the file to see the exact content:\",\"time\":{\"start\":1775566155348,\"end\":1775566155348}}}\n{\"type\":\"tool_use\",\"timestamp\":1775566155353,\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"part\":{\"id\":\"prt_d67fd6e510012DOaVYpbij2PaW\",\"sessionID\":\"ses_29802f588ffeRdxIMeiPyANp6L\",\"messageID\":\"msg_d67fd606c0019PEslHg6FpValV\",\"type\":\"tool\",\"callID\":\"call_392b1ebbdc024a4c8f84c770\",\"tool\":\"read\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\"},\"output\":\"<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py</path>\\n<type>file</type>\\n<content>1: import csv\\n2: from collections import defaultdict\\n3: \\n4: \\n5: def process_pipeline():\\n6:     # Read input.csv and filter active employees\\n7:     active_employees = []\\n8:     try:\\n9:         with open(\\\"input.csv\\\", mode=\\\"r\\\", newline=\\\"\\\", encoding=\\\"utf-8\\\") as infile:\\n10:             reader = csv.DictReader(infile)\\n11:             for row in reader:\\n12:                 if row[\\\"status\\\"].lower() == \\\"active\\\":\\n13:                     active_employees.append(row)\\n14:     except FileNotFoundError:\\n15:         print(\\\"Error: input.csv not found\\\")\\n16:         return\\n17:     except Exception as e:\\n18:         print(f\\\"Error reading input.csv: {e}\\\")\\n19:         return\\n20: \\n21:     # Group by department and calculate statistics\\n22:     dept_stats = defaultdict(lambda: {\\\"total_salary\\\": 0, \\\"count\\\": 0})\\n23: \\n24:     for employee in active_employees:\\n25:         dept = employee[\\\"department\\\"]\\n26:         salary = float(employee[\\\"salary\\\"])\\n27:         dept_stats[dept][\\\"total_salary\\\"] += salary\\n28:         dept_stats[dept][\\\"count\\\"] += 1\\n29: \\n30:     # Calculate average salary and prepare output data\\n31:     output_data = []\\n32:     for dept, stats in dept_stats.items():\\n33:         avg_salary = round(stats[\\\"total_salary\\\"] / stats[\\\"count\\\"], 2)\\n34:         output_data.append(\\n35:             {\\\"department\\\": dept, \\\"avg_salary\\\": avg_salary, \\\"count\\\": stats[\\\"count\\\"]}\\n36:         )\\n37: \\n38:     # Sort by department name\\n39:     output_data.sort(key=lambda x: x[\\\"department\\\"])\\n40: \\n41:     # Write to output.csv\\n42:     try:\\n43:         with open(\\\"output.csv\\\", mode=\\\"w\\\", newline=\\\"\\\", encoding=\\\"utf-8\\\") as outfile:\\n44:             fieldnames = [\\\"department\\\", \\\"avg_salary\\\", \\\"count\\\"]\\n45:             writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n46: \\n47:             writer.writeheader()\\n48:             writer.writerows(output_data)\\n49: \\n50:         print(\\\"Processing completed successfully. Results written to output.csv\\\")\\n51:     except Exception as e:\\n52:         print(f\\\"Error writing output.csv: {e}\\\")\\n53: \\n54: \\n55: if __name__ == \\\"__main__\\\":\\n56:     process_pipeli",
+  "conversation": [
+    {
+      "role": "response",
+      "content": "\nI'll create a Python script called `pipeline.py` that processes the CSV data as specified. Let me start by creating the script.",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"import csv\\nfrom collections import defaultdict\\n\\ndef process_pipeline():\\n    # Read input.csv and filter active employees\\n    active_employees = []\\n    try:\\n        with open('input.csv', mode='r', newline='', encoding='utf-8') as infile:\\n            reader = csv.DictReader(infile)\\n            for row in reader:\\n                if row['status'].lower() == 'active':\\n                    active_employees.append(row)\\n    except FileNotFoundError:\\n        print(\\\"Error: input.csv not found\\\")\\n        return\\n    except Exception as e:\\n        print(f\\\"Error reading input.csv: {e}\\\")\\n        return\\n    \\n    # Group by department and calculate statistics\\n    dept_stats = defaultdict(lambda: {'total_salary': 0, 'count': 0})\\n    \\n    for employee in active_employees:\\n        dept = employee['department']\\n        salary = float(employee['salary'])\\n        dept_stats[dept]['total_salary'] += salary\\n        dept_stats[dept]['count'] += 1\\n    \\n    # Calculate average salary and prepare output data\\n    output_data = []\\n    for dept, stats in dept_stats.items():\\n        avg_salary = round(stats['total_salary'] / stats['count'], 2)\\n        output_data.append({\\n            'department': dept,\\n            'avg_salary': avg_salary,\\n            'count': stats['count']\\n        })\\n    \\n    # Sort by department name\\n    output_data.sort(key=lambda x: x['department'])\\n    \\n    # Write to output.csv\\n    try:\\n        with open('output.csv', mode='w', newline='', encoding='utf-8') as outfile:\\n            fieldnames = ['department', 'avg_salary', 'count']\\n            writer = csv.DictWriter(outfile, fieldnames=fieldnames)\\n            \\n            writer.writeheader()\\n            writer.writerows(output_data)\\n        \\n        print(\\\"Processing completed successfully. Results written to output.csv\\\")\\n    except Exception as e:\\n        print(f\\\"Error writing output.csv: {e}\\\")\\n\\nif __name__ == '__main__':\\n    process_pipeline()\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\">\nERROR [27:9] Argument of type \"float\" cannot be assigned to parameter \"value\" of type \"int\" in function \"__setitem__\"\n\u00a0\u00a0\"float\" is not assignable to \"int\"\n</diagnostics>",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\",\n  \"oldString\": \"# Group by department and calculate statistics\\n    dept_stats = defaultdict(lambda: {'total_salary': 0, 'count': 0})\",\n  \"newString\": \"# Group by department and calculate statistics\\n    dept_stats = defaultdict(lambda: {'total_salary': 0.0, 'count': 0})\"\n}",
+      "tool_name": "edit"
+    },
+    {
+      "role": "response",
+      "content": "\nI need to fix the LSP error. The issue is that we're trying to add a float to an integer in the defaultdict. Let me fix this:",
+      "tool_name": ""
+    },
+    {
+      "role": "response",
+      "content": "\nLet me read the file to see the exact content:",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\"\n}",
+      "tool_name": "read"
+    },
+    {
+      "role": "tool_result",
+      "content": "<path>/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py</path>\n<type>file</type>\n<content>1: import csv\n2: from collections import defaultdict\n3: \n4: \n5: def process_pipeline():\n6:     # Read input.csv and filter active employees\n7:     active_employees = []\n8:     try:\n9:         with open(\"input.csv\", mode=\"r\", newline=\"\", encoding=\"utf-8\") as infile:\n10:             reader = csv.DictReader(infile)\n11:             for row in reader:\n12:                 if row[\"status\"].lower() == \"active\":\n13:                     active_employees.append(row)\n14:     except FileNotFoundError:\n15:         print(\"Error: input.csv not found\")\n16:         return\n17:     except Exception as e:\n18:         print(f\"Error reading input.csv: {e}\")\n19:         return\n20: \n21:     # Group by department and calculate statistics\n22:     dept_stats = defaultdict(lambda: {\"total_salary\": 0, \"count\": 0})\n23: \n24:     for employee in active_employees:\n25:         dept = employee[\"department\"]\n26:         salary = float(employee[\"salary\"])\n27:         dept_stats[dept][\"total_salary\"] += salary\n28:         dept_stats[dept][\"count\"] += 1\n29: \n30:     # Calculate average salary and prepare output data\n31:     output_data = []\n32:     for dept, stats in dept_stats.items():\n33:         avg_salary = round(stats[\"total_salary\"] / stats[\"count\"], 2)\n34:         output_data.append(\n35:             {\"department\": dept, \"avg_salary\": avg_salary, \"count\": stats[\"count\"]}\n36:         )\n37: \n38:     # Sort by department name\n39:     output_data.sort(key=lambda x: x[\"department\"])\n40: \n41:     # Write to output.csv\n42:     try:\n43:         with open(\"output.csv\", mode=\"w\", newline=\"\", encoding=\"utf-8\") as outfile:\n44:             fieldnames = [\"department\", \"avg_salary\", \"count\"]\n45:             writer = csv.DictWriter(outfile, fieldnames=fieldnames)\n46: \n47:             writer.writeheader()\n48:             writer.writerows(output_data)\n49: \n50:         print(\"Processing compl",
+      "tool_name": "read"
+    },
+    {
+      "role": "response",
+      "content": "\nNow I can fix the LSP error by changing the initial value of `total_salary` to 0.0:",
+      "tool_name": ""
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv/pipeline.py\",\n  \"oldString\": \"dept_stats = defaultdict(lambda: {\\\"total_salary\\\": 0, \\\"count\\\": 0})\",\n  \"newString\": \"dept_stats = defaultdict(lambda: {\\\"total_salary\\\": 0.0, \\\"count\\\": 0})\"\n}",
+      "tool_name": "edit"
+    },
+    {
+      "role": "tool_result",
+      "content": "Edit applied successfully.",
+      "tool_name": "edit"
+    },
+    {
+      "role": "response",
+      "content": "\nThe Python script `pipeline.py` has been created successfully. It:\n\n1. Reads `input.csv` with columns: name, department, salary, status\n2. Filters rows where status equals 'active'\n3. Groups by department and calculates average salary (rounded to 2 decimal places)\n4. Counts employees per department\n5. Writes results to `output.csv` with columns: department, avg_salary, count\n6. Sorts rows alphabetically by department name\n7. Includes a header row\n\nThe script uses only the Python standard library (csv module) and handles basic error cases.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/3914830931504371",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-y06hmtyv\u0001\u000bpipeline.py\ufffd\ufffdLXZQ\ufffdq\ufffd\ufffd\ufffd\ufffd\ufffdg\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "input.csv",
+      "content": "name,department,salary,status\nAlice Johnson,Engineering,95000,active\nBob Smith,Marketing,72000,active\nCarol White,Engineering,88000,active\nDave Brown,Sales,65000,inactive\nEve Davis,Marketing,78000,active\nFrank Miller,Engineering,102000,active\nGrace Wilson,Sales,71000,active\nHenry Taylor,Marketing,69000,inactive\nIris Anderson,Engineering,91000,active\nJack Thomas,Sales,68000,active\nKaren Jackson,HR,82000,active\nLeo Harris,Engineering,97000,inactive\nMia Martin,HR,79000,active\nNathan Clark,Sales,73000,active\nOlivia Lewis,Marketing,85000,active\nPatrick Robinson,HR,76000,active\nQuinn Walker,Engineering,105000,active\nRachel Hall,Sales,62000,inactive\nSam Young,Marketing,71000,active\nTina King,HR,88000,active\n",
+      "language": ""
+    },
+    {
+      "path": "output.csv",
+      "content": "department,avg_salary,count\nEngineering,96200.0,5\nHR,81250.0,4\nMarketing,76500.0,4\nSales,70666.67,3\n",
+      "language": ""
+    },
+    {
+      "path": "pipeline.py",
+      "content": "import csv\nfrom collections import defaultdict\n\n\ndef process_pipeline():\n    # Read input.csv and filter active employees\n    active_employees = []\n    try:\n        with open(\"input.csv\", mode=\"r\", newline=\"\", encoding=\"utf-8\") as infile:\n            reader = csv.DictReader(infile)\n            for row in reader:\n                if row[\"status\"].lower() == \"active\":\n                    active_employees.append(row)\n    except FileNotFoundError:\n        print(\"Error: input.csv not found\")\n        return\n    except Exception as e:\n        print(f\"Error reading input.csv: {e}\")\n        return\n\n    # Group by department and calculate statistics\n    dept_stats = defaultdict(lambda: {\"total_salary\": 0.0, \"count\": 0})\n\n    for employee in active_employees:\n        dept = employee[\"department\"]\n        salary = float(employee[\"salary\"])\n        dept_stats[dept][\"total_salary\"] += salary\n        dept_stats[dept][\"count\"] += 1\n\n    # Calculate average salary and prepare output data\n    output_data = []\n    for dept, stats in dept_stats.items():\n        avg_salary = round(stats[\"total_salary\"] / stats[\"count\"], 2)\n        output_data.append(\n            {\"department\": dept, \"avg_salary\": avg_salary, \"count\": stats[\"count\"]}\n        )\n\n    # Sort by department name\n    output_data.sort(key=lambda x: x[\"department\"])\n\n    # Write to output.csv\n    try:\n        with open(\"output.csv\", mode=\"w\", newline=\"\", encoding=\"utf-8\") as outfile:\n            fieldnames = [\"department\", \"avg_salary\", \"count\"]\n            writer = csv.DictWriter(outfile, fieldnames=fieldnames)\n\n            writer.writeheader()\n            writer.writerows(output_data)\n\n        print(\"Processing completed successfully. Results written to output.csv\")\n    except Exception as e:\n        print(f\"Error writing output.csv: {e}\")\n\n\nif __name__ == \"__main__\":\n    process_pipeline()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

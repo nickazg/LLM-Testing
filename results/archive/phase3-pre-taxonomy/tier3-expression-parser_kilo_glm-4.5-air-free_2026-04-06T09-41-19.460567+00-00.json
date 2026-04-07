@@ -1,0 +1,50 @@
+{
+  "task_id": "tier3-expression-parser",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0058322499972,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T09:41:19.460567+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/7580000560693415030",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-sewor5rr\u0001\u000eexpr_parser.py\ufffd!\f\ufffd\ufffd\ufffd\u0010\ufffd\ufffd\ufffd\u0016*b\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "expr_parser.py",
+      "content": "from typing import Union, Any\n\n\nclass ASTNode:\n    def __init__(self, node_type: str, **kwargs):\n        self.type: str = node_type\n        if node_type == \"number\":\n            self.value: float = kwargs.get(\"value\")\n        elif node_type == \"binop\":\n            self.op: str = kwargs.get(\"op\")\n            self.left: ASTNode = kwargs.get(\"left\")\n            self.right: ASTNode = kwargs.get(\"right\")\n        elif node_type == \"unary\":\n            self.op: str = kwargs.get(\"op\")\n            self.operand: ASTNode = kwargs.get(\"operand\")\n\n\ndef __repr__(self) -> str:\n    if self.type == \"number\":\n        return f\"Number({self.value})\"\n    elif self.type == \"binop\":\n        return f\"BinOp({self.op}, {self.left}, {self.right})\"\n    elif self.type == \"unary\":\n        return f\"UnaryOp({self.op}, {self.operand})\"\n    return \"ASTNode()\"\n\n\ndef parse(expression: str) -> ASTNode:\n    if not expression.strip():\n        raise ValueError(\"Empty expression\")\n\n    tokens = _tokenize(expression)\n    return _parse_expression(tokens)\n\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == \"number\":\n        return node.value\n    elif node.type == \"binop\":\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n\n        if node.op == \"+\":\n            return left_val + right_val\n        elif node.op == \"-\":\n            return left_val - right_val\n        elif node.op == \"*\":\n            return left_val * right_val\n        elif node.op == \"/\":\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n    elif node.type == \"unary\":\n        operand_val = evaluate(node.operand)\n        if node.op == \"-\":\n            return -operand_val\n\n    raise ValueError(\"Invalid AST node\")\n\n\ndef _tokenize(expression: str) -> list:\n    tokens = []\n    i = 0\n    n = len(expression)\n\n    while i < n:\n        c = expression[i]\n\n        if c == \" \":\n            i += 1\n            continue\n\n        if c in \"()+-*/\":\n            tokens.append(c)\n            i += 1\n        elif c.isdigit() or c == \".\":\n            j = i\n            while j < n and (expression[j].isdigit() or expression[j] == \".\"):\n                j += 1\n            num_str = expression[i:j]\n            try:\n                num = float(num_str)\n                tokens.append(num)\n            except ValueError:\n                raise ValueError(f\"Invalid number: {num_str}\")\n            i = j\n        else:\n            raise ValueError(f\"Invalid token: {c}\")\n\n    return tokens\n\n\ndef _parse_expression(tokens: list) -> ASTNode:\n    return _parse_additive(tokens)\n\n\ndef _parse_additive(tokens: list) -> ASTNode:\n    left = _parse_multiplicative(tokens)\n\n    while tokens and tokens[0] in (\"+\", \"-\"):\n        op = tokens.pop(0)\n        right = _parse_multiplicative(tokens)\n        left = ASTNode(\"binop\", op=op, left=left, right=right)\n\n    return left\n\n\ndef _parse_multiplicative(tokens: list) -> ASTNode:\n    left = _parse_unary(tokens)\n\n    while tokens and tokens[0] in (\"*\", \"/\"):\n        op = tokens.pop(0)\n        right = _parse_unary(tokens)\n        left = ASTNode(\"binop\", op=op, left=left, right=right)\n\n    return left\n\n\ndef _parse_unary(tokens: list) -> ASTNode:\n    if tokens and tokens[0] == \"-\":\n        op = tokens.pop(0)\n        operand = _parse_primary(tokens)\n        return ASTNode(\"unary\", op=op, operand=operand)\n\n    return _parse_primary(tokens)\n\n\ndef _parse_primary(tokens: list) -> ASTNode:\n    if not tokens:\n        raise ValueError(\"Unexpected end of expression\")\n\n    token = tokens[0]\n\n    if token == \"(\":\n        tokens.pop(0)\n        node = _parse_expression(tokens)\n        if not tokens or tokens[0] != \")\":\n            raise ValueError(\"Unmatched parentheses\")\n        tokens.pop(0)\n        return node\n    elif isinstance(token, (int, float)):\n        tokens.pop(0)\n        return ASTNode(\"number\", value=token)\n    else:\n        raise ValueError(f\"Unexpected token: {token}\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3
+}

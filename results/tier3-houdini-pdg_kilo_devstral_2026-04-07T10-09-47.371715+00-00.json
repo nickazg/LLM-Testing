@@ -1,0 +1,70 @@
+{
+  "task_id": "tier3-houdini-pdg",
+  "model": "devstral",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.875,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 12107,
+        "output": 46,
+        "thinking": 0,
+        "cache_read": 2400
+      },
+      "tool_calls": 0,
+      "wall_time_s": 14.505795417004265,
+      "cost_usd": 0.01102664
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T10:09:47.371715+00:00",
+  "prompt": "Create a Python script called build_top_network.py for Houdini's PDG/TOPs context. The script should build a TOP network using Python:\n\n1. Get the /obj context and create a topnet node\n2. Inside the topnet, create these nodes:\n   - A Python Processor node that generates work items from a list of 5 file paths (file1.exr through file5.exr), setting a \"filepath\" attribute on each work item\n   - A Partition by Attribute node connected to the processor, partitioning by a \"batch\" attribute\n   - A Generic Generator or Python Script node that processes each work item (can just print the filepath attribute)\n   - A Wait for All node before the final output\n3. Connect the nodes in sequence: processor \u2192 partition \u2192 script \u2192 waitforall\n4. Set the display flag on the final node\n5. Layout the nodes using node.moveToGoodPosition() or layoutChildren()\n\nUse hou module (available in Houdini Python context). The script should work when executed inside Houdini.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775556584215,\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"part\":{\"id\":\"prt_d676b6316001p501w7p5A53EYl\",\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"messageID\":\"msg_d676b3f3a001y8uhEa0gJMaoPW\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775556584986,\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"part\":{\"id\":\"prt_d676b6318001R9AC5gOaeY711Q\",\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"messageID\":\"msg_d676b3f3a001y8uhEa0gJMaoPW\",\"type\":\"tool\",\"callID\":\"ENyCnSyCo\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"#!/usr/bin/env python\\n\\\"\\\"\\\"Build a TOP network in Houdini using Python.\\\"\\\"\\\"\\n\\nimport hou\\n\\ndef build_top_network():\\n    # Get the /obj context\\n    obj_context = hou.node(\\\"/obj\\\")\\n    \\n    # Create a topnet node\\n    topnet = obj_context.createNode(\\\"topnet\\\", \\\"top_network\\\")\\n    topnet.moveToGoodPosition()\\n    \\n    # Create a Python Processor node\\n    processor = topnet.createNode(\\\"pythonscript\\\", \\\"python_processor\\\")\\n    processor.moveToGoodPosition()\\n    \\n    # Set the Python script for the processor to generate work items\\n    processor_script = \\\"\\\"\\\"\\nimport hou\\n\\n# Generate work items from a list of file paths\\nfile_paths = [\\\"file1.exr\\\", \\\"file2.exr\\\", \\\"file3.exr\\\", \\\"file4.exr\\\", \\\"file5.exr\\\"]\\n\\nfor file_path in file_paths:\\n    work_item = kwargs[\\\"work_item\\\"]\\n    work_item.setStringAttribute(\\\"filepath\\\", file_path)\\n    work_item.setStringAttribute(\\\"batch\\\", \\\"batch_1\\\")  # Set batch attribute for partitioning\\n\\\"\\\"\\\"\\n    processor.parm(\\\"script\\\").set(processor_script)\\n    \\n    # Create a Partition by Attribute node\\n    partition = topnet.createNode(\\\"partitionbyattribute\\\", \\\"partition_by_batch\\\")\\n    partition.moveToGoodPosition()\\n    partition.parm(\\\"groupbyattribute\\\").set(\\\"batch\\\")\\n    \\n    # Create a Generic Generator node\\n    script_node = topnet.createNode(\\\"pythonscript\\\", \\\"process_filepath\\\")\\n    script_node.moveToGoodPosition()\\n    \\n    # Set the Python script for the script node to process each work item\\n    script_node_script = \\\"\\\"\\\"\\nimport hou\\n\\n# Print the filepath attribute\\nfilepath = kwargs[\\\"work_item\\\"].stringAttribute(\\\"filepath\\\")\\nprint(f\\\"Processing file: {filepath}\\\")\\n\\\"\\\"\\\"\\n    script_node.parm(\\\"script\\\").set(script_node_script)\\n    \\n    # Create a Wait for All node\\n    waitforall = topnet.createNode(\\\"waitforall\\\", \\\"wait_for_all\\\")\\n    waitforall.moveToGoodPosition()\\n    \\n    # Connect the nodes in sequence\\n    processor.setNextInput(partition)\\n    partition.setNextInput(script_node)\\n    script_node.setNextInput(waitforall)\\n    \\n    # Set the display flag on the final node\\n    waitforall.setDisplayFlag(True)\\n    \\n    # Layout the nodes\\n    topnet.layoutChildren()\\n\\nif __name__ == \\\"__main__\\\":\\n    build_top_network()\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\"},\"output\":\"Wrote file successfully.\\n\\nLSP errors detected in this file, please fix:\\n<diagnostics file=\\\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\\\">\\nERROR [4:8] Import \\\"hou\\\" could not be resolved\\n</diagnostics>\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\":[{\"range\":{\"start\":{\"line\":3,\"character\":7},\"end\":{\"line\":3,\"character\":10}},\"message\":\"Import \\\"hou\\\" could not be resolved\",\"severity\":1,\"code\":\"reportMissingImports\",\"source\":\"Pyright\",\"codeDescription\":{\"href\":\"https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportMissingImports\"}}]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775556584220,\"end\":1775556584985}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775556584988,\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"part\":{\"id\":\"prt_d676b661a0013n4MrFnxcKnom4\",\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"messageID\":\"msg_d676b3f3a001y8uhEa0gJMaoPW\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.00599584,\"tokens\":{\"total\":14416,\"input\":11215,\"output\":705,\"reasoning\":0,\"cache\":{\"read\":2496,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775556586204,\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"part\":{\"id\":\"prt_d676b6adb001YkaGf5euCHQIZ3\",\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"messageID\":\"msg_d676b661e001x6K5N1UzOTnlUc\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775556586806,\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"part\":{\"id\":\"prt_d676b6adc001Qdg4x5Lhmcg80r\",\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"messageID\":\"msg_d676b661e001x6K5N1UzOTnlUc\",\"type\":\"text\",\"text\":\"The script has been created successfully. The `hou` module is a Houdini-specific module and will only be available when executed within the Houdini environment. The LSP error is expected outside of Houdini.\",\"time\":{\"start\":1775556586806,\"end\":1775556586806}}}\n{\"type\":\"step_finish\",\"timestamp\":1775556586808,\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"part\":{\"id\":\"prt_d676b6d37001RdG9fDZ6qfrPI9\",\"sessionID\":\"ses_29894c541ffejbTdhrbNacM9J5\",\"messageID\":\"msg_d676b661e001x6K5N1UzOTnlUc\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.0050308,\"tokens\":{\"total\":14553,\"input\":12107,\"output\":46,\"reasoning\":0,\"cache\":{\"read\":2400,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"#!/usr/bin/env python\\n\\\"\\\"\\\"Build a TOP network in Houdini using Python.\\\"\\\"\\\"\\n\\nimport hou\\n\\ndef build_top_network():\\n    # Get the /obj context\\n    obj_context = hou.node(\\\"/obj\\\")\\n    \\n    # Create a topnet node\\n    topnet = obj_context.createNode(\\\"topnet\\\", \\\"top_network\\\")\\n    topnet.moveToGoodPosition()\\n    \\n    # Create a Python Processor node\\n    processor = topnet.createNode(\\\"pythonscript\\\", \\\"python_processor\\\")\\n    processor.moveToGoodPosition()\\n    \\n    # Set the Python script for the processor to generate work items\\n    processor_script = \\\"\\\"\\\"\\nimport hou\\n\\n# Generate work items from a list of file paths\\nfile_paths = [\\\"file1.exr\\\", \\\"file2.exr\\\", \\\"file3.exr\\\", \\\"file4.exr\\\", \\\"file5.exr\\\"]\\n\\nfor file_path in file_paths:\\n    work_item = kwargs[\\\"work_item\\\"]\\n    work_item.setStringAttribute(\\\"filepath\\\", file_path)\\n    work_item.setStringAttribute(\\\"batch\\\", \\\"batch_1\\\")  # Set batch attribute for partitioning\\n\\\"\\\"\\\"\\n    processor.parm(\\\"script\\\").set(processor_script)\\n    \\n    # Create a Partition by Attribute node\\n    partition = topnet.createNode(\\\"partitionbyattribute\\\", \\\"partition_by_batch\\\")\\n    partition.moveToGoodPosition()\\n    partition.parm(\\\"groupbyattribute\\\").set(\\\"batch\\\")\\n    \\n    # Create a Generic Generator node\\n    script_node = topnet.createNode(\\\"pythonscript\\\", \\\"process_filepath\\\")\\n    script_node.moveToGoodPosition()\\n    \\n    # Set the Python script for the script node to process each work item\\n    script_node_script = \\\"\\\"\\\"\\nimport hou\\n\\n# Print the filepath attribute\\nfilepath = kwargs[\\\"work_item\\\"].stringAttribute(\\\"filepath\\\")\\nprint(f\\\"Processing file: {filepath}\\\")\\n\\\"\\\"\\\"\\n    script_node.parm(\\\"script\\\").set(script_node_script)\\n    \\n    # Create a Wait for All node\\n    waitforall = topnet.createNode(\\\"waitforall\\\", \\\"wait_for_all\\\")\\n    waitforall.moveToGoodPosition()\\n    \\n    # Connect the nodes in sequence\\n    processor.setNextInput(partition)\\n    partition.setNextInput(script_node)\\n    script_node.setNextInput(waitforall)\\n    \\n    # Set the display flag on the final node\\n    waitforall.setDisplayFlag(True)\\n    \\n    # Layout the nodes\\n    topnet.layoutChildren()\\n\\nif __name__ == \\\"__main__\\\":\\n    build_top_network()\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.\n\nLSP errors detected in this file, please fix:\n<diagnostics file=\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4/build_top_network.py\">\nERROR [4:8] Import \"hou\" could not be resolved\n</diagnostics>",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "The script has been created successfully. The `hou` module is a Houdini-specific module and will only be available when executed within the Houdini environment. The LSP error is expected outside of Houdini.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/10534400186743111084",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-xxg2ygj4\u0001\u0014build_top_network.py\ufffd\u001d\u067bn\ufffd\ufffd\ufffdA\ufffd;ckg\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "build_top_network.py",
+      "content": "#!/usr/bin/env python\n\"\"\"Build a TOP network in Houdini using Python.\"\"\"\n\nimport hou\n\n\ndef build_top_network():\n    # Get the /obj context\n    obj_context = hou.node(\"/obj\")\n\n    # Create a topnet node\n    topnet = obj_context.createNode(\"topnet\", \"top_network\")\n    topnet.moveToGoodPosition()\n\n    # Create a Python Processor node\n    processor = topnet.createNode(\"pythonscript\", \"python_processor\")\n    processor.moveToGoodPosition()\n\n    # Set the Python script for the processor to generate work items\n    processor_script = \"\"\"\nimport hou\n\n# Generate work items from a list of file paths\nfile_paths = [\"file1.exr\", \"file2.exr\", \"file3.exr\", \"file4.exr\", \"file5.exr\"]\n\nfor file_path in file_paths:\n    work_item = kwargs[\"work_item\"]\n    work_item.setStringAttribute(\"filepath\", file_path)\n    work_item.setStringAttribute(\"batch\", \"batch_1\")  # Set batch attribute for partitioning\n\"\"\"\n    processor.parm(\"script\").set(processor_script)\n\n    # Create a Partition by Attribute node\n    partition = topnet.createNode(\"partitionbyattribute\", \"partition_by_batch\")\n    partition.moveToGoodPosition()\n    partition.parm(\"groupbyattribute\").set(\"batch\")\n\n    # Create a Generic Generator node\n    script_node = topnet.createNode(\"pythonscript\", \"process_filepath\")\n    script_node.moveToGoodPosition()\n\n    # Set the Python script for the script node to process each work item\n    script_node_script = \"\"\"\nimport hou\n\n# Print the filepath attribute\nfilepath = kwargs[\"work_item\"].stringAttribute(\"filepath\")\nprint(f\"Processing file: {filepath}\")\n\"\"\"\n    script_node.parm(\"script\").set(script_node_script)\n\n    # Create a Wait for All node\n    waitforall = topnet.createNode(\"waitforall\", \"wait_for_all\")\n    waitforall.moveToGoodPosition()\n\n    # Connect the nodes in sequence\n    processor.setNextInput(partition)\n    partition.setNextInput(script_node)\n    script_node.setNextInput(waitforall)\n\n    # Set the display flag on the final node\n    waitforall.setDisplayFlag(True)\n\n    # Layout the nodes\n    topnet.layoutChildren()\n\n\nif __name__ == \"__main__\":\n    build_top_network()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

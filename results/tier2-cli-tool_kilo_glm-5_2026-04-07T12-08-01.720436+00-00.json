@@ -1,0 +1,130 @@
+{
+  "task_id": "tier2-cli-tool",
+  "model": "glm-5",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 447,
+        "output": 145,
+        "thinking": 0,
+        "cache_read": 14080
+      },
+      "tool_calls": 0,
+      "wall_time_s": 53.85211850004271,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:08:01.720436+00:00",
+  "prompt": "Create a Python script called `wordcount.py` that works like a simplified `wc` command. It should accept one or more file paths as positional arguments and optional flags: `--lines` (or `-l`), `--words` (or `-w`), `--chars` (or `-c`). If no flags are given, show all three counts. For each file, print a line with the requested counts followed by the filename, separated by tabs. If multiple files are given, also print a 'total' line summing all counts. Use `argparse` for argument parsing. Exit with code 0 on success, 1 if any file is not found.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775563633624,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d6f3d60017d2OyZmbvRk3Ve\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d6e503001wFRMwcOV9dbrFn\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775563651065,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d73465001ybZOD6QT8GQM6J\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d6e503001wFRMwcOV9dbrFn\",\"type\":\"tool\",\"callID\":\"call_6be0a2c9a68d4b26855cccd0\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\",\"content\":\"#!/usr/bin/env python3\\nimport argparse\\nimport sys\\n\\n\\ndef count_file(filepath):\\n    try:\\n        with open(filepath, 'r') as f:\\n            content = f.read()\\n            lines = content.count('\\\\n')\\n            words = len(content.split())\\n            chars = len(content)\\n            return lines, words, chars, filepath\\n    except FileNotFoundError:\\n        return None\\n\\n\\ndef main():\\n    parser = argparse.ArgumentParser(description='Count lines, words, and characters in files')\\n    parser.add_argument('files', nargs='+', help='Files to count')\\n    parser.add_argument('-l', '--lines', action='store_true', help='Count lines')\\n    parser.add_argument('-w', '--words', action='store_true', help='Count words')\\n    parser.add_argument('-c', '--chars', action='store_true', help='Count characters')\\n    \\n    args = parser.parse_args()\\n    \\n    show_lines = args.lines or (not args.lines and not args.words and not args.chars)\\n    show_words = args.words or (not args.lines and not args.words and not args.chars)\\n    show_chars = args.chars or (not args.lines and not args.words and not args.chars)\\n    \\n    total_lines = 0\\n    total_words = 0\\n    total_chars = 0\\n    has_error = False\\n    \\n    for filepath in args.files:\\n        result = count_file(filepath)\\n        if result is None:\\n            print(f\\\"wordcount.py: {filepath}: No such file or directory\\\", file=sys.stderr)\\n            has_error = True\\n            continue\\n        \\n        lines, words, chars, name = result\\n        total_lines += lines\\n        total_words += words\\n        total_chars += chars\\n        \\n        parts = []\\n        if show_lines:\\n            parts.append(str(lines))\\n        if show_words:\\n            parts.append(str(words))\\n        if show_chars:\\n            parts.append(str(chars))\\n        parts.append(name)\\n        print('\\\\t'.join(parts))\\n    \\n    if len(args.files) > 1 and not has_error:\\n        parts = []\\n        if show_lines:\\n            parts.append(str(total_lines))\\n        if show_words:\\n            parts.append(str(total_words))\\n        if show_chars:\\n            parts.append(str(total_chars))\\n        parts.append('total')\\n        print('\\\\t'.join(parts))\\n    \\n    sys.exit(1 if has_error else 0)\\n\\n\\nif __name__ == '__main__':\\n    main()\\n\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775563650156,\"end\":1775563651064}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775563651070,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d737fa0016nvCUxfY0zG096\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d6e503001wFRMwcOV9dbrFn\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":13945,\"input\":12718,\"output\":715,\"reasoning\":0,\"cache\":{\"read\":512,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775563652624,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d73e0e001xNS6QbI60GBpjb\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d7380000172q1uPqqNp9gFO\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775563654944,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d74705001kZVZBc4B258XW2\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d7380000172q1uPqqNp9gFO\",\"type\":\"tool\",\"callID\":\"call_a9a3f9d897924ccba16ee515\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"chmod +x /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\",\"description\":\"Make script executable\"},\"output\":\"\",\"title\":\"Make script executable\",\"metadata\":{\"output\":\"\",\"exit\":0,\"description\":\"Make script executable\",\"truncated\":false},\"time\":{\"start\":1775563654922,\"end\":1775563654944}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775563654946,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d74721001AMvUL00ZT7c8Un\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d7380000172q1uPqqNp9gFO\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":14038,\"input\":770,\"output\":84,\"reasoning\":0,\"cache\":{\"read\":13184,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775563656413,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d74cdb001IeSXR05qS2RTxU\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d74724001CeInO7XETfEhS2\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775563658436,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d754b9001DiILM4YW1h2vLP\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d74724001CeInO7XETfEhS2\",\"type\":\"tool\",\"callID\":\"call_547427d14613449cb12871f8\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"echo -e \\\"Hello world\\\\nThis is a test\\\\nThree lines\\\" > /tmp/test1.txt && echo \\\"Single line file\\\" > /tmp/test2.txt\",\"description\":\"Create test files\"},\"output\":\"\",\"title\":\"Create test files\",\"metadata\":{\"output\":\"\",\"exit\":0,\"description\":\"Create test files\",\"truncated\":false},\"time\":{\"start\":1775563658428,\"end\":1775563658435}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775563658494,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d754fd001rf9B3YJ2TQHY7z\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d74724001CeInO7XETfEhS2\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0,\"tokens\":{\"total\":14106,\"input\":90,\"output\":64,\"reasoning\":0,\"cache\":{\"read\":13952,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775563660940,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d75e8b001i1NZqKGh32oqYx\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d75500001i4QltLYNPTBlO2\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775563664285,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d76b78001PGat44yRFNYL2z\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d75500001i4QltLYNPTBlO2\",\"type\":\"tool\",\"callID\":\"call_2754190d090e4ff08b7a5593\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py /tmp/test1.txt /tmp/test2.txt\",\"description\":\"Test with multiple files (default all counts)\"},\"output\":\"3\\t8\\t39\\t/tmp/test1.txt\\n1\\t3\\t17\\t/tmp/test2.txt\\n4\\t11\\t56\\ttotal\\n\",\"title\":\"Test with multiple files (default all counts)\",\"metadata\":{\"output\":\"3\\t8\\t39\\t/tmp/test1.txt\\n1\\t3\\t17\\t/tmp/test2.txt\\n4\\t11\\t56\\ttotal\\n\",\"exit\":0,\"description\":\"Test with multiple files (default all counts)\",\"truncated\":false},\"time\":{\"start\":1775563664250,\"end\":1775563664284}}}}\n{\"type\":\"tool_use\",\"timestamp\":1775563666091,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d7728c001kn4AdfYe3S4Jc9\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d75500001i4QltLYNPTBlO2\",\"type\":\"tool\",\"callID\":\"call_da8167ec6328471abeee03d4\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py -l /tmp/test1.txt\",\"description\":\"Test with lines flag only\"},\"output\":\"3\\t/tmp/test1.txt\\n\",\"title\":\"Test with lines flag only\",\"metadata\":{\"output\":\"3\\t/tmp/test1.txt\\n\",\"exit\":0,\"description\":\"Test with lines flag only\",\"truncated\":false},\"time\":{\"start\":1775563666062,\"end\":1775563666090}}}}\n{\"type\":\"tool_use\",\"timestamp\":1775563668504,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d77bf7001kVX63OoNLOXF86\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d75500001i4QltLYNPTBlO2\",\"type\":\"tool\",\"callID\":\"call_2d44187ec029432ba142722f\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py -w -c /tmp/test1.txt /tmp/test2.txt; echo \\\"Exit code: $?\\\"\",\"description\":\"Test with words and chars flags\"},\"output\":\"8\\t39\\t/tmp/test1.txt\\n3\\t17\\t/tmp/test2.txt\\n11\\t56\\ttotal\\nExit code: 0\\n\",\"title\":\"Test with words and chars flags\",\"metadata\":{\"output\":\"8\\t39\\t/tmp/test1.txt\\n3\\t17\\t/tmp/test2.txt\\n11\\t56\\ttotal\\nExit code: 0\\n\",\"exit\":0,\"description\":\"Test with words and chars flags\",\"truncated\":false},\"time\":{\"start\":1775563668473,\"end\":1775563668504}}}}\n{\"type\":\"tool_use\",\"timestamp\":1775563669836,\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"part\":{\"id\":\"prt_d67d7812a001WoggMWBR57OQAx\",\"sessionID\":\"ses_298291f30ffehqi8jlPI5i2BHZ\",\"messageID\":\"msg_d67d75500001i4QltLYNPTBlO2\",\"type\":\"tool\",\"callID\":\"call_7918aa5473364d39a27ea2a8\",\"tool\":\"bash\",\"state\":{\"status\":\"completed\",\"input\":{\"command\":\"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py /tmp/nonexistent.txt; echo \\\"Exit code: $?\\\"\",\"description\":\"Test with missing file\"},\"output\":\"wordcount.py: /tmp/nonexistent.txt: No such file or directory\\nExit code: 1\\n\",\"title\":\"Test with missing file\",\"metadata\":{\"output\":\"wordcount.py: /tmp/nonexistent.txt: No such file or directo",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\",\n  \"content\": \"#!/usr/bin/env python3\\nimport argparse\\nimport sys\\n\\n\\ndef count_file(filepath):\\n    try:\\n        with open(filepath, 'r') as f:\\n            content = f.read()\\n            lines = content.count('\\\\n')\\n            words = len(content.split())\\n            chars = len(content)\\n            return lines, words, chars, filepath\\n    except FileNotFoundError:\\n        return None\\n\\n\\ndef main():\\n    parser = argparse.ArgumentParser(description='Count lines, words, and characters in files')\\n    parser.add_argument('files', nargs='+', help='Files to count')\\n    parser.add_argument('-l', '--lines', action='store_true', help='Count lines')\\n    parser.add_argument('-w', '--words', action='store_true', help='Count words')\\n    parser.add_argument('-c', '--chars', action='store_true', help='Count characters')\\n    \\n    args = parser.parse_args()\\n    \\n    show_lines = args.lines or (not args.lines and not args.words and not args.chars)\\n    show_words = args.words or (not args.lines and not args.words and not args.chars)\\n    show_chars = args.chars or (not args.lines and not args.words and not args.chars)\\n    \\n    total_lines = 0\\n    total_words = 0\\n    total_chars = 0\\n    has_error = False\\n    \\n    for filepath in args.files:\\n        result = count_file(filepath)\\n        if result is None:\\n            print(f\\\"wordcount.py: {filepath}: No such file or directory\\\", file=sys.stderr)\\n            has_error = True\\n            continue\\n        \\n        lines, words, chars, name = result\\n        total_lines += lines\\n        total_words += words\\n        total_chars += chars\\n        \\n        parts = []\\n        if show_lines:\\n            parts.append(str(lines))\\n        if show_words:\\n            parts.append(str(words))\\n        if show_chars:\\n            parts.append(str(chars))\\n        parts.append(name)\\n        print('\\\\t'.join(parts))\\n    \\n    if len(args.files) > 1 and not has_error:\\n        parts = []\\n        if show_lines:\\n            parts.append(str(total_lines))\\n        if show_words:\\n            parts.append(str(total_words))\\n        if show_chars:\\n            parts.append(str(total_chars))\\n        parts.append('total')\\n        print('\\\\t'.join(parts))\\n    \\n    sys.exit(1 if has_error else 0)\\n\\n\\nif __name__ == '__main__':\\n    main()\\n\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"chmod +x /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py\",\n  \"description\": \"Make script executable\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"echo -e \\\"Hello world\\\\nThis is a test\\\\nThree lines\\\" > /tmp/test1.txt && echo \\\"Single line file\\\" > /tmp/test2.txt\",\n  \"description\": \"Create test files\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py /tmp/test1.txt /tmp/test2.txt\",\n  \"description\": \"Test with multiple files (default all counts)\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "3\t8\t39\t/tmp/test1.txt\n1\t3\t17\t/tmp/test2.txt\n4\t11\t56\ttotal\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py -l /tmp/test1.txt\",\n  \"description\": \"Test with lines flag only\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "3\t/tmp/test1.txt\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py -w -c /tmp/test1.txt /tmp/test2.txt; echo \\\"Exit code: $?\\\"\",\n  \"description\": \"Test with words and chars flags\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "8\t39\t/tmp/test1.txt\n3\t17\t/tmp/test2.txt\n11\t56\ttotal\nExit code: 0\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_use",
+      "content": "{\n  \"command\": \"python3 /private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7/wordcount.py /tmp/nonexistent.txt; echo \\\"Exit code: $?\\\"\",\n  \"description\": \"Test with missing file\"\n}",
+      "tool_name": "bash"
+    },
+    {
+      "role": "tool_result",
+      "content": "wordcount.py: /tmp/nonexistent.txt: No such file or directory\nExit code: 1\n",
+      "tool_name": "bash"
+    },
+    {
+      "role": "response",
+      "content": "Created `wordcount.py` with all requested features:\n- Positional file arguments (one or more)\n- Flags: `-l`/`--lines`, `-w`/`--words`, `-c`/`--chars`\n- Shows all counts by default\n- Tab-separated output with filename\n- Total line for multiple files\n- Exit code 1 if any file not found",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/18242823887056022147",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-nyw66zl7\u0001\fwordcount.py\ufffd\ufffd\ufffd\ufffd\u0017\ufffdr\u0126\ufffd\ufffd4\ufffdg\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "sample1.txt",
+      "content": "The quick brown fox jumps over the lazy dog.\nPython is a versatile programming language.\nIt supports multiple paradigms including procedural and object-oriented.\nMany developers choose Python for data science and automation.\nThis sample file is used for testing a word count tool.\nEach line contains a different number of words.\n",
+      "language": "text"
+    },
+    {
+      "path": "sample2.txt",
+      "content": "Short lines here.\nAnother brief line of text.\nThe third line is slightly longer than the others.\nDone.\n",
+      "language": "text"
+    },
+    {
+      "path": "wordcount.py",
+      "content": "#!/usr/bin/env python3\nimport argparse\nimport sys\n\n\ndef count_file(filepath):\n    try:\n        with open(filepath, \"r\") as f:\n            content = f.read()\n            lines = content.count(\"\\n\")\n            words = len(content.split())\n            chars = len(content)\n            return lines, words, chars, filepath\n    except FileNotFoundError:\n        return None\n\n\ndef main():\n    parser = argparse.ArgumentParser(\n        description=\"Count lines, words, and characters in files\"\n    )\n    parser.add_argument(\"files\", nargs=\"+\", help=\"Files to count\")\n    parser.add_argument(\"-l\", \"--lines\", action=\"store_true\", help=\"Count lines\")\n    parser.add_argument(\"-w\", \"--words\", action=\"store_true\", help=\"Count words\")\n    parser.add_argument(\"-c\", \"--chars\", action=\"store_true\", help=\"Count characters\")\n\n    args = parser.parse_args()\n\n    show_lines = args.lines or (not args.lines and not args.words and not args.chars)\n    show_words = args.words or (not args.lines and not args.words and not args.chars)\n    show_chars = args.chars or (not args.lines and not args.words and not args.chars)\n\n    total_lines = 0\n    total_words = 0\n    total_chars = 0\n    has_error = False\n\n    for filepath in args.files:\n        result = count_file(filepath)\n        if result is None:\n            print(\n                f\"wordcount.py: {filepath}: No such file or directory\", file=sys.stderr\n            )\n            has_error = True\n            continue\n\n        lines, words, chars, name = result\n        total_lines += lines\n        total_words += words\n        total_chars += chars\n\n        parts = []\n        if show_lines:\n            parts.append(str(lines))\n        if show_words:\n            parts.append(str(words))\n        if show_chars:\n            parts.append(str(chars))\n        parts.append(name)\n        print(\"\\t\".join(parts))\n\n    if len(args.files) > 1 and not has_error:\n        parts = []\n        if show_lines:\n            parts.append(str(total_lines))\n        if show_words:\n            parts.append(str(total_words))\n        if show_chars:\n            parts.append(str(total_chars))\n        parts.append(\"total\")\n        print(\"\\t\".join(parts))\n\n    sys.exit(1 if has_error else 0)\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 2,
+  "difficulty": 2,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

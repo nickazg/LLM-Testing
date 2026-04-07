@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-lru-cache",
+  "model": "gemma-4-27b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0066756249871,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T11:02:56.842503+00:00",
+  "prompt": "Create a Python file called lru_cache.py implementing an LRUCache class with the following requirements:\n\n1. Constructor: LRUCache(capacity: int) \u2014 maximum number of items\n2. get(key) \u2192 value or -1 if not found. Accessing moves item to most-recently-used\n3. put(key, value) \u2192 None. If at capacity, evict the least-recently-used item first\n4. Both get() and put() must be O(1) time complexity\n5. Do NOT use collections.OrderedDict \u2014 implement with a dict + doubly-linked list\n6. Must be thread-safe using threading.Lock\n7. Include a size() method returning current number of items",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

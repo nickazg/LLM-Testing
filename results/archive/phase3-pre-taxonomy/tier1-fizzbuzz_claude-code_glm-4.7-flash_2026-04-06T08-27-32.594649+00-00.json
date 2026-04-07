@@ -1,0 +1,65 @@
+{
+  "task_id": "tier1-fizzbuzz",
+  "model": "glm-4.7-flash",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 120.34332158300094,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T08:27:32.594649+00:00",
+  "prompt": "Create a Python file called fizzbuzz.py that prints numbers 1 to 100, but prints 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, and 'FizzBuzz' for multiples of both. One value per line.",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".pytest_cache/.gitignore",
+      "content": "# Created by pytest automatically.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55\n# This file is a cache directory tag created by pytest.\n# For information about cache directory tags, see:\n#\thttps://bford.info/cachedir/spec.html\n",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/README.md",
+      "content": "# pytest cache directory #\n\nThis directory contains data from the pytest's cache plugin,\nwhich provides the `--lf` and `--ff` options, as well as the `cache` fixture.\n\n**Do not** commit this to version control.\n\nSee [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.\n",
+      "language": "markdown"
+    },
+    {
+      "path": ".pytest_cache/v/cache/lastfailed",
+      "content": "{}",
+      "language": ""
+    },
+    {
+      "path": ".pytest_cache/v/cache/nodeids",
+      "content": "[\n  \"test_fizzbuzz.py::test_fizzbuzz_1\",\n  \"test_fizzbuzz.py::test_fizzbuzz_100\",\n  \"test_fizzbuzz.py::test_fizzbuzz_15\",\n  \"test_fizzbuzz.py::test_fizzbuzz_2\",\n  \"test_fizzbuzz.py::test_fizzbuzz_3\",\n  \"test_fizzbuzz.py::test_fizzbuzz_5\"\n]",
+      "language": ""
+    },
+    {
+      "path": "fizzbuzz.py",
+      "content": "def fizzbuzz(n):\n    \"\"\"Return FizzBuzz output for a number 1 to 100.\"\"\"\n    if n % 15 == 0:\n        return \"FizzBuzz\"\n    if n % 3 == 0:\n        return \"Fizz\"\n    if n % 5 == 0:\n        return \"Buzz\"\n    return str(n)\n\n\ndef print_fizzbuzz():\n    \"\"\"Print FizzBuzz numbers 1 to 100.\"\"\"\n    for i in range(1, 101):\n        print(fizzbuzz(i))\n",
+      "language": "python"
+    },
+    {
+      "path": "test_fizzbuzz.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"Test for FizzBuzz functionality.\"\"\"\n\nfrom fizzbuzz import fizzbuzz\n\ndef test_fizzbuzz_1():\n    \"\"\"Test that 1 prints 1.\"\"\"\n    result = fizzbuzz(1)\n    assert result == \"1\", f\"Expected '1', got '{result}'\"\n\ndef test_fizzbuzz_3():\n    \"\"\"Test that 3 prints 'Fizz'.\"\"\"\n    result = fizzbuzz(3)\n    assert result == \"Fizz\", f\"Expected 'Fizz', got '{result}'\"\n\ndef test_fizzbuzz_5():\n    \"\"\"Test that 5 prints 'Buzz'.\"\"\"\n    result = fizzbuzz(5)\n    assert result == \"Buzz\", f\"Expected 'Buzz', got '{result}'\"\n\ndef test_fizzbuzz_15():\n    \"\"\"Test that 15 prints 'FizzBuzz'.\"\"\"\n    result = fizzbuzz(15)\n    assert result == \"FizzBuzz\", f\"Expected 'FizzBuzz', got '{result}'\"\n\ndef test_fizzbuzz_2():\n    \"\"\"Test that 2 prints 2.\"\"\"\n    result = fizzbuzz(2)\n    assert result == \"2\", f\"Expected '2', got '{result}'\"\n\ndef test_fizzbuzz_100():\n    \"\"\"Test that 100 prints 'Buzz'.\"\"\"\n    result = fizzbuzz(100)\n    assert result == \"Buzz\", f\"Expected 'Buzz', got '{result}'\"\n\nif __name__ == \"__main__\":\n    pytest.main([__file__, \"-v\"])\n",
+      "language": "python"
+    }
+  ],
+  "tier": 1
+}

@@ -1,0 +1,54 @@
+{
+  "task_id": "tier3-lru-cache",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0051935419906,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:58:02.377197+00:00",
+  "prompt": "Create a Python file called lru_cache.py implementing an LRUCache class with the following requirements:\n\n1. Constructor: LRUCache(capacity: int) \u2014 maximum number of items\n2. get(key) \u2192 value or -1 if not found. Accessing moves item to most-recently-used\n3. put(key, value) \u2192 None. If at capacity, evict the least-recently-used item first\n4. Both get() and put() must be O(1) time complexity\n5. Do NOT use collections.OrderedDict \u2014 implement with a dict + doubly-linked list\n6. Must be thread-safe using threading.Lock\n7. Include a size() method returning current number of items",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/4953873701684935208",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-l_tppj_i\u0001\flru_cache.py\ufffd\ufffd\ufffd\u0018\ufffd\ufffd\ufffd\ufffd\u0012\ufffd\ufffd_(g\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "lru_cache.py",
+      "content": "import threading\n\n\nfrom typing import Optional\n\n\nclass Node:\n    def __init__(self, key=None, value=None):\n        self.key = key\n        self.value = value\n        self.prev: Optional[\"Node\"] = None\n        self.next: Optional[\"Node\"] = None\n\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.capacity = capacity\n        self.cache = {}\n        self.lock = threading.Lock()\n        self.head = Node()\n        self.tail = Node()\n        self.head.next = self.tail\n        self.tail.prev = self.head\n\n    def _remove(self, node):\n        prev_node = node.prev\n        next_node = node.next\n        if prev_node is not None:\n            prev_node.next = next_node\n        if next_node is not None:\n            next_node.prev = prev_node\n\n    def _add(self, node):\n        node.prev = self.head\n        node.next = self.head.next\n        self.head.next.prev = node\n        self.head.next = node\n\n    def get(self, key):\n        with self.lock:\n            if key in self.cache:\n                node = self.cache[key]\n                self._remove(node)\n                self._add(node)\n                return node.value\n            return -1\n\n    def put(self, key, value):\n        with self.lock:\n            if key in self.cache:\n                self._remove(self.cache[key])\n\n            node = Node(key, value)\n            self._add(node)\n            self.cache[key] = node\n\n            if len(self.cache) > self.capacity:\n                lru = self.tail.prev\n                if lru:\n                    self._remove(lru)\n                    del self.cache[lru.key]\n\n    def size(self):\n        with self.lock:\n            return len(self.cache)\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

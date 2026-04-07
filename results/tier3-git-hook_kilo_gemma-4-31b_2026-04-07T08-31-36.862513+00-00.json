@@ -1,0 +1,55 @@
+{
+  "task_id": "tier3-git-hook",
+  "model": "gemma-4-31b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.6666666666666666,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 13497,
+        "output": 28,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 239.1948825418949,
+      "cost_usd": 0.0039011
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:31:36.862513+00:00",
+  "prompt": "Create a file called pre-commit (no extension) that works as a git pre-commit hook. The hook should check all staged files and reject the commit if any of these conditions are found:\n\n1. Any staged file larger than 5MB (5242880 bytes)\n2. Any staged Python file containing print() calls used for debugging (lines with just 'print(' that aren't in comments or strings \u2014 simple heuristic is fine)\n3. Any staged file with trailing whitespace on any line\n4. Any staged Python file that fails py_compile syntax check\n\nThe hook should:\n- Print a clear error message for each violation found, prefixed with 'ERROR:'\n- Exit 0 if all checks pass (allow commit)\n- Exit 1 if any check fails (reject commit)\n- Only check files that are staged (git diff --cached --name-only)\n- Be written in bash and be POSIX-compatible",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775550470865,\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"part\":{\"id\":\"prt_d670e1ad00017ZwaQZS76hB2F8\",\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"messageID\":\"msg_d670def00001RBT5Z3SqK1M6CN\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775550690322,\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"part\":{\"id\":\"prt_d670e1df700163hSqg0btD9lY8\",\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"messageID\":\"msg_d670def00001RBT5Z3SqK1M6CN\",\"type\":\"tool\",\"callID\":\"chatcmpl-tool-a956e48309ecf78d\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"content\":\"#!/bin/sh\\n\\n# Get staged files\\nstaged_files=$(git diff --cached --name-only)\\n\\nif [ -z \\\"$staged_files\\\" ]; then\\n    exit 0\\nfi\\n\\nfailed=0\\n\\nfor file in $staged_files; do\\n    # Skip files that were deleted\\n    if [ ! -f \\\"$file\\\" ]; then\\n        continue\\n    fi\\n\\n    # 1. Check file size (5MB = 5242880 bytes)\\n    size=$(wc -c << \\\"$ \\\"$file\\\")\\n    if [ \\\"$size\\\" -gt 5242880 ]; then\\n        echo \\\"ERROR: $file is larger than 5MB\\\"\\n        failed=1\\n    fi\\n\\n    # 2. Check for debugging print() in Python files\\n    case \\\"$file\\\" in\\n        *.py)\\n            if grep -q \\\"^[[:space:]]*print(\\\" \\\"$file\\\"; then\\n                echo \\\"ERROR: $file contains debug print() calls\\\"\\n                failed=1\\n            fi\\n            # 4. Py compile syntax check\\n            if ! python3 -m py_compile \\\"$file\\\" > /dev/null 2>&1; then\\n                echo \\\"ERROR: $file failed py_compile syntax check\\\"\\n                failed=1\\n            fi\\n            ;;\\n    esac\\n\\n    # 3. Check for trailing whitespace\\n    if grep -q \\\"[[:space:]]$\\\" \\\"$file\\\"; then\\n        echo \\\"ERROR: $file contains trailing whitespace\\\"\\n        failed=1\\n    fi\\ndone\\n\\nif [ \\\"$failed\\\" -ne 0 ]; then\\n    exit 1\\nfi\\n\\nexit 0\\n\",\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1h8tjm6f/pre-commit\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1h8tjm6f/pre-commit\",\"metadata\":{\"diagnostics\":{},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1h8tjm6f/pre-commit\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775550690318,\"end\":1775550690321}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775550690572,\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"part\":{\"id\":\"prt_d6711750a001AX6KJiAM8OqNQc\",\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"messageID\":\"msg_d670def00001RBT5Z3SqK1M6CN\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.00200032,\"tokens\":{\"total\":13482,\"input\":10488,\"output\":434,\"reasoning\":0,\"cache\":{\"read\":2560,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775550694217,\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"part\":{\"id\":\"prt_d67118348001BvI9t2sWDUgP11\",\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"messageID\":\"msg_d6711750e001C6LRcYG5oTYcmz\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775550695768,\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"part\":{\"id\":\"prt_d67118349001Jij9PGlhjxDdUo\",\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"messageID\":\"msg_d6711750e001C6LRcYG5oTYcmz\",\"type\":\"text\",\"text\":\"Created `pre-commit` git hook with checks for file size, Python `print()` calls, trailing whitespace, and Python syntax.\",\"time\":{\"start\":1775550695767,\"end\":1775550695767}}}\n{\"type\":\"step_finish\",\"timestamp\":1775550695769,\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"part\":{\"id\":\"prt_d67118958001454Lpm8OAYPsdA\",\"sessionID\":\"ses_298f21588ffep2mCjrzaa7iPnT\",\"messageID\":\"msg_d6711750e001C6LRcYG5oTYcmz\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00190078,\"tokens\":{\"total\":13525,\"input\":13497,\"output\":28,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"content\": \"#!/bin/sh\\n\\n# Get staged files\\nstaged_files=$(git diff --cached --name-only)\\n\\nif [ -z \\\"$staged_files\\\" ]; then\\n    exit 0\\nfi\\n\\nfailed=0\\n\\nfor file in $staged_files; do\\n    # Skip files that were deleted\\n    if [ ! -f \\\"$file\\\" ]; then\\n        continue\\n    fi\\n\\n    # 1. Check file size (5MB = 5242880 bytes)\\n    size=$(wc -c << \\\"$ \\\"$file\\\")\\n    if [ \\\"$size\\\" -gt 5242880 ]; then\\n        echo \\\"ERROR: $file is larger than 5MB\\\"\\n        failed=1\\n    fi\\n\\n    # 2. Check for debugging print() in Python files\\n    case \\\"$file\\\" in\\n        *.py)\\n            if grep -q \\\"^[[:space:]]*print(\\\" \\\"$file\\\"; then\\n                echo \\\"ERROR: $file contains debug print() calls\\\"\\n                failed=1\\n            fi\\n            # 4. Py compile syntax check\\n            if ! python3 -m py_compile \\\"$file\\\" > /dev/null 2>&1; then\\n                echo \\\"ERROR: $file failed py_compile syntax check\\\"\\n                failed=1\\n            fi\\n            ;;\\n    esac\\n\\n    # 3. Check for trailing whitespace\\n    if grep -q \\\"[[:space:]]$\\\" \\\"$file\\\"; then\\n        echo \\\"ERROR: $file contains trailing whitespace\\\"\\n        failed=1\\n    fi\\ndone\\n\\nif [ \\\"$failed\\\" -ne 0 ]; then\\n    exit 1\\nfi\\n\\nexit 0\\n\",\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-1h8tjm6f/pre-commit\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "Created `pre-commit` git hook with checks for file size, Python `print()` calls, trailing whitespace, and Python syntax.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "pre-commit",
+      "content": "#!/bin/sh\n\n# Get staged files\nstaged_files=$(git diff --cached --name-only)\n\nif [ -z \"$staged_files\" ]; then\n    exit 0\nfi\n\nfailed=0\n\nfor file in $staged_files; do\n    # Skip files that were deleted\n    if [ ! -f \"$file\" ]; then\n        continue\n    fi\n\n    # 1. Check file size (5MB = 5242880 bytes)\n    size=$(wc -c << \"$ \"$file\")\n    if [ \"$size\" -gt 5242880 ]; then\n        echo \"ERROR: $file is larger than 5MB\"\n        failed=1\n    fi\n\n    # 2. Check for debugging print() in Python files\n    case \"$file\" in\n        *.py)\n            if grep -q \"^[[:space:]]*print(\" \"$file\"; then\n                echo \"ERROR: $file contains debug print() calls\"\n                failed=1\n            fi\n            # 4. Py compile syntax check\n            if ! python3 -m py_compile \"$file\" > /dev/null 2>&1; then\n                echo \"ERROR: $file failed py_compile syntax check\"\n                failed=1\n            fi\n            ;;\n    esac\n\n    # 3. Check for trailing whitespace\n    if grep -q \"[[:space:]]$\" \"$file\"; then\n        echo \"ERROR: $file contains trailing whitespace\"\n        failed=1\n    fi\ndone\n\nif [ \"$failed\" -ne 0 ]; then\n    exit 1\nfi\n\nexit 0\n",
+      "language": ""
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

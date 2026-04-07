@@ -1,0 +1,40 @@
+{
+  "task_id": "tier4-usd-shot-assembly-compiled-glm-5",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": "usd-composition:compiled-glm-5",
+  "scores": {
+    "correctness": 0.1,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2874310830375,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T14:35:33.382580+00:00",
+  "prompt": "Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:\n\n1. assets.usda \u2014 contains:\n   - Default prim /Assets\n   - /Assets/Chair \u2014 an Xform with a child Mesh (/Assets/Chair/Geo) representing a simple chair (8-point cube is fine)\n   - /Assets/Chair has a variant set 'modelVariant' with variants 'simple' and 'detailed' (both can contain the same geo, this tests the variant mechanism)\n\n2. shot.usda \u2014 contains:\n   - Default prim /Shot\n   - Sublayers assets.usda\n   - /Shot/Set \u2014 an Xform\n   - /Shot/Set/ChairA \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (-2, 0, 0)\n   - /Shot/Set/ChairB \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (2, 0, 0)\n   - /Shot/Lighting \u2014 an Xform with a variant set 'lightingVariant' containing 'day' and 'night' variants\n   - In 'day' variant: a DistantLight at /Shot/Lighting/Sun with intensity=50000\n   - In 'night' variant: a DomeLight at /Shot/Lighting/Sky with intensity=500\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "assemble_shot.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nScript to build a multi-file shot assembly using Pixar USD.\nCreates assets.usda and shot.usda files with the specified structure.\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, UsdLux, Sdf, Gf\nimport os\n\ndef create_assets_file():\n    \"\"\"Create assets.usda file with chair model and variants\"\"\"\n    print(\"Creating assets.usda...\")\n\n    # Create stage\n    stage = Usd.Stage.CreateNew(\"assets.usda\")\n\n    # Set default prim\n    stage.SetDefaultPrim(stage.DefinePrim(\"/Assets\"))\n\n    # Create chair Xform\n    chair_xform = UsdGeom.Xform.Define(stage, \"/Assets/Chair\")\n\n    # Create prim with variant\n    chair_prim = chair_xform.GetPrim()\n    chair_prim.CreateAttribute(\"variantSets\", Sdf.ValueTypeNames.TokenArray).Set([\"modelVariant\"])\n    variant_set = chair_prim.GetVariantSet(\"modelVariant\")\n    variant_set.AddVariant(\"simple\")\n    variant_set.AddVariant(\"detailed\")\n    variant_set.SetVariantSelection(\"simple\")\n\n    # Create 'simple' variant\n    with variant_set.GetVariant(\"simple\"):\n        # Create cube mesh in simple variant\n        chair_geo = UsdGeom.Cube.Define(stage, \"/Assets/Chair/Geo\")\n        chair_geo.GetPrim().CreateAttribute(\"purpose\", Sdf.ValueTypeNames.String).Set(\"default\")\n\n        # Create xformOp for positioning the cube\n        xform_ops = chair_geo.GetPrim().GetOrderedXformOps()\n        cube_size = 0.5  # Half-size for 8-point cube\n        chair_geo.AddTranslateOp(name=\"xformOp:translate\", value=Gf.Vec3f(0, cube_size/2, 0))\n\n    # Create 'detailed' variant\n    with variant_set.GetVariant(\"detailed\"):\n        # Create the same cube mesh in detailed variant\n        chair_geo_detailed = UsdGeom.Cube.Define(stage, \"/Assets/Chair/Geo\")\n        chair_geo_detailed.GetPrim().CreateAttribute(\"purpose\", Sdf.ValueTypeNames.String).Set(\"default\")\n\n        # Same positioning\n        chair_geo_detailed.AddTranslateOp(name=\"xformOp:translate\", value=Gf.Vec3f(0, cube_size/2, 0))\n\n    # Save the stage\n    stage.GetRootLayer().Export()\n    print(\"assets.usda created successfully\")\n\ndef create_shot_file():\n    \"\"\"Create shot.usda file referencing assets and setting up shot composition\"\"\"\n    print(\"Creating shot.usda...\")\n\n    # Create stage\n    stage = Usd.Stage.CreateNew(\"shot.usda\")\n\n    # Set default prim\n    stage.SetDefaultPrim(stage.DefinePrim(\"/Shot\"))\n\n    # Add assets.usda as sublayer\n    sub_layer_path = Sdf.Layer.CreateAnonymous('.usda')\n    sub_layer_path.Import(\"assets.usda\")\n    stage.GetRootLayer().subLayerPaths.append(sub_layer_path.identifier)\n\n    # Create Set Xform\n    set_xform = UsdGeom.Xform.Define(stage, \"/Shot/Set\")\n\n    # Create ChairA reference\n    chair_a_ref = UsdGeom.Xform.Define(stage, \"/Shot/Set/ChairA\")\n    chair_a_ref.GetPrim().GetReferences().AddAssetReference(\"assets.usda\", \"/Assets/Chair\")\n    # Add translation op\n    chair_a_ref.AddTranslateOp(name=\"xformOp:translate\", value=Gf.Vec3f(-2, 0, 0))\n\n    # Create ChairB reference\n    chair_b_ref = UsdGeom.Xform.Define(stage, \"/Shot/Set/ChairB\")\n    chair_b_ref.GetPrim().GetReferences().AddAssetReference(\"assets.usda\", \"/Assets/Chair\")\n    # Add translation op\n    chair_b_ref.AddTranslateOp(name=\"xformOp:translate\", value=Gf.Vec3f(2, 0, 0))\n\n    # Create Lighting Xform\n    lighting_xform = UsdGeom.Xform.Define(stage, \"/Shot/Lighting\")\n\n    # Add lighting variant set\n    lighting_variant_set = lighting_xform.GetVariantSet(\"lightingVariant\")\n    lighting_variant_set.AddVariant(\"day\")\n    lighting_variant_set.AddVariant(\"night\")\n    lighting_variant_set.SetVariantSelection(\"day\")\n\n    # Create 'day' variant\n    day_variant = lighting_xform.GetVariantSet(\"lightingVariant\").AddVariant(\"day\")\n    with day_variant:\n        # Create distant light\n        sun_light = UsdLux.DistantLight.Define(stage, \"/Shot/Lighting/Sun\")\n        sun_light.CreateIntensityAttr().Set(50000)\n        sun_light.CreateColorAttr().Set(Gf.Vec3f(1, 0.9, 0.8))  # Warm sunlight\n\n    # Create 'night' variant\n    night_variant = lighting_xform.GetVariantSet(\"lightingVariant\").AddVariant(\"night\")\n    with night_variant:\n        # Create dome light\n        dome_light = UsdLux.DomeLight.Define(stage, \"/Shot/Lighting/Sky\")\n        dome_light.CreateIntensityAttr().Set(500)\n        dome_light.CreateColorAttr().Set(Gf.Vec3f(0.1, 0.1, 0.3))  # Cool night sky\n\n    # Save the stage\n    stage.GetRootLayer().Export()\n    print(\"shot.usda created successfully\")\n\ndef main():\n    \"\"\"Main function to create both USD files\"\"\"\n    print(\"Starting shot assembly creation...\")\n\n    # Create assets.usda\n    create_assets_file()\n\n    # Create shot.usda\n    create_shot_file()\n\n    print(\"\\nShot assembly complete!\")\n    print(\"Files created:\")\n    print(\"- assets.usda\")\n    print(\"- shot.usda\")\n\nif __name__ == \"__main__\":\n    main()",
+      "language": "python"
+    },
+    {
+      "path": "assets.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 4
+}

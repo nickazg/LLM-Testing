@@ -1,0 +1,70 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "gpt-oss-20b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 12406,
+        "output": 59,
+        "thinking": 40,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 5.82221291703172,
+      "cost_usd": 0.00076351
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T06:44:33.293680+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775544270317,\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"part\":{\"id\":\"prt_d66af7dec001Bl2dprGAWKxrwh\",\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"messageID\":\"msg_d66af7a75001jTxZICqf5hiEri\",\"type\":\"step-start\"}}\n{\"type\":\"tool_use\",\"timestamp\":1775544271528,\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"part\":{\"id\":\"prt_d66af7ffa001aBePyeaIM3bHFn\",\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"messageID\":\"msg_d66af7a75001jTxZICqf5hiEri\",\"type\":\"tool\",\"callID\":\"chatcmpl-tool-673256e67cf6462fa216efc854ec640e\",\"tool\":\"write\",\"state\":{\"status\":\"completed\",\"input\":{\"filePath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vb_galo2/hello.py\",\"content\":\"print('Hello, World!')\"},\"output\":\"Wrote file successfully.\",\"title\":\"private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vb_galo2/hello.py\",\"metadata\":{\"diagnostics\":{\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vb_galo2/hello.py\":[]},\"filepath\":\"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vb_galo2/hello.py\",\"exists\":false,\"truncated\":false},\"time\":{\"start\":1775544270846,\"end\":1775544271527}},\"metadata\":{\"openrouter\":{\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"We need to create hello.py. No other files. Just create file content. No tests. Use write.\",\"format\":\"unknown\",\"index\":0}]}}}}\n{\"type\":\"step_finish\",\"timestamp\":1775544271530,\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"part\":{\"id\":\"prt_d66af82a9001hDR3grlVQ48hnJ\",\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"messageID\":\"msg_d66af7a75001jTxZICqf5hiEri\",\"type\":\"step-finish\",\"reason\":\"tool-calls\",\"cost\":0.00038307,\"tokens\":{\"total\":12417,\"input\":12321,\"output\":96,\"reasoning\":23,\"cache\":{\"read\":0,\"write\":0}}}}\n{\"type\":\"step_start\",\"timestamp\":1775544271917,\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"part\":{\"id\":\"prt_d66af842b0010UU72RVS1Uvd0U\",\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"messageID\":\"msg_d66af82ac0010oIdAhv1Jmr3DK\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775544272205,\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"part\":{\"id\":\"prt_d66af84f40014PlPVcM4TLOv7H\",\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"messageID\":\"msg_d66af82ac0010oIdAhv1Jmr3DK\",\"type\":\"text\",\"text\":\"The file `hello.py` has been created with the required code.\",\"time\":{\"start\":1775544272204,\"end\":1775544272204}}}\n{\"type\":\"step_finish\",\"timestamp\":1775544272206,\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"part\":{\"id\":\"prt_d66af854d001S6yxekvJ6d4alP\",\"sessionID\":\"ses_2995089b0ffebsCBhLw1mIDW89\",\"messageID\":\"msg_d66af82ac0010oIdAhv1Jmr3DK\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00038044,\"tokens\":{\"total\":12465,\"input\":12406,\"output\":59,\"reasoning\":40,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "tool_use",
+      "content": "{\n  \"filePath\": \"/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vb_galo2/hello.py\",\n  \"content\": \"print('Hello, World!')\"\n}",
+      "tool_name": "write"
+    },
+    {
+      "role": "tool_result",
+      "content": "Wrote file successfully.",
+      "tool_name": "write"
+    },
+    {
+      "role": "response",
+      "content": "The file `hello.py` has been created with the required code.",
+      "tool_name": ""
+    }
+  ],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/12510982297173541251",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-vb_galo2\u0001\bhello.py\ufffd\ufffd\u0014\t\ufffd\ufffdtOF\ufffd\u001d\ufffd\ufffdf\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "hello.py",
+      "content": "print(\"Hello, World!\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 1,
+  "difficulty": 1,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

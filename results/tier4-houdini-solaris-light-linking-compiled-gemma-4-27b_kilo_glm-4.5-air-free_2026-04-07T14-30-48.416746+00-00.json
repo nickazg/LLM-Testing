@@ -1,0 +1,54 @@
+{
+  "task_id": "tier4-houdini-solaris-light-linking-compiled-gemma-4-27b",
+  "model": "glm-4.5-air-free",
+  "cli": "kilo",
+  "skill": "houdini-solaris-light-linking:compiled-gemma-4-27b",
+  "scores": {
+    "correctness": 1.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0069515419891,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T14:30:48.416746+00:00",
+  "prompt": "Create a Python script called solaris_light_linking.py for Houdini Solaris (LOPs context). Using the editableStage from a Python Script LOP, the script should:\n\n1. Get the stage: stage = hou.pwd().editableStage()\n2. Create /Scene as default prim (UsdGeom.Xform)\n3. Create geometry:\n   - /Scene/Hero \u2014 a UsdGeom.Xform with /Scene/Hero/Body (Mesh cube), purpose set to \"render\"\n   - /Scene/Environment \u2014 a UsdGeom.Xform with /Scene/Environment/Ground (Mesh quad), purpose set to \"render\"\n   - /Scene/Proxy \u2014 a UsdGeom.Xform with purpose set to \"proxy\"\n4. Create lights:\n   - /Scene/Lighting/KeyLight \u2014 a UsdLux.DistantLight, intensity=50000, angle=1.0, rotateXYZ (-45, 30, 0)\n   - /Scene/Lighting/FillLight \u2014 a UsdLux.DomeLight, intensity=500\n   - /Scene/Lighting/RimLight \u2014 a UsdLux.DistantLight, intensity=25000, rotateXYZ (-30, -150, 0)\n5. Create a UsdLux.LightFilter child under KeyLight:\n   - /Scene/Lighting/KeyLight/BarnDoor \u2014 type it as a generic prim with custom attributes for barn door parameters (top=0.2, bottom=-0.1, left=-0.3, right=0.3)\n6. Light linking using UsdCollectionAPI:\n   - On KeyLight: create collection \"lightLink\" that includes /Scene/Hero and excludes /Scene/Environment\n   - On RimLight: create collection \"lightLink\" that includes only /Scene/Hero/Body\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf, Vt",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/0.12.5/7487945886552830490",
+      "content": "K/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-unorvj8b\u0001\u0018solaris_light_linking.py\ufffd\u05b8\ufffd\ufffd\ufffd+\ufffd\ufffd\ufffd,WZh\ufffd\u0001\u0000\u0000\u0000\u0001",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "solaris_light_linking.py",
+      "content": "from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf, Vt\n\n\ndef create_geometry_and_lights():\n    # Get the editable stage\n    stage = hou.pwd().editableStage()\n\n    # Create /Scene as default prim (UsdGeom.Xform)\n    if not stage.GetPrimAtPath(\"/Scene\"):\n        UsdGeom.Xform.Define(stage, \"/Scene\")\n\n    # Create Hero geometry\n    UsdGeom.Xform.Define(stage, \"/Scene/Hero\")\n    hero_body = UsdGeom.Mesh.Define(stage, \"/Scene/Hero/Body\")\n\n    # Create a cube for the hero body\n    cube = UsdGeom.Mesh.Define(stage, \"/Scene/Hero/Body/temp_cube\")\n    cube.CreateAttribute(\"size\", Sdf.AttributeTypeNames.Float).Set(1.0)\n\n    # Copy cube data to hero body\n    points = cube.GetPointsAttr().Get()\n    faceVertexCounts = cube.GetFaceVertexCountsAttr().Get()\n    faceVertexIndices = cube.GetFaceVertexIndicesAttr().Get()\n\n    hero_body.GetPointsAttr().Set(points)\n    hero_body.GetFaceVertexCountsAttr().Set(faceVertexCounts)\n    hero_body.GetFaceVertexIndicesAttr().Set(faceVertexIndices)\n\n    # Set purpose to render\n    hero_body.SetPurpose(\"render\")\n\n    # Create Environment geometry\n    UsdGeom.Xform.Define(stage, \"/Scene/Environment\")\n    env_ground = UsdGeom.Mesh.Define(stage, \"/Scene/Environment/Ground\")\n\n    # Create a quad for the ground\n    quad_points = Vt.Vec3fArray(\n        [Gf.Vec3f(-5, 0, -5), Gf.Vec3f(5, 0, -5), Gf.Vec3f(5, 0, 5), Gf.Vec3f(-5, 0, 5)]\n    )\n\n    env_ground.GetPointsAttr().Set(quad_points)\n    env_ground.GetFaceVertexCountsAttr().Set(Vt.IntArray([4]))\n    env_ground.GetFaceVertexIndicesAttr().Set(Vt.IntArray([0, 1, 2, 3]))\n\n    # Set purpose to render\n    env_ground.SetPurpose(\"render\")\n\n    # Create Proxy geometry\n    proxy_xform = UsdGeom.Xform.Define(stage, \"/Scene/Proxy\")\n    proxy_xform.SetPurpose(\"proxy\")\n\n    # Create Lighting\n    UsdGeom.Xform.Define(stage, \"/Scene/Lighting\")\n\n    # KeyLight\n    key_light = UsdLux.DistantLight.Define(stage, \"/Scene/Lighting/KeyLight\")\n    key_light.GetIntensityAttr().Set(50000)\n    key_light.GetAngleAttr().Set(1.0)\n    key_light.GetRotateXYZAttr().Set(Gf.Vec3f(-45, 30, 0))\n\n    # BarnDoor filter under KeyLight\n    barn_door = stage.DefinePrim(\"/Scene/Lighting/KeyLight/BarnDoor\", \"Xform\")\n    barn_door.CreateAttribute(\"top\", Sdf.AttributeTypeNames.Float).Set(0.2)\n    barn_door.CreateAttribute(\"bottom\", Sdf.AttributeTypeNames.Float).Set(-0.1)\n    barn_door.CreateAttribute(\"left\", Sdf.AttributeTypeNames.Float).Set(-0.3)\n    barn_door.CreateAttribute(\"right\", Sdf.AttributeTypeNames.Float).Set(0.3)\n\n    # FillLight\n    UsdLux.DomeLight.Define(stage, \"/Scene/Lighting/FillLight\")\n    fill_light = stage.GetPrimAtPath(\"/Scene/Lighting/FillLight\")\n    fill_light.GetAttribute(\"intensity\").Set(500)\n\n    # RimLight\n    rim_light = UsdLux.DistantLight.Define(stage, \"/Scene/Lighting/RimLight\")\n    rim_light.GetIntensityAttr().Set(25000)\n    rim_light.GetRotateXYZAttr().Set(Gf.Vec3f(-30, -150, 0))\n\n    # Light linking using UsdCollectionAPI\n\n    # KeyLight lightLink collection\n    key_light_collection = UsdCollectionAPI.Apply(key_light.GetPrim(), \"lightLink\")\n    key_light_collection.CreateIncludesRel()\n    key_light_collection.CreateExcludesRel()\n\n    # Add Hero to includes, Environment to excludes\n    includes_rel = key_light_collection.GetIncludesRel()\n    excludes_rel = key_light_collection.GetExcludesRel()\n\n    includes_rel.SetTargets([Sdf.Path(\"/Scene/Hero\")])\n    excludes_rel.SetTargets([Sdf.Path(\"/Scene/Environment\")])\n\n    # RimLight lightLink collection\n    rim_light_collection = UsdCollectionAPI.Apply(rim_light.GetPrim(), \"lightLink\")\n    rim_light_collection.CreateIncludesRel()\n\n    # Add only Hero/Body to includes\n    rim_includes_rel = rim_light_collection.GetIncludesRel()\n    rim_includes_rel.SetTargets([Sdf.Path(\"/Scene/Hero/Body\")])\n\n\n# Execute the function when the script is run\ncreate_geometry_and_lights()\n",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "novel",
+  "skill_intensity": "heavy",
+  "skill_pair": "houdini-solaris-light-linking"
+}

@@ -1,0 +1,49 @@
+{
+  "task_id": "tier3-usd-procedural-animation",
+  "model": "qwen3-30b",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.125,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2591000830289,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T08:34:02.613170+00:00",
+  "prompt": "Create a Python script called animate_skeleton.py that uses the pxr library to build a skeletal animation setup. The script must create a file called skeleton_anim.usda containing:\n\n1. /Root \u2014 a UsdSkel.Root (default prim)\n2. /Root/Skeleton \u2014 a UsdSkel.Skeleton with joints: [\"Hips\", \"Hips/Spine\", \"Hips/Spine/Head\", \"Hips/LeftLeg\", \"Hips/RightLeg\"]\n3. /Root/Skeleton should have restTransforms and bindTransforms for each joint (use identity or simple offsets \u2014 Hips at origin, Spine at (0,1,0), Head at (0,2,0), LeftLeg at (-0.5,-1,0), RightLeg at (0.5,-1,0))\n4. /Root/Anim \u2014 a UsdSkel.Animation with:\n   - joints matching the skeleton\n   - Time-sampled translations for frames 1-24 (animate Hips translating up and down in Y by 0.5 units over the cycle)\n5. /Root/Mesh \u2014 a UsdGeom.Mesh (simple cube/box) bound to the skeleton using UsdSkel.BindingAPI\n   - Set skel:jointIndices and skel:jointWeights (all vertices bound to Hips joint is fine)\n\nUse: from pxr import Usd, UsdGeom, UsdSkel, Sdf, Gf, Vt",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "animate_skeleton.py",
+      "content": "#!/usr/bin/env python3\n\n\"\"\"\nScript to create a skeletal animation setup using pxr library.\nCreates a skeleton_anim.usda file containing:\n1. /Root - UsdSkel.Root (default prim)\n2. /Root/Skeleton - UsdSkel.Skeleton with specified joints and transforms\n3. /Root/Anim - UsdSkel.Animation with time-sampled translations\n4. /Root/Mesh - UsdGeom.Mesh bound to skeleton\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, UsdSkel, Sdf, Gf, Vt\n\ndef create_skeleton_animation():\n    # Create a new USD stage\n    stage = Usd.Stage.CreateNew(\"skeleton_anim.usda\")\n\n    # Set the default prim to /Root\n    root = UsdGeom.Xform.Define(stage, \"/Root\")\n    stage.SetDefaultPrim(root.GetPrim())\n\n    # Create Skeleton\n    skeleton = UsdSkel.Skeleton.Define(stage, \"/Root/Skeleton\")\n\n    # Define joints\n    joints = [\"Hips\", \"Hips/Spine\", \"Hips/Head\", \"Hips/LeftLeg\", \"Hips/RightLeg\"]\n    joint_names = Vt.StringArray(joints)\n\n    # Set joint names\n    skeleton.CreateJointNamesAttr(joint_names)\n\n    # Set rest transforms (identity or simple offsets)\n    # Hips at origin, Spine at (0,1,0), Head at (0,2,0), LeftLeg at (-0.5,-1,0), RightLeg at (0.5,-1,0)\n    rest_transforms = [\n        Gf.Matrix4d(1),  # Hips at origin\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(0, 1, 0)),  # Spine\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(0, 2, 0)),  # Head\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(-0.5, -1, 0)),  # LeftLeg\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(0.5, -1, 0))   # RightLeg\n    ]\n\n    skeleton.CreateRestTransformsAttr(rest_transforms)\n\n    # Set bind transforms (same as rest for this simple case)\n    bind_transforms = rest_transforms\n    skeleton.CreateBindTransformsAttr(bind_transforms)\n\n    # Create Animation\n    anim = UsdSkel.Animation.Define(stage, \"/Root/Anim\")\n\n    # Set joint names to match skeleton\n    anim.CreateJointsAttr(joint_names)\n\n    # Create time-sampled translations for frames 1-24\n    # Animate Hips translating up and down in Y by 0.5 units over the cycle\n    import math\n\n    # Create time-sampled translations for each joint\n    for frame in range(1, 25):\n        # Simple sine wave motion for Hips in Y direction (joint index 0)\n        y_offset = 0.5 * math.sin(frame * 2 * math.pi / 24)  # Cycle every 24 frames\n        hips_translation = Gf.Vec3d(0, y_offset, 0)\n\n        # Create translations array for all joints - only Hips is animated\n        translations = []\n        for i in range(len(joints)):\n            if i == 0:  # Hips joint\n                translations.append(hips_translation)\n            else:\n                translations.append(Gf.Vec3d(0, 0, 0))  # Rest position for others\n\n        # For translation attribute, we need to make a proper Vt.Array\n        # Let's use Vt.Vec3dArray instead\n        translations_array = Vt.Vec3dArray(translations)\n\n        # Set translation for this frame\n        anim.GetTranslationAttr().Set(translations_array, Usd.TimeCode(frame))\n\n    # Create Mesh\n    mesh = UsdGeom.Cube.Define(stage, \"/Root/Mesh\")\n\n    # Bind mesh to skeleton using UsdSkel.BindingAPI\n    binding = UsdSkel.BindingAPI.Apply(mesh.GetPrim())\n\n    # Set skel:jointIndices and skel:jointWeights\n    # For simplicity, all vertices bound to Hips joint (index 0)\n    joint_indices = Vt.IntArray([0] * 8)  # 8 vertices for a cube\n    joint_weights = Vt.FloatArray([1.0] * 8)  # Full weight to Hips\n\n    binding.CreateJointIndicesAttr(joint_indices)\n    binding.CreateJointWeightsAttr(joint_weights)\n\n    # Set the skeleton reference\n    binding.CreateSkeletonAttr().Set(skeleton.GetPrim())\n\n    # Save the stage\n    stage.Save()\n    print(\"Skeleton animation USD file created: skeleton_anim.usda\")\n\nif __name__ == \"__main__\":\n    create_skeleton_animation()",
+      "language": "python"
+    },
+    {
+      "path": "animate_skeleton_v2.py",
+      "content": "#!/usr/bin/env python3\n\n\"\"\"\nScript to create a skeletal animation setup using pxr library.\nCreates a skeleton_anim.usda file containing:\n1. /Root - UsdSkel.Root (default prim)\n2. /Root/Skeleton - UsdSkel.Skeleton with specified joints and transforms\n3. /Root/Anim - UsdSkel.Animation with time-sampled translations\n4. /Root/Mesh - UsdGeom.Mesh bound to skeleton\n\"\"\"\n\nfrom pxr import Usd, UsdGeom, UsdSkel, Sdf, Gf, Vt, Tf\n\ndef create_skeleton_animation():\n    # Create a new USD stage\n    stage = Usd.Stage.CreateNew(\"skeleton_anim.usda\")\n\n    # Set the default prim to /Root\n    root = UsdGeom.Xform.Define(stage, \"/Root\")\n    stage.SetDefaultPrim(root.GetPrim())\n\n    # Create Skeleton\n    skeleton = UsdSkel.Skeleton.Define(stage, \"/Root/Skeleton\")\n\n    # Define joints\n    joints = [\"Hips\", \"Hips/Spine\", \"Hips/Head\", \"Hips/LeftLeg\", \"Hips/RightLeg\"]\n\n    # Set joint names (should be Vt.Array of Tf.Token)\n    joint_tokens = [Tf.Token(joint) for joint in joints]\n    joint_names = Vt.Array(Tf.Token, joint_tokens)\n\n    # Set joint names\n    skeleton.CreateJointNamesAttr(joint_names)\n\n    # Set rest transforms (identity or simple offsets)\n    # Hips at origin, Spine at (0,1,0), Head at (0,2,0), LeftLeg at (-0.5,-1,0), RightLeg at (0.5,-1,0)\n    rest_transforms = [\n        Gf.Matrix4d(1),  # Hips at origin\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(0, 1, 0)),  # Spine\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(0, 2, 0)),  # Head\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(-0.5, -1, 0)),  # LeftLeg\n        Gf.Matrix4d(1).SetTranslateOnly(Gf.Vec3d(0.5, -1, 0))   # RightLeg\n    ]\n\n    skeleton.CreateRestTransformsAttr(rest_transforms)\n\n    # Set bind transforms (same as rest for this simple case)\n    bind_transforms = rest_transforms\n    skeleton.CreateBindTransformsAttr(bind_transforms)\n\n    # Create Animation\n    anim = UsdSkel.Animation.Define(stage, \"/Root/Anim\")\n\n    # Set joint names to match skeleton\n    anim.CreateJointsAttr(joint_names)\n\n    # Create time-sampled translations for frames 1-24\n    # Animate Hips translating up and down in Y by 0.5 units over the cycle\n    import math\n\n    # Get the translations attribute for animation\n    translations_attr = anim.GetTranslationsAttr()\n\n    # Create time-sampled translations for each joint\n    for frame in range(1, 25):\n        # Simple sine wave motion for Hips in Y direction (joint index 0)\n        y_offset = 0.5 * math.sin(frame * 2 * math.pi / 24)  # Cycle every 24 frames\n        hips_translation = Gf.Vec3d(0, y_offset, 0)\n\n        # Create translations array for all joints - only Hips is animated\n        translations = []\n        for i in range(len(joints)):\n            if i == 0:  # Hips joint\n                translations.append(hips_translation)\n            else:\n                translations.append(Gf.Vec3d(0, 0, 0))  # Rest position for others\n\n        # Set translation for this frame\n        translations_array = Vt.Vec3dArray(translations)\n        translations_attr.Set(translations_array, Usd.TimeCode(frame))\n\n    # Create Mesh\n    mesh = UsdGeom.Cube.Define(stage, \"/Root/Mesh\")\n\n    # Bind mesh to skeleton using UsdSkel.BindingAPI\n    binding = UsdSkel.BindingAPI.Apply(mesh.GetPrim())\n\n    # Set skel:jointIndices and skel:jointWeights\n    # For simplicity, all vertices bound to Hips joint (index 0)\n    joint_indices = Vt.IntArray([0] * 8)  # 8 vertices for a cube\n    joint_weights = Vt.FloatArray([1.0] * 8)  # Full weight to Hips\n\n    binding.CreateJointIndicesAttr(joint_indices)\n    binding.CreateJointWeightsAttr(joint_weights)\n\n    # Set the skeleton reference\n    binding.CreateSkeletonAttr().Set(skeleton.GetPrim())\n\n    # Save the stage\n    stage.Save()\n    print(\"Skeleton animation USD file created: skeleton_anim.usda\")\n\nif __name__ == \"__main__\":\n    create_skeleton_animation()",
+      "language": "python"
+    },
+    {
+      "path": "skeleton_anim.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

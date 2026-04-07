@@ -1,0 +1,39 @@
+{
+  "task_id": "tier4-expression-parser-workflow-light",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": "expression-parser-workflow-light",
+  "scores": {
+    "correctness": 0.75,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2649582499871,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T14:16:58.759483+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "expr_parser.py",
+      "content": "class ASTNode:\n    def __init__(self, type, **kwargs):\n        self.type = type\n        if type == 'number':\n            self.value = kwargs.get('value')\n        elif type == 'binop':\n            self.op = kwargs.get('op')\n            self.left = kwargs.get('left')\n            self.right = kwargs.get('right')\n        elif type == 'unary':\n            self.op = kwargs.get('op')\n            self.operand = kwargs.get('operand')\n\n    def __repr__(self):\n        if self.type == 'number':\n            return f\"Number({self.value})\"\n        elif self.type == 'binop':\n            return f\"BinOp({self.op}, {self.left}, {self.right})\"\n        elif self.type == 'unary':\n            return f\"Unary({self.op}, {self.operand})\"\n\n\ndef parse(expression: str) -> ASTNode:\n    if not expression.strip():\n        raise ValueError(\"Empty expression\")\n\n    tokens = tokenize(expression)\n    if not tokens:\n        raise ValueError(\"No tokens found in expression\")\n\n    parser = Parser(tokens)\n    return parser.parse()\n\n\ndef tokenize(expression: str) -> list:\n    tokens = []\n    i = 0\n    n = len(expression)\n\n    while i < n:\n        c = expression[i]\n\n        if c.isspace():\n            i += 1\n            continue\n\n        if c.isdigit() or c == '.':\n            num_str = ''\n            while i < n and (expression[i].isdigit() or expression[i] == '.'):\n                num_str += expression[i]\n                i += 1\n            try:\n                tokens.append(('number', float(num_str)))\n            except ValueError:\n                raise ValueError(f\"Invalid number format: {num_str}\")\n            continue\n\n        if c in '+-*/()':\n            tokens.append(('operator', c))\n            i += 1\n            continue\n\n        raise ValueError(f\"Invalid character: {c}\")\n\n    return tokens\n\n\nclass Parser:\n    def __init__(self, tokens: list):\n        self.tokens = tokens\n        self.current = 0\n        self.peek_token = None\n\n    def parse(self) -> ASTNode:\n        self.peek_token = self.tokens[0] if self.tokens else None\n        return self.parse_expression()\n\n    def peek(self):\n        if self.current < len(self.tokens):\n            return self.tokens[self.current]\n        return None\n\n    def consume(self):\n        token = self.peek()\n        self.current += 1\n        self.peek_token = self.peek()\n        return token\n\n    def expect(self, expected_type):\n        token = self.consume()\n        if token is None or token[0] != expected_type:\n            raise ValueError(f\"Expected {expected_type}, got {token}\")\n        return token\n\n    def parse_expression(self):\n        return self.parse_addition()\n\n    def parse_addition(self):\n        node = self.parse_multiplication()\n\n        while self.peek() and self.peek()[1] in ('+', '-'):\n            op = self.consume()[1]\n            right = self.parse_multiplication()\n            node = ASTNode('binop', op=op, left=node, right=right)\n\n        return node\n\n    def parse_multiplication(self):\n        node = self.parse_unary()\n\n        while self.peek() and self.peek()[1] in ('*', '/'):\n            op = self.consume()[1]\n            right = self.parse_unary()\n            node = ASTNode('binop', op=op, left=node, right=right)\n\n        return node\n\n    def parse_unary(self):\n        if self.peek() and self.peek()[1] == '-':\n            self.consume()\n            operand = self.parse_primary()\n            return ASTNode('unary', op='-', operand=operand)\n\n        return self.parse_primary()\n\n    def parse_primary(self):\n        if not self.peek():\n            raise ValueError(\"Unexpected end of expression\")\n\n        token = self.peek()\n\n        if token[1] == '(':\n            self.consume()\n            expr = self.parse_expression()\n            self.expect('operator')\n            if self.peek()[1] != ')':\n                raise ValueError(\"Unmatched parentheses\")\n            self.consume()\n            return expr\n\n        if token[0] == 'number':\n            self.consume()\n            return ASTNode('number', value=token[1])\n\n        raise ValueError(f\"Unexpected token: {token}\")\n\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == 'number':\n        return node.value\n    elif node.type == 'binop':\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n\n        if node.op == '+':\n            return left_val + right_val\n        elif node.op == '-':\n            return left_val - right_val\n        elif node.op == '*':\n            return left_val * right_val\n        elif node.op == '/':\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n    elif node.type == 'unary':\n        operand_val = evaluate(node.operand)\n        if node.op == '-':\n            return -operand_val\n\n    raise ValueError(f\"Unknown node type: {node.type}\")",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "workflow",
+  "skill_intensity": "light",
+  "skill_pair": "expression-parser"
+}

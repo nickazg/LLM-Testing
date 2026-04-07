@@ -1,0 +1,39 @@
+{
+  "task_id": "tier1-hello-world",
+  "model": "qwen3-30b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 13318,
+        "output": 97,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 6.486614541965537,
+      "cost_usd": 0.00095845
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T06:43:55.919176+00:00",
+  "prompt": "Create a Python file called hello.py that prints 'Hello, World!' to stdout. Do not create any other files.",
+  "raw_output": "{\"type\":\"step_start\",\"timestamp\":1775544234409,\"sessionID\":\"ses_299511d93ffeDsgE6KKteCshSx\",\"part\":{\"id\":\"prt_d66aef1a8001NBngvGxnJX7AaH\",\"sessionID\":\"ses_299511d93ffeDsgE6KKteCshSx\",\"messageID\":\"msg_d66aee6c50016ZNkei3uShxjK8\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1775544234852,\"sessionID\":\"ses_299511d93ffeDsgE6KKteCshSx\",\"part\":{\"id\":\"prt_d66aef1a90016HNtgrwBF8YWtm\",\"sessionID\":\"ses_299511d93ffeDsgE6KKteCshSx\",\"messageID\":\"msg_d66aee6c50016ZNkei3uShxjK8\",\"type\":\"text\",\"text\":\"I'll create a Python file called hello.py that prints 'Hello, World!' to stdout.\\n\\n<function=write>\\n<parameter=content>\\nprint(\\\"Hello, World!\\\")\\n</parameter>\\n<parameter=filePath>\\n/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-pu3iojke/hello.py\\n</parameter>\\n</function>\\n</tool_call>\",\"time\":{\"start\":1775544234851,\"end\":1775544234851}}}\n{\"type\":\"step_finish\",\"timestamp\":1775544234854,\"sessionID\":\"ses_299511d93ffeDsgE6KKteCshSx\",\"part\":{\"id\":\"prt_d66aef364001r0LCGAE7sZQgxF\",\"sessionID\":\"ses_299511d93ffeDsgE6KKteCshSx\",\"messageID\":\"msg_d66aee6c50016ZNkei3uShxjK8\",\"type\":\"step-finish\",\"reason\":\"stop\",\"cost\":0.00095845,\"tokens\":{\"total\":13415,\"input\":13318,\"output\":97,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}\n",
+  "conversation": [
+    {
+      "role": "response",
+      "content": "I'll create a Python file called hello.py that prints 'Hello, World!' to stdout.\n\n<function=write>\n<parameter=content>\nprint(\"Hello, World!\")\n</parameter>\n<parameter=filePath>\n/private/var/folders/k0/jp_x85zj55nf3ssm76z3dmmh0000gn/T/llm-bench-pu3iojke/hello.py\n</parameter>\n</function>\n</tool_call>",
+      "tool_name": ""
+    }
+  ],
+  "files": [],
+  "tier": 1,
+  "difficulty": 1,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

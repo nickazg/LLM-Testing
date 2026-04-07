@@ -1,0 +1,39 @@
+{
+  "task_id": "tier4-expression-parser-compiled-glm-4.7-flash",
+  "model": "gemma-4-31b",
+  "cli": "claude-code",
+  "skill": "recursive-descent-parser:compiled-glm-4.7-flash",
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.3244112500688,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T09:52:54.965999+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "expr_parser.py",
+      "content": "import re\nfrom typing import Union, Optional\n\nclass ASTNode:\n    def __init__(\n        self,\n        node_type: str,\n        value: Optional[float] = None,\n        op: Optional[str] = None,\n        left: Optional['ASTNode'] = None,\n        right: Optional['ASTNode'] = None,\n        operand: Optional['ASTNode'] = None\n    ):\n        self.type = node_type # 'number', 'binop', 'unary'\n        self.value = value\n        self.op = op\n        self.left = left\n        self.right = right\n        self.operand = operand\n\ndef tokenize(expression: str):\n    tokens = []\n    # Pattern matches numbers (including floats), operators, and parentheses\n    pattern = re.compile(r'\\d*\\.\\d+|\\d+|[+\\-*/()]')\n    for match in pattern.finditer(expression):\n        token = match.group()\n        if token.isdigit() or '.' in token:\n            tokens.append(('NUMBER', float(token)))\n        else:\n            tokens.append(('OP', token))\n\n    # Basic validation: check if we missed any non-whitespace characters\n    stripped = \"\".join(expression.split())\n    tokens_joined = \"\".join([str(t[1]) if t[0] == 'NUMBER' else t[1] for t in tokens])\n    # This is a crude check; the recursive descent parser will do better validation\n    return tokens\n\nclass Parser:\n    def __init__(self, tokens):\n        self.tokens = tokens\n        self.pos = 0\n\n    def peek(self):\n        return self.tokens[self.pos] if self.pos << len len(self.tokens) else None\n\n    def consume(self):\n        token = self.peek()\n        self.pos += 1\n        return token\n\n    def parse_expression(self):\n        # handles + and -\n        node = self.parse_term()\n        while self.peek() and self.peek()[1] in ('+', '-'):\n            op = self.consume()[1]\n            right = self.parse_term()\n            node = ASTNode('binop', op=op, left=node, right=right)\n        return node\n\n    def parse_term(self):\n        # handles * and /\n        node = self.parse_unary()\n        while self.peek() and self.peek()[1] in ('*', '/'):\n            op = self.consume()[1]\n            right = self.parse_unary()\n            node = ASTNode('binop', op=op, left=node, right=right)\n        return node\n\n    def parse_unary(self):\n        # handles unary minus\n        if self.peek() and self.peek()[1] == '-':\n            self.consume()\n            operand = self.parse_unary()\n            return ASTNode('unary', op='-', operand=operand)\n        return self.parse_primary()\n\n    def parse_primary(self):\n        token = self.consume()\n        if not token:\n            raise ValueError(\"Unexpected end of input\")\n\n        if token[0] == 'NUMBER':\n            return ASTNode('number', value=token[1])\n\n        if token[1] == '(':\n            node = self.parse_expression()\n            next_token = self.consume()\n            if not next_token or next_token[1] != ')':\n                raise ValueError(\"Unmatched parentheses\")\n            return node\n\n        raise ValueError(f\"Invalid token: {token[1]}\")\n\ndef parse(expression: str) -> ASTNode:\n    if not expression or not expression.strip():\n        raise ValueError(\"Empty input\")\n\n    tokens = tokenize(expression)\n    parser = Parser(tokens)\n    result = parser.parse_expression()\n\n    if parser.pos << len len(tokens):\n        raise ValueError(\"Unexpected tokens at end of expression\")\n\n    return result\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == 'number':\n        return node.value\n\n    if node.type == 'unary':\n        return -evaluate(node.operand)\n\n    if node.type == 'binop':\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n        if node.op == '+': return left_val + right_val\n        if node.op == '-': return left_val - right_val\n        if node.op == '*': return left_val * right_val\n        if node.op == '/':\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n\n    raise ValueError(\"Invalid AST node\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 4,
+  "difficulty": 3,
+  "skill_type": "workflow",
+  "skill_intensity": "heavy",
+  "skill_pair": "expression-parser"
+}

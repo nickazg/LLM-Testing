@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-usd-procedural-animation",
+  "model": "gpt-oss-20b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00711458397564,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T12:06:23.162314+00:00",
+  "prompt": "Create a Python script called animate_skeleton.py that uses the pxr library to build a skeletal animation setup. The script must create a file called skeleton_anim.usda containing:\n\n1. /Root \u2014 a UsdSkel.Root (default prim)\n2. /Root/Skeleton \u2014 a UsdSkel.Skeleton with joints: [\"Hips\", \"Hips/Spine\", \"Hips/Spine/Head\", \"Hips/LeftLeg\", \"Hips/RightLeg\"]\n3. /Root/Skeleton should have restTransforms and bindTransforms for each joint (use identity or simple offsets \u2014 Hips at origin, Spine at (0,1,0), Head at (0,2,0), LeftLeg at (-0.5,-1,0), RightLeg at (0.5,-1,0))\n4. /Root/Anim \u2014 a UsdSkel.Animation with:\n   - joints matching the skeleton\n   - Time-sampled translations for frames 1-24 (animate Hips translating up and down in Y by 0.5 units over the cycle)\n5. /Root/Mesh \u2014 a UsdGeom.Mesh (simple cube/box) bound to the skeleton using UsdSkel.BindingAPI\n   - Set skel:jointIndices and skel:jointWeights (all vertices bound to Hips joint is fine)\n\nUse: from pxr import Usd, UsdGeom, UsdSkel, Sdf, Gf, Vt",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

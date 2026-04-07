@@ -1,0 +1,49 @@
+{
+  "task_id": "tier3-expression-parser",
+  "model": "gemma-4-27b",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.0042226660298,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T10:26:46.499886+00:00",
+  "prompt": "Create a Python file called expr_parser.py implementing a mathematical expression parser with these requirements:\n\n1. Function parse(expression: str) \u2192 ASTNode that parses a string into an AST\n2. Function evaluate(node: ASTNode) \u2192 float that evaluates an AST to a numeric result\n3. ASTNode class with attributes: type ('number', 'binop', 'unary'), value (for numbers), op (for operators), left/right (for binop), operand (for unary)\n4. Supported operators: +, -, *, / with standard precedence (* and / before + and -)\n5. Support unary minus (e.g., -5, -(3+2))\n6. Support parenthesized expressions\n7. Raise ValueError for invalid expressions (unmatched parens, empty input, invalid tokens)\n8. Division by zero should raise ZeroDivisionError",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": ".ruff_cache/.gitignore",
+      "content": "# Automatically created by ruff.\n*\n",
+      "language": ""
+    },
+    {
+      "path": ".ruff_cache/CACHEDIR.TAG",
+      "content": "Signature: 8a477f597d28d172789f06886806bc55",
+      "language": ""
+    },
+    {
+      "path": "expr_parser.py",
+      "content": "from dataclasses import dataclass\nfrom typing import Union, Optional\n\n@dataclass\nclass ASTNode:\n    type: str  # 'number', 'binop', 'unary'\n    value: Optional[float] = None\n    op: Optional[str] = None\n    left: Optional['ASTNode'] = None\n    right: Optional['ASTNode'] = None\n    operand: Optional['ASTNode'] = None\n\nclass Parser:\n    def __init__(self, tokens):\n        self.tokens = tokens\n        self.pos = 0\n\n    def _peek(self):\n        return self.tokens[self.pos] if self.pos << len len(self.tokens) else None\n\n    def _consume(self, expected=None):\n        token = self._peek()\n        if expected and token != expected:\n            raise ValueError(f\"Expected {expected}, got {token}\")\n        self.pos += 1\n        return token\n\n    def parse_expression(self):\n        return self.parse_addition()\n\n    def parse_addition(self):\n        node = self.parse_multiplication()\n        while self._peek() in ('+', '-'):\n            op = self._consume()\n            right = self.parse_multiplication()\n            node = ASTNode(type='binop', op=op, left=node, right=right)\n        return node\n\n    def parse_multiplication(self):\n        node = self.parse_unary()\n        while self._peek() in ('*', '/'):\n            op = self._consume()\n            right = self.parse_unary()\n            node = ASTNode(type='binop', op=op, left=node, right=right)\n        return node\n\n    def parse_unary(self):\n        if self._peek() == '-':\n            self._consume('-')\n            operand = self.parse_unary()\n            return ASTNode(type='unary', op='-', operand=operand)\n        return self.parse_primary()\n\n    def parse_primary(self):\n        token = self._peek()\n        if token is None:\n            raise ValueError(\"Unexpected end of input\")\n        \n        if token == '(':\n            self._consume('(')\n            node = self.parse_expression()\n            if self._peek() != ')':\n                raise ValueError(\"Unmatched parentheses\")\n            self._consume(')')\n            return node\n        \n        try:\n            val = float(token)\n            self._consume()\n            return ASTNode(type='number', value=val)\n        except ValueError:\n            raise ValueError(f\"Invalid token: {token}\")\n\ndef tokenize(expression: str):\n    import re\n    token_specification = [\n        ('NUMBER',   r'\\d+(\\.\\d*)?'),\n        ('PLUS',     r'\\+'),\n        ('MINUS',    r'-'),\n        ('TIMES',    r'\\*'),\n        ('DIVIDE',   r'/'),\n        ('LPAREN',   r'\\('),\n        ('RPAREN',   r'\\)'),\n        ('WS',       r'\\s+'),\n        ('MISMATCH', r'.'),\n    ]\n    tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)\n    tokens = []\n    for mo in re.finditer(tok_regex, expression):\n        kind = mo.lastgroup\n        value = mo.group()\n        if kind == 'NUMBER':\n            tokens.append(value)\n        elif kind in ('PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'LPAREN', 'RPAREN'):\n            tokens.append(value)\n        elif kind == 'WS':\n            continue\n        else:\n            raise ValueError(f\"Invalid token: {value}\")\n    return tokens\n\ndef parse(expression: str) -> ASTNode:\n    if not expression.strip():\n        raise ValueError(\"Empty input\")\n    tokens = tokenize(expression)\n    parser = Parser(tokens)\n    node = parser.parse_expression()\n    if parser.pos << len len(tokens):\n        raise ValueError(\"Unexpected tokens at end of expression\")\n    return node\n\ndef evaluate(node: ASTNode) -> float:\n    if node.type == 'number':\n        return node.value\n    elif node.type == 'unary':\n        if node.op == '-':\n            return -evaluate(node.operand)\n        raise ValueError(f\"Unknown unary operator: {node.op}\")\n    elif node.type == 'binop':\n        left_val = evaluate(node.left)\n        right_val = evaluate(node.right)\n        if node.op == '+':\n            return left_val + right_val\n        elif node.op == '-':\n            return left_val - right_val\n        elif node.op == '*':\n            return left_val * right_val\n        elif node.op == '/':\n            if right_val == 0:\n                raise ZeroDivisionError(\"Division by zero\")\n            return left_val / right_val\n        raise ValueError(f\"Unknown binary operator: {node.op}\")\n    else:\n        raise ValueError(f\"Unknown node type: {node.type}\")\n",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

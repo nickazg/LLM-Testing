@@ -1,0 +1,44 @@
+{
+  "task_id": "tier3-usd-shader-graph",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": null,
+  "scores": {
+    "correctness": 0.125,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.2742548750248,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T13:35:23.138354+00:00",
+  "prompt": "Create a Python script called shader_graph.py that uses the pxr library to build a multi-material shader network. The script must create a file called materials.usda containing:\n\n1. Default prim /Materials\n2. /Materials/WoodMat \u2014 a UsdShade.Material containing:\n   - /Materials/WoodMat/Surface \u2014 a UsdPreviewSurface shader with diffuseColor input connected to a texture\n   - /Materials/WoodMat/WoodTex \u2014 a UsdUVTexture shader with file input set to \"wood_diffuse.png\" and outputs:rgb connected to Surface's diffuseColor\n   - /Materials/WoodMat/UVReader \u2014 a UsdPrimvarReader_float2 with varname \"st\", outputs:result connected to WoodTex's st input\n   - Surface roughness=0.7, metallic=0.0\n\n3. /Materials/MetalMat \u2014 a UsdShade.Material containing:\n   - /Materials/MetalMat/Surface \u2014 a UsdPreviewSurface shader with diffuseColor (0.8, 0.8, 0.85), roughness=0.2, metallic=1.0\n\n4. /Geometry/Table \u2014 a UsdGeom.Mesh (simple quad/cube)\n   - Create a UsdGeom.Subset \"top_face\" on the mesh and bind WoodMat to it\n   - Bind MetalMat to the overall mesh (the subset binding overrides for those faces)\n\nUse: from pxr import Usd, UsdGeom, UsdShade, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "materials.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "shader_graph.py",
+      "content": "#!/usr/bin/env python\n\nfrom pxr import Usd, UsdGeom, UsdShade, Sdf, Gf\nimport os\n\ndef create_shader_network():\n    # Create a new USD stage\n    stage = Usd.Stage.CreateNew(\"materials.usda\")\n\n    # Create default Materials prim\n    materials_prim = UsdShade.Material.Define(stage, \"/Materials\")\n\n    # === Create Wood Material ===\n    wood_mat = UsdShade.Material.Define(stage, \"/Materials/WoodMat\")\n\n    # Create WoodTex shader\n    wood_tex = UsdShade.Shader.Define(stage, \"/Materials/WoodMat/WoodTex\")\n    wood_tex.CreateIdAttr(\"UsdUVTexture\")\n    file_input = wood_tex.CreateInput(\"file\", Sdf.ValueTypeNames.Asset)\n    file_input.Set(Sdf.AssetPath(\"wood_diffuse.png\"))\n    st_input = wood_tex.CreateInput(\"st\", Sdf.ValueTypeNames.Float2)\n    st_input.Set(Gf.Vec2f(0, 0))\n\n    # Create UVReader shader\n    uv_reader = UsdShade.Shader.Define(stage, \"/Materials/WoodMat/UVReader\")\n    uv_reader.CreateIdAttr(\"UsdPrimvarReader_float2\")\n    varname_input = uv_reader.CreateInput(\"varname\", Sdf.ValueTypeNames.Token)\n    varname_input.Set(\"st\")\n\n    # Connect UVReader to WoodTex\n    wood_tex.GetInput(\"st\").ConnectToSource(uv_reader.GetOutput(\"result\"))\n\n    # Create Surface shader for Wood\n    wood_surface = UsdShade.Shader.Define(stage, \"/Materials/WoodMat/Surface\")\n    wood_surface.CreateIdAttr(\"UsdPreviewSurface\")\n    diffuse_input = wood_surface.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Color3f)\n    roughness_input = wood_surface.CreateInput(\"roughness\", Sdf.ValueTypeNames.Float)\n    roughness_input.Set(0.7)\n    metallic_input = wood_surface.CreateInput(\"metallic\", Sdf.ValueTypeNames.Float)\n    metallic_input.Set(0.0)\n\n    # Connect WoodTex to Surface\n    wood_surface.GetInput(\"diffuseColor\").ConnectToSource(\n        wood_tex.GetOutput(\"rgb\")\n    )\n\n    # Connect Surface to Material\n    wood_mat.ConnectToSource(wood_surface.GetOutputSurface())\n\n    # === Create Metal Material ===\n    metal_mat = UsdShade.Material.Define(stage, \"/Materials/MetalMat\")\n\n    # Create Surface shader for Metal\n    metal_surface = UsdShade.Shader.Define(stage, \"/Materials/MetalMat/Surface\")\n    metal_surface.CreateIdAttr(\"UsdPreviewSurface\")\n    diffuse_input = metal_surface.CreateInput(\"diffuseColor\", Sdf.ValueTypeNames.Color3f)\n    diffuse_input.Set(Gf.Vec3f(0.8, 0.8, 0.85))\n    roughness_input = metal_surface.CreateInput(\"roughness\", Sdf.ValueTypeNames.Float)\n    roughness_input.Set(0.2)\n    metallic_input = metal_surface.CreateInput(\"metallic\", Sdf.ValueTypeNames.Float)\n    metallic_input.Set(1.0)\n\n    # Connect Surface to Material\n    metal_mat.ConnectToSource(metal_surface.GetOutputSurface())\n\n    # === Create Geometry ===\n    # Create a simple cube mesh\n    cube = UsdGeom.Cube.Define(stage, \"/Geometry/Table\")\n\n    # Create a subset for the top face\n    subset = UsdGeom.Subset.Define(stage, \"/Geometry/Table/top_face\")\n    subset.CreateFamilyNameAttr(\"top_face\")\n\n    # Bind MetalMat to the overall mesh\n    cube.GetPrim().GetReferences().AddReference(\"\", \"/Materials\")\n    cube.GetPrim().SetMetadata(\"material:binding\", \"MetalMat\")\n\n    # Bind WoodMat to the subset\n    subset.GetPrim().GetReferences().AddReference(\"\", \"/Materials\")\n    subset.GetPrim().SetMetadata(\"material:binding\", \"WoodMat\")\n\n    # Save the stage\n    stage.GetRootLayer().Save()\n\n    print(\"Successfully created materials.usda with multi-material shader network\")\n\nif __name__ == \"__main__\":\n    create_shader_network()",
+      "language": "python"
+    }
+  ],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}

@@ -1,0 +1,45 @@
+{
+  "task_id": "tier4-usd-shot-assembly-compiled-gemma-4-31b",
+  "model": "glm-4.5-air-free",
+  "cli": "claude-code",
+  "skill": "usd-composition:compiled-gemma-4-31b",
+  "scores": {
+    "correctness": 0.2,
+    "completion": 1.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 300.36102062498685,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-06T13:43:13.202565+00:00",
+  "prompt": "Create a Python script called assemble_shot.py that uses the pxr library (Pixar USD) to build a multi-file shot assembly. The script must create TWO files:\n\n1. assets.usda \u2014 contains:\n   - Default prim /Assets\n   - /Assets/Chair \u2014 an Xform with a child Mesh (/Assets/Chair/Geo) representing a simple chair (8-point cube is fine)\n   - /Assets/Chair has a variant set 'modelVariant' with variants 'simple' and 'detailed' (both can contain the same geo, this tests the variant mechanism)\n\n2. shot.usda \u2014 contains:\n   - Default prim /Shot\n   - Sublayers assets.usda\n   - /Shot/Set \u2014 an Xform\n   - /Shot/Set/ChairA \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (-2, 0, 0)\n   - /Shot/Set/ChairB \u2014 a reference to /Assets/Chair from assets.usda, with xformOp:translate at (2, 0, 0)\n   - /Shot/Lighting \u2014 an Xform with a variant set 'lightingVariant' containing 'day' and 'night' variants\n   - In 'day' variant: a DistantLight at /Shot/Lighting/Sun with intensity=50000\n   - In 'night' variant: a DomeLight at /Shot/Lighting/Sky with intensity=500\n\nUse: from pxr import Usd, UsdGeom, UsdLux, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [
+    {
+      "path": "assemble_shot.py",
+      "content": "#!/usr/bin/env python\n\nfrom pxr import Usd, UsdGeom, UsdLux, Sdf, Gf\nimport os\n\ndef create_assets_file():\n    \"\"\"Create assets.usda with a chair model with variants\"\"\"\n    # Create assets.usda\n    stage = Usd.Stage.CreateNew(\"assets.usda\")\n\n    # Set default prim to /Assets\n    default_prim = stage.DefinePrim(\"/Assets\")\n    default_prim.SetInstanceable(True)\n\n    # Create chair Xform\n    chair_prim = stage.DefinePrim(\"/Assets/Chair\")\n    chair_prim.GetVariantSet('modelVariant').AddVariant('simple')\n    chair_prim.GetVariantSet('modelVariant').AddVariant('detailed')\n\n    # Set default variant\n    chair_prim.GetVariantSet('modelVariant').SetVariantSelection('simple')\n\n    # Create chair geometry (8-point cube)\n    chair_geo = UsdGeom.Sphere.Define(stage, \"/Assets/Chair/Geo\")\n    chair_geo.CreateRadiusAttr().Set(0.5)\n\n    # Set xform ops for chair position\n    xform = UsdGeom.Xformable(chair_prim)\n    xform.AddTranslateOp()\n\n    # Save the stage\n    stage.GetRootLayer().Save()\n\ndef create_shot_file():\n    \"\"\"Create shot.usda with references to assets and lighting variants\"\"\"\n    # Create shot.usda\n    stage = Usd.Stage.CreateNew(\"shot.usda\")\n\n    # Set default prim to /Shot\n    default_prim = stage.DefinePrim(\"/Shot\")\n    default_prim.SetInstanceable(True)\n\n    # Add assets.usda as sublayer\n    stage.GetRootLayer().subLayerPaths.append(\"assets.usda\")\n\n    # Create Set Xform\n    set_prim = stage.DefinePrim(\"/Shot/Set\")\n    xform = UsdGeom.Xformable(set_prim)\n    xform.AddTranslateOp(opSuffix=\"translate\")\n\n    # Create ChairA reference\n    chair_a_ref = stage.DefinePrim(\"/Shot/Set/ChairA\")\n    chair_a_ref.GetReferences().AddInternalReference(\"/Assets/Chair\")\n    chair_a_xform = UsdGeom.Xformable(chair_a_ref)\n    chair_a_xform.AddTranslateOp(opSuffix=\"translate\").Set(Gf.Vec3f(-2, 0, 0))\n\n    # Create ChairB reference\n    chair_b_ref = stage.DefinePrim(\"/Shot/Set/ChairB\")\n    chair_b_ref.GetReferences().AddInternalReference(\"/Assets/Chair\")\n    chair_b_xform = UsdGeom.Xformable(chair_b_ref)\n    chair_b_xform.AddTranslateOp(opSuffix=\"translate\").Set(Gf.Vec3f(2, 0, 0))\n\n    # Create Lighting Xform with variants\n    lighting_prim = stage.DefinePrim(\"/Shot/Lighting\")\n    lighting_prim.GetVariantSet('lightingVariant').AddVariant('day')\n    lighting_prim.GetVariantSet('lightingVariant').AddVariant('night')\n\n    # Set default variant\n    lighting_prim.GetVariantSet('lightingVariant').SetVariantSelection('day')\n\n    # Create DistantLight for day\n    sun_light = UsdLux.DistantLight.Define(stage, \"/Shot/Lighting/Sun\")\n    sun_light.CreateIntensityAttr().Set(50000)\n    sun_light.CreateDirectionAttr().Set(Gf.Vec3f(0.707, 0.707, -0.707))\n\n    # Create DomeLight for night\n    sky_light = UsdLux.DomeLight.Define(stage, \"/Shot/Lighting/Sky\")\n    sky_light.CreateIntensityAttr().Set(500)\n    sky_light.CreateTextureFileAttr().Set(\"\")\n\n    # Set xform ops for lighting\n    lighting_xform = UsdGeom.Xformable(lighting_prim)\n    lighting_xform.AddTranslateOp(opSuffix=\"translate\").Set(Gf.Vec3f(0, 5, 5))\n\n    # Save the stage\n    stage.GetRootLayer().Save()\n\nif __name__ == \"__main__\":\n    print(\"Creating assets.usda...\")\n    create_assets_file()\n    print(\"Creating shot.usda...\")\n    create_shot_file()\n    print(\"Done! Both files have been created.\")",
+      "language": "python"
+    },
+    {
+      "path": "assets.usda",
+      "content": "#usda 1.0\n\ndef \"Assets\" (\n    instanceable = true\n)\n{\n    def \"Chair\" (\n        variants = {\n            string modelVariant = \"simple\"\n        }\n        prepend variantSets = \"modelVariant\"\n    )\n    {\n        double3 xformOp:translate\n        uniform token[] xformOpOrder = [\"xformOp:translate\"]\n\n        def Sphere \"Geo\"\n        {\n            double radius = 0.5\n        }\n        variantSet \"modelVariant\" = {\n            \"detailed\" {\n\n            }\n            \"simple\" {\n\n            }\n        }\n    }\n}\n\n",
+      "language": "usd"
+    },
+    {
+      "path": "shot.usda",
+      "content": "#usda 1.0\n\n",
+      "language": "usd"
+    }
+  ],
+  "tier": 4
+}

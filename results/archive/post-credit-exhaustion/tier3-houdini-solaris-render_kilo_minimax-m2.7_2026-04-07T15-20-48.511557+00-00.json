@@ -1,0 +1,33 @@
+{
+  "task_id": "tier3-houdini-solaris-render",
+  "model": "minimax-m2.7",
+  "cli": "kilo",
+  "skill": null,
+  "scores": {
+    "correctness": 0.0,
+    "completion": 0.0,
+    "efficiency": {
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "thinking": 0,
+        "cache_read": 0
+      },
+      "tool_calls": 0,
+      "wall_time_s": 310.00780508306343,
+      "cost_usd": 0.0
+    },
+    "quality": null,
+    "instruction_following": null
+  },
+  "timestamp": "2026-04-07T15:20:48.511557+00:00",
+  "prompt": "Create a Python script called solaris_render_setup.py for Houdini Solaris (LOPs context). Using the editableStage from a Python Script LOP, the script should:\n\n1. Get the stage: stage = hou.pwd().editableStage()\n2. Create /Render as default prim (UsdGeom.Xform)\n3. Create /Render/Camera \u2014 a UsdGeom.Camera with focalLength=35, horizontalAperture=36\n4. Set camera transform: translate (0, 5, 15), rotateXYZ (-20, 0, 0)\n5. Create /Render/RenderSettings \u2014 a UsdRender.Settings prim:\n   - Set resolution to (1920, 1080)\n   - Set pixelAspectRatio to 1.0\n   - Set camera relation to /Render/Camera\n6. Create /Render/RenderProduct \u2014 a UsdRender.Product:\n   - Set productName to \"beauty_output.exr\"\n7. Create AOV render vars under /Render/RenderProduct/:\n   - beauty \u2014 UsdRender.Var, dataType=\"color3f\", sourceName=\"Ci\"\n   - depth \u2014 UsdRender.Var, dataType=\"float\", sourceName=\"z\"\n   - cryptomatte \u2014 UsdRender.Var, dataType=\"color3f\", sourceName=\"id\"\n8. Create /Render/KarmaSettings as a custom prim to store renderer-specific settings:\n   - Add custom attribute \"karma:global:sampleCount\" (int) = 256\n   - Add custom attribute \"karma:global:maxRayDepth\" (int) = 10\n\nUse: from pxr import Usd, UsdGeom, UsdRender, Sdf, Gf",
+  "raw_output": "",
+  "conversation": [],
+  "files": [],
+  "tier": 3,
+  "difficulty": 3,
+  "skill_type": null,
+  "skill_intensity": null,
+  "skill_pair": null
+}
