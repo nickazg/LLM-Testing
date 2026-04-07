@@ -6,7 +6,7 @@ Automated benchmarking framework that measures LLM coding performance across CLI
 
 **1,444 runs | 13 models | 2 CLIs | 68 tasks | 75 DSPy compilations**
 
-[**Interactive Dashboard & Report (HTML)**](https://html-preview.github.io/?url=https://github.com/nickazg/LLM-Testing/blob/master/docs/phase3-report.html) | [Academic Paper (Markdown)](docs/case-studies/phase3-skill-taxonomy/report.md) | [Summary Report](docs/phase3-benchmark-report.md)
+[**Interactive Dashboard & Report (Live)**](https://nickazg.github.io/LLM-Testing/phase3-report.html) | [Academic Paper (Markdown)](docs/case-studies/phase3-skill-taxonomy/report.md) | [Summary Report](docs/phase3-benchmark-report.md)
 
 ### Headline Findings
 
